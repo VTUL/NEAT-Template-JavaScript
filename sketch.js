@@ -21,7 +21,7 @@ var upToGen = 0;
 var genPlayerTemp; //player
 
 var showNothing = false;
-
+let treats = [];
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -29,10 +29,29 @@ function setup() {
   window.canvas = createCanvas(1280, 720);
   //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
   population = new Population(500);
-  humanPlayer = new Player();
+
+   for (let i = 0; i < 5; i++) {
+    treats.push(new Treat());
+  }
+
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 function draw() {
+  background(255);
+//add treats/collectibles to the screen
+  for (let i = treats.length - 1; i >= 0; i--) {
+    treats[i].show();
+  }
+
+//placeholder text so player knows how to start playing
+if (!humanPlaying && !runBest && !showBestEachGen) {
+  fill(0);
+  textAlign(RIGHT, BOTTOM); 
+  textSize(24);
+  text("Press P to play as human", width - 10, height - 10);
+}
+
+  
   drawToScreen();
   if (showBestEachGen) { //show the best of each gen
     showBestPlayersForEachGeneration();
@@ -73,7 +92,16 @@ function showHumanPlaying() {
     humanPlayer.look();
     humanPlayer.update();
     humanPlayer.show();
-  } else { //once done return to ai
+    //check for collisions with treats
+    for (let i = treats.length - 1; i >= 0; i--) {
+ 
+      if (treats[i].checkCollision(humanPlayer)) {
+        treats.splice(i, 1); //remove the treat from the array/screen
+        humanPlayer.score += 1;
+      }
+    }
+  }
+  else { //once done return to ai
     humanPlaying = false;
   }
 }
@@ -94,7 +122,6 @@ function showBestEverPlayer() {
 function drawToScreen() {
   if (!showNothing) {
     //pretty stuff
-    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
     drawBrain();
     writeInfo();
   }
@@ -123,6 +150,7 @@ function writeInfo() {
   fill(200);
   textAlign(LEFT);
   textSize(30);
+  stroke(0);
   if (showBestEachGen) {
     text("Score: " + genPlayerTemp.score, 650, 50); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
     text("Gen: " + (genPlayerTemp.gen + 1), 1150, 50);
@@ -181,16 +209,16 @@ function keyPressed() {
   }
   //any of the arrow keys
   switch (keyCode) {
-    case UP_ARROW: //the only time up/ down / left is used is to control the player
-      //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-      break;
-    case DOWN_ARROW:
-      //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-      break;
-    case LEFT_ARROW:
-      //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-      break;
-    case RIGHT_ARROW: //right is used to move through the generations
+  case UP_ARROW:
+    if (humanPlaying) humanPlayer.move("w");
+    break;
+  case DOWN_ARROW:
+    if (humanPlaying) humanPlayer.move("s");
+    break;
+  case LEFT_ARROW:
+    if (humanPlaying) humanPlayer.move("a");
+    break;
+  case RIGHT_ARROW: //right is used to move through the generations
 
       if (showBestEachGen) { //if showing the best player each generation then move on to the next generation
         upToGen++;

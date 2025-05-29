@@ -1,7 +1,6 @@
 class Player {
 
   constructor() {
-
     this.fitness = 0;
     this.vision = []; //the input array fed into the neuralNet
     this.decision = []; //the out put of the NN
@@ -15,20 +14,59 @@ class Player {
     this.genomeInputs = 5;
     this.genomeOutputs = 2;
     this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
+
+    this.speed = 10;
+    this.x = 100;
+    this.y = 100;
+    this.w = 25;  
+    this.h = 25;
   }
+
+
+ 
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   show() {
-      //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+    fill(255, 0, 0);
+    rect(this.x, this.y, this.w, this.h);
     }
-    //---------------------------------------------------------------------------------------------------------------------------------------------------------
-  move() {
-      //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+  //---------------------------------------------------------------------------------------------------------------------------------------------------------
+  move(direction) {
+    switch (direction) {
+      case "a":
+        this.x = max(0, this.x - this.speed);
+        break;
+      case "d":
+        this.x = min(width - 25, this.x + this.speed);
+        break;
+      case "w":
+        this.y = max(0, this.y - this.speed);
+        break;
+      case "s":
+        this.y = min(height - 25, this.y + this.speed);
+        break;
     }
+  }
     //---------------------------------------------------------------------------------------------------------------------------------------------------------
   update() {
-      //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+  if (humanPlaying) {
+    if (keyIsDown(87)) { // W
+      this.y -= this.speed;
     }
+    if (keyIsDown(83)) { // S
+      this.y += this.speed;
+    }
+    if (keyIsDown(65)) { // A
+      this.x -= this.speed;
+    }
+    if (keyIsDown(68)) { // D
+      this.x += this.speed;
+    }
+  }
+
+  // Insert AI-related update logic here if needed
+}
+
     //----------------------------------------------------------------------------------------------------------------------------------------------------------
 
   look() {
