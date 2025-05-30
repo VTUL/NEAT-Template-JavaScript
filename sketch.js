@@ -20,20 +20,41 @@ var showBestEachGen = false;
 var upToGen = 0;
 var genPlayerTemp; //player
 
-var showNothing = false;
+var showNothing = false; 
 let treats = [];
+let enemies = []; 
+let ball;
+let ballRespawnTime = 0;
+let treatRespawnTime = 0;
+let PBRespawnTime = 0;
+let pb;
+var bg;
+//--------------------------------------------------------------------------------------------------------------------------------------------------
+function preload(){
+ // bg = loadImage("images/VT_NewmanLibrary4th.png", img => img.resize(width, height));
+}
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
-
 function setup() {
   window.canvas = createCanvas(1280, 720);
-  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+  
+  //if (bg) {
+   // image(bg, 0, 0, width, height); // Draw the background image stretched to canvas size
+  //}
   population = new Population(500);
 
-   for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 10; i++) {
     treats.push(new Treat());
   }
 
+  ball = new TennisBall();
+  ballRespawnTime = millis() + 10000;
+  PBRespawnTime = millis() + 60000;
+
+  for (let i = 0; i < 5; i++) {
+    enemies.push(new Enemy());
+  }
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 function draw() {
@@ -43,13 +64,43 @@ function draw() {
     treats[i].show();
   }
 
+  if (ball) {
+    ball.show();
+  }
+
+  if (!pb && millis() > PBRespawnTime) {
+    pb = new PeanutButter();
+    PBRespawnTime = millis() + 60000;
+  }
+
+  if (pb) {
+    pb.show();
+  }
+
+   //respawn ball if it was collected and 10 seconds passed
+  if (!ball && millis() > ballRespawnTime) {
+    ball = new TennisBall();
+    ballRespawnTime = millis() + 10000;
+  }
+
+  //respawn treats if it was collected and 3 seconds passed
+ if (treats.length <= 5 && millis() > treatRespawnTime) {
+    treats.push(new Treat());
+    treatRespawnTime = millis() + 3000; 
+  }
+
+  for (let i = 0; i < enemies.length; i++) {
+  enemies[i].move();
+  enemies[i].show();
+  }
+  
 //placeholder text so player knows how to start playing
-if (!humanPlaying && !runBest && !showBestEachGen) {
-  fill(0);
-  textAlign(RIGHT, BOTTOM); 
-  textSize(24);
-  text("Press P to play as human", width - 10, height - 10);
-}
+  if (!humanPlaying && !runBest && !showBestEachGen) {
+    fill(0);
+    textAlign(RIGHT, BOTTOM); 
+    textSize(24);
+    text("Press P to play as human", width - 10, height - 10);
+  }
 
   
   drawToScreen();
@@ -92,14 +143,8 @@ function showHumanPlaying() {
     humanPlayer.look();
     humanPlayer.update();
     humanPlayer.show();
-    //check for collisions with treats
-    for (let i = treats.length - 1; i >= 0; i--) {
- 
-      if (treats[i].checkCollision(humanPlayer)) {
-        treats.splice(i, 1); //remove the treat from the array/screen
-        humanPlayer.score += 1;
-      }
-    }
+    handleInteractions(humanPlayer); //handle interactions with treats, enemies, and the tennis ball
+
   }
   else { //once done return to ai
     humanPlaying = false;
@@ -232,5 +277,38 @@ function keyPressed() {
         //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
       }
       break;
+  }
+}
+
+function handleInteractions(player) {
+  if (player.dead) return;
+
+  //Treats
+  for (let i = treats.length - 1; i >= 0; i--) {
+    if (treats[i].checkCollision(player)) {
+      treats.splice(i, 1);
+      player.score += 1;
+    }
+  }
+
+  //Tennis Ball
+  if (ball && ball.checkCollision(player)) {
+    player.speedBoostedUntil = millis() + 3000;
+    ball = null;
+    ballRespawnTime = millis() + 10000;
+  }
+
+   //Peanut Butter
+  if (pb && pb.checkCollision(player)) {
+    pb = null;
+    player.score += 10;
+    PBRespawnTime = millis() + 60000;
+  }
+
+  //Enemies
+  for (let i = enemies.length - 1; i >= 0; i--) {
+    if (enemies[i].checkCollision(player)) {
+      player.dead = true;
+    }
   }
 }

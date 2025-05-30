@@ -15,7 +15,10 @@ class Player {
     this.genomeOutputs = 2;
     this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
 
-    this.speed = 10;
+    this.baseSpeed = 10;
+    this.boostedSpeed = 20;
+    this.speed = this.baseSpeed;
+    this.speedBoostedUntil = 0;
     this.x = 100;
     this.y = 100;
     this.w = 25;  
@@ -27,6 +30,22 @@ class Player {
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   show() {
+     //wrap horizontally
+    if (this.x + this.w < 0) {
+      this.x = width;
+    } else if (this.x > width) {
+      this.x = -this.w;
+    }
+
+    //wrap vertically
+    if (this.y + this.h < 0) {
+      this.y = height;
+    } else if (this.y > height) {
+      this.y = -this.h;
+    }
+
+    //sprite
+    
     fill(255, 0, 0);
     rect(this.x, this.y, this.w, this.h);
     }
@@ -49,19 +68,32 @@ class Player {
   }
     //---------------------------------------------------------------------------------------------------------------------------------------------------------
   update() {
-  if (humanPlaying) {
-    if (keyIsDown(87)) { // W
-      this.y -= this.speed;
+    if(this.dead)
+      {
+        return;
+      }
+      
+    if (millis() < this.speedBoostedUntil) {
+      this.speed = this.boostedSpeed;
+    } else {
+      this.speed = this.baseSpeed;
     }
-    if (keyIsDown(83)) { // S
-      this.y += this.speed;
-    }
-    if (keyIsDown(65)) { // A
-      this.x -= this.speed;
-    }
-    if (keyIsDown(68)) { // D
-      this.x += this.speed;
-    }
+
+    if (humanPlaying) {
+      if (keyIsDown(87)) { // W
+        this.y -= this.speed;
+      }
+      if (keyIsDown(83)) { // S
+        this.y += this.speed;
+      }
+      if (keyIsDown(65)) { // A
+        this.x -= this.speed;
+      }
+      if (keyIsDown(68)) { // D
+        this.x += this.speed;
+      }
+
+      
   }
 
   // Insert AI-related update logic here if needed
