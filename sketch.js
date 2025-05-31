@@ -32,15 +32,12 @@ let bandanaRespawnTime = 0;
 let enemyRespawnTime = 0;
 let pb;
 var bg;
-var blockImg;
 //haven't built map/bounds yet
-let block;
-let wall;
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function preload(){
   bg = loadImage("images/VT_NewmanLibrary4th.png");
-  blockImg = loadImage("images/square.png");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -104,7 +101,7 @@ function draw() {
   }
 
    //respawn enemies if killed and 10 seconds passed
- if (enemies.length <= 5 && millis() > enemyRespawnTime) {
+ if (millis() > enemyRespawnTime) {
     enemies.push(new Enemy());
     enemyRespawnTime = millis() + 10000; 
   }
@@ -344,11 +341,10 @@ function handleInteractions(player) {
   for (let i = enemies.length - 1; i >= 0; i--) {
     if (enemies[i].checkCollision(player) && !player.canEat) {
       player.dead = true;
-      gameRunning = false; 
     }
     else if (enemies[i].checkCollision(player) && player.canEat) {
-      enemies.splice(i, 1);
       enemies[i].dead = true;
+      enemies.splice(i, 1);
       enemyRespawnTime = millis() + 10000; 
   }
 
