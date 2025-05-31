@@ -24,24 +24,29 @@ var showNothing = false;
 let treats = [];
 let enemies = []; 
 let ball;
+let ban;
 let ballRespawnTime = 0;
 let treatRespawnTime = 0;
 let PBRespawnTime = 0;
+let bandanaRespawnTime = 0;
+let enemyRespawnTime = 0;
 let pb;
 var bg;
+var blockImg;
+//haven't built map/bounds yet
+let block;
+let wall;
+
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function preload(){
- // bg = loadImage("images/VT_NewmanLibrary4th.png", img => img.resize(width, height));
+  bg = loadImage("images/VT_NewmanLibrary4th.png");
+  blockImg = loadImage("images/square.png");
 }
-
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function setup() {
   window.canvas = createCanvas(1280, 720);
-  
-  //if (bg) {
-   // image(bg, 0, 0, width, height); // Draw the background image stretched to canvas size
-  //}
+    
   population = new Population(500);
 
   for (let i = 0; i < 10; i++) {
@@ -50,6 +55,8 @@ function setup() {
 
   ball = new TennisBall();
   ballRespawnTime = millis() + 10000;
+  ban = new Bandana();
+  bandanaRespawnTime = millis() + 20000;
   PBRespawnTime = millis() + 60000;
 
   for (let i = 0; i < 5; i++) {
@@ -60,12 +67,20 @@ function setup() {
 function draw() {
   background(255);
 //add treats/collectibles to the screen
+  if (bg) {
+    image(bg, 0, 0, width, height); 
+  }
+
   for (let i = treats.length - 1; i >= 0; i--) {
     treats[i].show();
   }
 
   if (ball) {
     ball.show();
+  }
+
+  if (ban) {
+    ban.show();
   }
 
   if (!pb && millis() > PBRespawnTime) {
@@ -82,6 +97,17 @@ function draw() {
     ball = new TennisBall();
     ballRespawnTime = millis() + 10000;
   }
+  //respawn bandana if it was collected and 60 seconds passed
+  if (!ban && millis() > bandanaRespawnTime) {
+    ban = new Bandana();
+    bandanaRespawnTime = millis() + 60000;
+  }
+
+   //respawn enemies if killed and 10 seconds passed
+ if (enemies.length <= 5 && millis() > enemyRespawnTime) {
+    enemies.push(new Enemy());
+    enemyRespawnTime = millis() + 10000; 
+  }
 
   //respawn treats if it was collected and 3 seconds passed
  if (treats.length <= 5 && millis() > treatRespawnTime) {
@@ -90,6 +116,7 @@ function draw() {
   }
 
   for (let i = 0; i < enemies.length; i++) {
+
   enemies[i].move();
   enemies[i].show();
   }
@@ -298,6 +325,14 @@ function handleInteractions(player) {
     ballRespawnTime = millis() + 10000;
   }
 
+  //Bandana
+  if (ban && ban.checkCollision(player)) {
+    player.canEat = true;
+    player.canEatUntil = millis() + 10000;
+    ban = null;
+    bandanaRespawnTime = millis() + 60000;
+  }
+
    //Peanut Butter
   if (pb && pb.checkCollision(player)) {
     pb = null;
@@ -307,8 +342,25 @@ function handleInteractions(player) {
 
   //Enemies
   for (let i = enemies.length - 1; i >= 0; i--) {
-    if (enemies[i].checkCollision(player)) {
+    if (enemies[i].checkCollision(player) && !player.canEat) {
       player.dead = true;
+      gameRunning = false; 
     }
+    else if (enemies[i].checkCollision(player) && player.canEat) {
+      enemies.splice(i, 1);
+      enemies[i].dead = true;
+      enemyRespawnTime = millis() + 10000; 
   }
+
+  if(player.canEat)
+  {
+    enemies[i].eat = true; //if player can eat then enemy will run away
+  }
+    else
+    {
+      enemies[i].eat = false; //if player can't eat then enemy will chase player
+    }
+
 }
+}
+

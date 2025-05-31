@@ -7,7 +7,10 @@ class Enemy {
     this.changeDirTime = 0;
     this.directionX = 0;
     this.directionY = 0;
+    this.eat = false;
+    this.dead = false;
   }
+
 
   findClosestPlayer() {
     // Only check humanPlayer if valid and alive
@@ -38,16 +41,35 @@ class Enemy {
     let { player, distance } = this.findClosestPlayer();
     let detectionRadius = 300;
 
-    if (player && distance !== null && distance < detectionRadius) {
+    if (!this.eat && player && distance !== null && distance < detectionRadius) {
       let angle = atan2(player.y - this.y, player.x - this.x);
       this.x += this.speed * cos(angle);
       this.y += this.speed * sin(angle);
-    } else {
+  } else if (this.eat && player && distance !== null && distance < detectionRadius) {
+      let angle = atan2(player.y - this.y, player.x - this.x);
+      this.x -= this.speed * cos(angle);
+      this.y -= this.speed * sin(angle);
+  } else {
       this.randomWalk();
-    }
+  }
+
   }
 
   show() {
+   //wrap horizontally
+    if (this.x + this.w < 0) {
+      this.x = width;
+    } else if (this.x > width) {
+      this.x = -this.w;
+    }
+
+    //wrap vertically
+    if (this.y + this.h < 0) {
+      this.y = height;
+    } else if (this.y > height) {
+      this.y = -this.h;
+    }
+
     fill(255, 0, 0);
     ellipse(this.x, this.y, this.size, this.size);
   }

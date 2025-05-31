@@ -19,6 +19,8 @@ class Player {
     this.boostedSpeed = 20;
     this.speed = this.baseSpeed;
     this.speedBoostedUntil = 0;
+    this.canEat = false;
+    this.canEatUntil = 0;
     this.x = 100;
     this.y = 100;
     this.w = 25;  
@@ -77,6 +79,12 @@ class Player {
       this.speed = this.boostedSpeed;
     } else {
       this.speed = this.baseSpeed;
+    }
+
+    if (millis() < this.canEatUntil) {
+      this.canEat = true;
+    } else {
+      this.canEat = false;
     }
 
     if (humanPlaying) {
