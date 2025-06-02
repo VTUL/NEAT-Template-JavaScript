@@ -1,3 +1,5 @@
+
+
 //this is a template to add a NEAT ai to any game
 //note //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
 //this means that there is some information specific to the game to input here
@@ -32,12 +34,16 @@ let bandanaRespawnTime = 0;
 let enemyRespawnTime = 0;
 let pb;
 var bg;
+var blockImg;
 //haven't built map/bounds yet
+let wall;
+let blocks = [];
 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function preload(){
   bg = loadImage("images/VT_NewmanLibrary4th.png");
+  blockImg = loadImage("images/square.png");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -45,6 +51,22 @@ function setup() {
   window.canvas = createCanvas(1280, 720);
     
   population = new Population(500);
+
+  wall = new Wall(MAP_DATA); //map
+
+  let blockSize = 15;
+  let wallWidth = wall.getColumns() * blockSize;
+  let wallHeight = wall.getRows() * blockSize;
+  let offsetX = (width - wallWidth) / 2;
+  let offsetY = (height - wallHeight) / 2;
+
+  for (let i = 0; i < wall.getRows(); i++) {
+    for (let j = 0; j < wall.getColumns(); j++) {
+      if (wall.getElement(i, j) === '*') {
+        blocks.push(new Block(j * blockSize + offsetX, i * blockSize + offsetY));
+      }
+    }
+  }
 
   for (let i = 0; i < 10; i++) {
     treats.push(new Treat());
@@ -64,9 +86,15 @@ function setup() {
 function draw() {
   background(255);
 //add treats/collectibles to the screen
+
+ 
   if (bg) {
     image(bg, 0, 0, width, height); 
   }
+
+  for(var i = 0; i < blocks.length; i++)
+      blocks[i].show();
+
 
   for (let i = treats.length - 1; i >= 0; i--) {
     treats[i].show();
@@ -103,7 +131,7 @@ function draw() {
    //respawn enemies if killed and 10 seconds passed
  if (millis() > enemyRespawnTime) {
     enemies.push(new Enemy());
-    enemyRespawnTime = millis() + 10000; 
+    enemyRespawnTime = millis() + 60000; 
   }
 
   //respawn treats if it was collected and 3 seconds passed
@@ -339,24 +367,25 @@ function handleInteractions(player) {
 
   //Enemies
   for (let i = enemies.length - 1; i >= 0; i--) {
-    if (enemies[i].checkCollision(player) && !player.canEat) {
-      player.dead = true;
-    }
-    else if (enemies[i].checkCollision(player) && player.canEat) {
-      enemies[i].dead = true;
-      enemies.splice(i, 1);
-      enemyRespawnTime = millis() + 10000; 
+  if (enemies[i].checkCollision(player) && !player.canEat) {
+    player.dead = true;
+  }
+  else if (enemies[i].checkCollision(player) && player.canEat) {
+    enemies[i].dead = true;
+    enemies.splice(i, 1);
+    enemyRespawnTime = millis() + 10000;
+    continue;  // skip to next iteration since this enemy is removed
   }
 
-  if(player.canEat)
-  {
-    enemies[i].eat = true; //if player can eat then enemy will run away
-  }
-    else
-    {
-      enemies[i].eat = false; //if player can't eat then enemy will chase player
+  // Only set .eat if enemy still exists (not removed)
+  if (enemies[i]) {
+    if (player.canEat) {
+      enemies[i].eat = true;  // enemy runs away
+    } else {
+      enemies[i].eat = false; // enemy chases player
     }
-
+  }
 }
+
 }
 

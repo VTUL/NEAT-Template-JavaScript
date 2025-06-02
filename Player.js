@@ -21,7 +21,7 @@ class Player {
     this.speedBoostedUntil = 0;
     this.canEat = false;
     this.canEatUntil = 0;
-    this.x = 100;
+    this.x = 400;
     this.y = 100;
     this.w = 25;  
     this.h = 25;
@@ -53,21 +53,31 @@ class Player {
     }
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   move(direction) {
-    switch (direction) {
-      case "a":
-        this.x = max(0, this.x - this.speed);
-        break;
-      case "d":
-        this.x = min(width - 25, this.x + this.speed);
-        break;
-      case "w":
-        this.y = max(0, this.y - this.speed);
-        break;
-      case "s":
-        this.y = min(height - 25, this.y + this.speed);
-        break;
-    }
+  let newX = this.x;
+  let newY = this.y;
+
+  switch (direction) {
+    case "a":
+      newX = max(0, this.x - this.speed);
+      break;
+    case "d":
+      newX = min(width - this.w, this.x + this.speed);
+      break;
+    case "w":
+      newY = max(0, this.y - this.speed);
+      break;
+    case "s":
+      newY = min(height - this.h, this.y + this.speed);
+      break;
   }
+
+  if (!this.collidesWithBlocks(newX, newY, this.w, this.h)) {
+    this.x = newX;
+    this.y = newY;
+  }
+}
+
+
     //---------------------------------------------------------------------------------------------------------------------------------------------------------
   update() {
     if(this.dead)
@@ -89,16 +99,16 @@ class Player {
 
     if (humanPlaying) {
       if (keyIsDown(87)) { // W
-        this.y -= this.speed;
+        this.move("w");
       }
       if (keyIsDown(83)) { // S
-        this.y += this.speed;
+        this.move("s");
       }
       if (keyIsDown(65)) { // A
-        this.x -= this.speed;
+        this.move("a");
       }
       if (keyIsDown(68)) { // D
-        this.x += this.speed;
+        this.move("d");
       }
 
       
@@ -176,4 +186,18 @@ class Player {
     child.brain.generateNetwork();
     return child;
   }
+
+  collidesWithBlocks(x, y, w, h) {
+  // create a temporary object with x,y,w,h to mimic player position
+  let tempPlayer = { x: x, y: y, w: w, h: h };
+
+  for (let block of blocks) {
+    if (block.intersects(tempPlayer)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+  
 }
