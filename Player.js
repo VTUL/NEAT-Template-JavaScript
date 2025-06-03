@@ -15,16 +15,17 @@ class Player {
     this.genomeOutputs = 2;
     this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
 
-    this.baseSpeed = 10;
-    this.boostedSpeed = 20;
+    this.baseSpeed = 5;
+    this.boostedSpeed = 10;
     this.speed = this.baseSpeed;
     this.speedBoostedUntil = 0;
     this.canEat = false;
     this.canEatUntil = 0;
     this.x = 400;
-    this.y = 100;
-    this.w = 25;  
-    this.h = 25;
+    this.y = 220;
+    // 400, 220
+    this.w = 18;  
+    this.h = 18;
   }
 
 
@@ -53,30 +54,36 @@ class Player {
     }
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   move(direction) {
-  let newX = this.x;
-  let newY = this.y;
+  let step = 1; // Move in small steps for accurate collision detection
+  let dx = 0;
+  let dy = 0;
 
   switch (direction) {
-    case "a":
-      newX = max(0, this.x - this.speed);
-      break;
-    case "d":
-      newX = min(width - this.w, this.x + this.speed);
-      break;
-    case "w":
-      newY = max(0, this.y - this.speed);
-      break;
-    case "s":
-      newY = min(height - this.h, this.y + this.speed);
-      break;
+    case "a": dx = -this.speed; break;
+    case "d": dx = this.speed; break;
+    case "w": dy = -this.speed; break;
+    case "s": dy = this.speed; break;
   }
 
-  if (!this.collidesWithBlocks(newX, newY, this.w, this.h)) {
-    this.x = newX;
-    this.y = newY;
+  // Incremental movement with collision checking
+  for (let i = 0; i < Math.abs(dx); i++) {
+    let newX = this.x + Math.sign(dx);
+    if (!this.collidesWithBlocks(newX, this.y, this.w, this.h)) {
+      this.x = newX;
+    } else {
+      break;
+    }
+  }
+
+  for (let i = 0; i < Math.abs(dy); i++) {
+    let newY = this.y + Math.sign(dy);
+    if (!this.collidesWithBlocks(this.x, newY, this.w, this.h)) {
+      this.y = newY;
+    } else {
+      break;
+    }
   }
 }
-
 
     //---------------------------------------------------------------------------------------------------------------------------------------------------------
   update() {

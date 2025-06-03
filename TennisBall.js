@@ -1,18 +1,22 @@
 class TennisBall {
+  static spawnPoints = [
+    { x: 200, y: 150 },
+    { x: 700, y: 100 },
+    { x: 600, y: 450 },
+    { x: 1000, y: 200 }
+  ];
+
   constructor() {
-    //random position on the screen
-    this.x = random(width);
-    this.y = random(height);
-    this.r = 10;
-    this.collected = false;
+    let spawn = random(TennisBall.spawnPoints); 
+    this.x = spawn.x;
+    this.y = spawn.y;
+    this.r = 5;
   }
 
   show() {
-    if (!this.collected) {
-      fill(123, 245, 60);
-      noStroke();
-      ellipse(this.x, this.y, this.r * 2);
-    }
+    fill(123, 245, 60);
+    noStroke();
+    ellipse(this.x, this.y, this.r * 2);
   }
 
 checkCollision(player) {

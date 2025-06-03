@@ -1,8 +1,8 @@
 function Block(x, y) {
   this.x = x;
   this.y = y;
-  this.w = 15; // width of block
-  this.h = 15; // height of block
+  this.w = 10; // width of block
+  this.h = 10; // height of block
 
   this.show = function () {
     image(blockImg, this.x, this.y, this.w, this.h);

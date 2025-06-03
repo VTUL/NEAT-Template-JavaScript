@@ -1,5 +1,4 @@
 
-
 //this is a template to add a NEAT ai to any game
 //note //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
 //this means that there is some information specific to the game to input here
@@ -35,7 +34,6 @@ let enemyRespawnTime = 0;
 let pb;
 var bg;
 var blockImg;
-//haven't built map/bounds yet
 let wall;
 let blocks = [];
 
@@ -54,7 +52,7 @@ function setup() {
 
   wall = new Wall(MAP_DATA); //map
 
-  let blockSize = 15;
+  let blockSize = 10;
   let wallWidth = wall.getColumns() * blockSize;
   let wallHeight = wall.getRows() * blockSize;
   let offsetX = (width - wallWidth) / 2;
@@ -85,15 +83,14 @@ function setup() {
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 function draw() {
   background(255);
-//add treats/collectibles to the screen
 
- 
+//add treats/collectibles to the screen
   if (bg) {
     image(bg, 0, 0, width, height); 
   }
 
   for(var i = 0; i < blocks.length; i++)
-      blocks[i].show();
+    blocks[i].show();
 
 
   for (let i = treats.length - 1; i >= 0; i--) {
@@ -122,6 +119,7 @@ function draw() {
     ball = new TennisBall();
     ballRespawnTime = millis() + 10000;
   }
+
   //respawn bandana if it was collected and 60 seconds passed
   if (!ban && millis() > bandanaRespawnTime) {
     ban = new Bandana();
@@ -141,7 +139,6 @@ function draw() {
   }
 
   for (let i = 0; i < enemies.length; i++) {
-
   enemies[i].move();
   enemies[i].show();
   }
@@ -160,7 +157,7 @@ function draw() {
     showBestPlayersForEachGeneration();
   } else if (humanPlaying) { //if the user is controling the ship[
     showHumanPlaying();
-  } else if (runBest) { // if replaying the best ever game
+  } else if (runBest) { //if replaying the best ever game
     showBestEverPlayer();
   } else { //if just evolving normally
     if (!population.done()) { //if any players are alive then update them
@@ -374,15 +371,15 @@ function handleInteractions(player) {
     enemies[i].dead = true;
     enemies.splice(i, 1);
     enemyRespawnTime = millis() + 10000;
-    continue;  // skip to next iteration since this enemy is removed
+    continue;  //skip to next iteration since this enemy is removed
   }
 
-  // Only set .eat if enemy still exists (not removed)
+  //only set eat if enemy still exists (not removed)
   if (enemies[i]) {
     if (player.canEat) {
-      enemies[i].eat = true;  // enemy runs away
+      enemies[i].eat = true;  //enemy runs away
     } else {
-      enemies[i].eat = false; // enemy chases player
+      enemies[i].eat = false; //enemy chases player
     }
   }
 }

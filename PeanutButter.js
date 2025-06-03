@@ -1,19 +1,22 @@
 class PeanutButter {
-  constructor() {
-    //random position on the screen
-    this.x = random(width);
-    this.y = random(height);
-    this.w = 10;
-    this.h = 15;
-    this.collected = false;
-  }
+  static spawnPoints = [
+    { x: 430, y: 150 },
+    { x: 700, y: 500 },
+    { x: 150, y: 600 },
+    { x: 1100, y: 300 }
+  ];
 
+  constructor() {
+    let spawn = random(PeanutButter.spawnPoints); 
+    this.x = spawn.x;
+    this.y = spawn.y;
+    this.w = 8;
+    this.h = 10;
+  }
   show() {
-    if (!this.collected) {
       fill(135, 77, 21);
       noStroke();
       rect(this.x, this.y, this.w, this.h);
-    }
   }
 
 checkCollision(player) {

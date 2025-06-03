@@ -1,18 +1,22 @@
 class Bandana {
+  static spawnPoints = [
+    { x: 180, y: 450 },
+    { x: 900, y: 550 },
+    { x: 600, y: 360 },
+    { x: 800, y: 250 }
+  ];
+
   constructor() {
-    //random position on the screen
-    this.x = random(width);
-    this.y = random(height);
-    this.r = 10;
-    this.collected = false;
+    let spawn = random(Bandana.spawnPoints);
+    this.x = spawn.x;
+    this.y = spawn.y;
+    this.r = 5;
   }
 
   show() {
-    if (!this.collected) {
-      fill(161, 97, 219);
-      noStroke();
-      ellipse(this.x, this.y, this.r * 2);
-    }
+    fill(161, 97, 219);
+    noStroke();
+    ellipse(this.x, this.y, this.r * 2);
   }
 
 checkCollision(player) {

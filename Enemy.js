@@ -3,7 +3,7 @@ class Enemy {
     this.x = 1070;
     this.y = 550;
     this.speed = 2;
-    this.size = 20;
+    this.size = 15;
     this.changeDirTime = 0;
     this.directionX = 0;
     this.directionY = 0;
