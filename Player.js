@@ -21,9 +21,10 @@ class Player {
     this.speedBoostedUntil = 0;
     this.canEat = false;
     this.canEatUntil = 0;
-    this.x = 400;
-    this.y = 220;
-    // 400, 220
+    this.x = 670; 
+    this.y = 440;
+    // 400, 220 spawn
+    // 170, 350 stairs1
     this.w = 18;  
     this.h = 18;
   }
@@ -33,12 +34,16 @@ class Player {
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   show() {
-     //wrap horizontally
-    if (this.x + this.w < 0) {
-      this.x = width;
-    } else if (this.x > width) {
-      this.x = -this.w;
+     //wrap from one stairs to another
+    if (this.x + this.w < 188 && this.y + this.h < 388 && this.y + this.h > 348) {
+      this.x = 680 + 5;  
+      this.y = 440;
     }
+    else if (this.x > 688 && this.x < 700 && this.y + this.h < 478 && this.y + this.h > 438) {
+      this.x = 188 - this.w - 5; 
+      this.y = 350;
+    }
+
 
     //wrap vertically
     if (this.y + this.h < 0) {

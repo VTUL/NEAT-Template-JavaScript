@@ -1,35 +1,31 @@
 class Treat {
+  static spawnPoints = [
+    { x: 305, y: 432 },
+    { x: 812, y: 275 },
+    { x: 978, y: 90 },
+    { x: 450, y: 150 },
+    { x: 221, y: 378 },
+    { x: 643, y: 519 },
+    { x: 877, y: 327 },
+    { x: 313, y: 610 },
+    { x: 1087, y: 205 },
+    { x: 700, y: 355 },
+    { x: 900, y: 575 },
+    { x: 650, y: 162 },
+    { x: 302, y: 476 },
+    { x: 480, y: 510 },
+    { x: 731, y: 399 },
+    { x: 150, y: 250 },
+
+  ];
+
   constructor() {
+    let spawn = random(Treat.spawnPoints); 
+    this.x = spawn.x;
+    this.y = spawn.y;
     this.r = 5;
-
-    //try to find a position not colliding with any block
-    let tries = 0;
-    do {
-      this.x = random(this.r, width - this.r); //since its random, treats spawn outside of map (maybe block out unwanted areas)
-      this.y = random(this.r, height - this.r);
-      tries++;
-      if (tries > 100) {
-        //give up after 100 tries to avoid infinite loop
-        break;
-      }
-    } while (this.collidesWithBlocks());
   }
 
-  collidesWithBlocks() {
-    for (let block of blocks) {
-      let closestX = constrain(this.x, block.x, block.x + block.w);
-      let closestY = constrain(this.y, block.y, block.y + block.h);
-
-      let dx = this.x - closestX;
-      let dy = this.y - closestY;
-      let distSq = dx * dx + dy * dy;
-
-      if (distSq < this.r * this.r) {
-        return true; //collision found
-      }
-    }
-    return false; //no collision
-  }
 
   show() {
       fill(255, 193, 0);

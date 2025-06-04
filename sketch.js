@@ -134,7 +134,9 @@ function draw() {
 
   //respawn treats if it was collected and 3 seconds passed
  if (treats.length <= 5 && millis() > treatRespawnTime) {
-    treats.push(new Treat());
+    if(treats.length < 15){
+      treats.push(new Treat());
+    }
     treatRespawnTime = millis() + 3000; 
   }
 
