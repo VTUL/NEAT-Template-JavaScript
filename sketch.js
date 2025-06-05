@@ -34,20 +34,23 @@ let enemyRespawnTime = 0;
 let pb;
 var bg;
 var blockImg;
+var dog;
 let wall;
 let blocks = [];
 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function preload(){
-  bg = loadImage("images/VT_NewmanLibrary4th.png");
+  bg = loadImage("images/map_base-2.png");
   blockImg = loadImage("images/square.png");
+  dog = loadImage("images/testDog.png");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function setup() {
-  window.canvas = createCanvas(1280, 720);
-    
+  window.canvas = createCanvas(1080, 640);
+  canvas.parent("canvasContainer");
+
   population = new Population(500);
 
   wall = new Wall(MAP_DATA); //map
@@ -90,7 +93,7 @@ function draw() {
   }
 
   for(var i = 0; i < blocks.length; i++)
-    blocks[i].show();
+    //blocks[i].show();
 
 
   for (let i = treats.length - 1; i >= 0; i--) {
@@ -243,27 +246,29 @@ function drawBrain() { //show the brain of whatever genome is currently showing
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //writes info about the current player
 function writeInfo() {
-  fill(200);
-  textAlign(LEFT);
-  textSize(30);
-  stroke(0);
+  let info = "";
+
   if (showBestEachGen) {
-    text("Score: " + genPlayerTemp.score, 650, 50); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-    text("Gen: " + (genPlayerTemp.gen + 1), 1150, 50);
-  } else
-  if (humanPlaying) {
-    text("Score: " + humanPlayer.score, 650, 50); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-  } else
-  if (runBest) {
-    text("Score: " + population.bestPlayer.score, 650, 50); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-    text("Gen: " + population.gen, 1150, 50);
+    info += "Score: " + genPlayerTemp.score + "<br>";
+    info += "Gen: " + (genPlayerTemp.gen + 1) + "<br>";
+  } else if (humanPlaying) {
+    info += "Score: " + humanPlayer.score + "<br>";
+  } else if (runBest) {
+    info += "Score: " + population.bestPlayer.score + "<br>";
+    info += "Gen: " + population.gen + "<br>";
   } else {
     if (showBest) {
-      text("Score: " + population.players[0].score, 650, 50); //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-      text("Gen: " + population.gen, 1150, 50);
-      text("Species: " + population.species.length, 50, canvas.height / 2 + 300);
-      text("Global Best Score: " + population.bestScore, 50, canvas.height / 2 + 200);
+      info += "Score: " + population.players[0].score + "<br>";
+      info += "Gen: " + population.gen + "<br>";
+      info += "Species: " + population.species.length + "<br>";
+      info += "Global Best Score: " + population.bestScore + "<br>";
     }
+  }
+
+  // Write the info to the HTML div
+  let infoDiv = document.getElementById("gameInfo");
+  if (infoDiv) {
+    infoDiv.innerHTML = info;
   }
 }
 

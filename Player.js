@@ -21,8 +21,8 @@ class Player {
     this.speedBoostedUntil = 0;
     this.canEat = false;
     this.canEatUntil = 0;
-    this.x = 670; 
-    this.y = 440;
+    this.x = 600; 
+    this.y = 220;
     // 400, 220 spawn
     // 170, 350 stairs1
     this.w = 18;  
@@ -34,7 +34,7 @@ class Player {
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   show() {
-     //wrap from one stairs to another
+     //wrap from one stairs to another, left to right
     if (this.x + this.w < 188 && this.y + this.h < 388 && this.y + this.h > 348) {
       this.x = 680 + 5;  
       this.y = 440;
@@ -44,18 +44,19 @@ class Player {
       this.y = 350;
     }
 
-
-    //wrap vertically
-    if (this.y + this.h < 0) {
-      this.y = height;
-    } else if (this.y > height) {
-      this.y = -this.h;
+    //stairs2 down and up
+    if (this.x + this.w < 398 && this.x > 340 && this.y + this.h < 153 && this.y + this.h > 148) {
+      this.x = 795 + 5;  
+      this.y = 170;
+    }
+    else if (this.x > 768 && this.x < 800 && this.y + this.h < 178 && this.y + this.h > 168) {
+      this.x = 378 + this.w - 5; 
+      this.y = 120;
     }
 
     //sprite
     
-    fill(255, 0, 0);
-    rect(this.x, this.y, this.w, this.h);
+   image(dog, this.x, this.y);
     }
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   move(direction) {
