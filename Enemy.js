@@ -1,9 +1,9 @@
 class Enemy {
   constructor() {
-    this.x = 1070;
+    this.x = 1000;
     this.y = 550;
     this.speed = 2;
-    this.size = 15;
+    this.size = 32;
     this.changeDirTime = 0;
     this.directionX = 0;
     this.directionY = 0;
@@ -43,7 +43,7 @@ class Enemy {
 
  move() {
   let { player, distance } = this.findClosestPlayer();
-  let detectionRadius = 300;
+  let detectionRadius = 200;
 
   if (!this.eat && player && distance !== null && distance < detectionRadius) {
     let angle = atan2(player.y - this.y, player.x - this.x);

@@ -21,12 +21,12 @@ class Player {
     this.speedBoostedUntil = 0;
     this.canEat = false;
     this.canEatUntil = 0;
-    this.x = 600; 
-    this.y = 220;
+    this.x = 450; 
+    this.y = 250;
     // 400, 220 spawn
     // 170, 350 stairs1
-    this.w = 18;  
-    this.h = 18;
+    this.w = 64;  
+    this.h = 64;
   }
 
 
@@ -56,7 +56,9 @@ class Player {
 
     //sprite
     
-   image(dog, this.x, this.y);
+   //image(dog, this.x, this.y, this.w, this.h);
+    fill(0, 0, 255);
+    rect(this.x, this.y, this.w, this.h);
     }
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   move(direction) {

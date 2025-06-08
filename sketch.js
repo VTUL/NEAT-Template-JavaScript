@@ -41,14 +41,14 @@ let blocks = [];
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function preload(){
-  bg = loadImage("images/map_base-2.png");
+  bg = loadImage("images/updated_base_map.png");
   blockImg = loadImage("images/square.png");
   dog = loadImage("images/testDog.png");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function setup() {
-  window.canvas = createCanvas(1080, 640);
+  let canvas = createCanvas(1080, 900);
   canvas.parent("canvasContainer");
 
   population = new Population(500);
@@ -93,7 +93,7 @@ function draw() {
   }
 
   for(var i = 0; i < blocks.length; i++)
-    //blocks[i].show();
+    blocks[i].show();
 
 
   for (let i = treats.length - 1; i >= 0; i--) {

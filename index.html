@@ -6,8 +6,8 @@
   <script language="javascript" src="libraries/p5.sound.js"></script>
   <script language="javascript" src="libraries/Box2d.js"></script>
 
-  <script language="javascript" type="text/javascript" src="mapData.js"></script>
-  <script language="javascript" type="text/javascript" src="sketch.js"></script>
+  <script language="javascript" type="text/javascript" src="mapData.js"></script> 
+  <script language="javascript" type="text/javascript" src="sketch.js"></script> 
   <script language="javascript" type="text/javascript" src="ConnectionGene.js"></script>
   <script language="javascript" type="text/javascript" src="ConnectionHistory.js"></script>
   <script language="javascript" type="text/javascript" src="Node.js"></script>
@@ -22,28 +22,30 @@
   <script language="javascript" type="text/javascript" src="Population.js"></script>
   <script language="javascript" type="text/javascript" src="Species.js"></script>
   <script language="javascript" type="text/javascript" src="Genome.js"></script>
-
+  <title>NEAT Template</title>
 </head>
-
-<style>
+<body>
+  <style>
     * {
-      margin: 0;
-      padding: 0;
+      margin: 0px;
+      padding: 10px;
       box-sizing: border-box;
     }
 
-    body {
+   body {
       background-color: #f0f0f0;
       font-family: sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
+      padding: 0;
+      margin: 0;
     }
 
     h2 {
-      margin-bottom: 20px;
+      text-align: center;
+      font-family: sans-serif;
+      font-size: 32px;
     }
 
     canvas {
@@ -55,15 +57,17 @@
       background-color: #f8f8f8;
       padding: 10px;
       border-top: 2px solid #ccc;
-      margin-top: 10px;
+      margin-top: 5px;
       width: fit-content;
       text-align: left;
     }
   </style>
-</head>
-<body>
-  <h2>NEAT Template</h2>
-  <div id="canvasContainer"></div>
-  <div id="gameInfo" style="font-family: monospace; color: #444; padding-top: 10px;"></div>
+  <main>
+    <div class="title">
+      <h2>NEAT Template</h2>
+      </div>
+      <div id="canvasContainer"></div>
+      <div id="gameInfo" style="font-family: monospace; color: #444; padding-top: 10px;"></div>
+  </main>
 </body>
 </html>
