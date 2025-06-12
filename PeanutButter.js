@@ -1,17 +1,17 @@
 class PeanutButter {
   static spawnPoints = [
-    { x: 430, y: 150 },
-    { x: 700, y: 500 },
-    { x: 150, y: 600 },
-    { x: 1100, y: 300 }
+    { x: 460, y: 150 },
+    { x: 700, y: 800 },
+    { x: 180, y: 600 },
+    { x: 990, y: 770 }
   ];
 
   constructor() {
     let spawn = random(PeanutButter.spawnPoints); 
     this.x = spawn.x;
     this.y = spawn.y;
-    this.w = 8;
-    this.h = 10;
+    this.w = 18;
+    this.h = 20;
   }
   show() {
       fill(135, 77, 21);

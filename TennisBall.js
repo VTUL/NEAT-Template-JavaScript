@@ -1,8 +1,8 @@
 class TennisBall {
   static spawnPoints = [
-    { x: 200, y: 150 },
-    { x: 700, y: 100 },
-    { x: 600, y: 450 },
+    { x: 200, y: 200 },
+    { x: 750, y: 100 },
+    { x: 500, y: 200 },
     { x: 1000, y: 200 }
   ];
 
@@ -10,7 +10,7 @@ class TennisBall {
     let spawn = random(TennisBall.spawnPoints); 
     this.x = spawn.x;
     this.y = spawn.y;
-    this.r = 5;
+    this.r = 8;
   }
 
   show() {

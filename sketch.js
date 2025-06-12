@@ -43,7 +43,7 @@ let blocks = [];
 function preload(){
   bg = loadImage("images/updated_base_map.png");
   blockImg = loadImage("images/square.png");
-  dog = loadImage("images/testDog.png");
+  dog = loadImage("images/dogside.png");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------

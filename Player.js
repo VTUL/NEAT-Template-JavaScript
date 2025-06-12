@@ -21,12 +21,12 @@ class Player {
     this.speedBoostedUntil = 0;
     this.canEat = false;
     this.canEatUntil = 0;
-    this.x = 450; 
-    this.y = 250;
+    this.x = 200; 
+    this.y = 850;
     // 400, 220 spawn
     // 170, 350 stairs1
-    this.w = 64;  
-    this.h = 64;
+    this.w = 48;  
+    this.h = 32;
   }
 
 
@@ -35,30 +35,54 @@ class Player {
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   show() {
      //wrap from one stairs to another, left to right
-    if (this.x + this.w < 188 && this.y + this.h < 388 && this.y + this.h > 348) {
-      this.x = 680 + 5;  
-      this.y = 440;
+    /*if (this.x + this.w < 0 && this.y + this.h < 610 && this.y + this.h > 548) {
+      this.x = width;  
+      this.y = 800;
     }
-    else if (this.x > 688 && this.x < 700 && this.y + this.h < 478 && this.y + this.h > 438) {
-      this.x = 188 - this.w - 5; 
-      this.y = 350;
+    else if (this.x > width && this.y + this.h < 868 && this.y + this.h > 778) {
+      this.x = -this.w; 
+      this.y = 560;
+    }*/
+
+    if (this.x + this.w < 0 && this.y + this.h < 610 && this.y + this.h > 548) {
+      this.x = width;  
+      this.y = 800;
+    }
+    else if (this.x > width && this.y + this.h < 868 && this.y + this.h > 778) {
+      this.x = -this.w; 
+      this.y = 560;
     }
 
     //stairs2 down and up
-    if (this.x + this.w < 398 && this.x > 340 && this.y + this.h < 153 && this.y + this.h > 148) {
-      this.x = 795 + 5;  
-      this.y = 170;
+    if (this.x < 278 && this.x > 170 && this.y + this.h > height) {
+      this.x = 700;  
+      this.y = 850;
     }
-    else if (this.x > 768 && this.x < 800 && this.y + this.h < 178 && this.y + this.h > 168) {
-      this.x = 378 + this.w - 5; 
-      this.y = 120;
+    else if (this.x > 680 && this.x < 730 && this.y + this.h > height) {
+      this.x = 230; 
+      this.y = 850;
     }
+
+      //wrap horizontallyMore actions
+    //if (this.x + this.w < 0) {
+      //this.x = width;
+    //} else if (this.x > width) {
+     // this.x = -this.w;
+    //}
+
+
+    //wrap vertically
+    //if (this.y + this.h < 0) {
+      //this.y = height;
+    //} else if (this.y > height) {
+      //this.y = -this.h;
+    //}
 
     //sprite
     
-   //image(dog, this.x, this.y, this.w, this.h);
-    fill(0, 0, 255);
-    rect(this.x, this.y, this.w, this.h);
+   image(dog, this.x, this.y, this.w, this.h);
+    //fill(0, 0, 255);
+    //rect(this.x, this.y, this.w, this.h);
     }
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   move(direction) {

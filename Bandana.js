@@ -2,7 +2,7 @@ class Bandana {
   static spawnPoints = [
     { x: 180, y: 450 },
     { x: 900, y: 550 },
-    { x: 600, y: 360 },
+    { x: 600, y: 650 },
     { x: 800, y: 250 }
   ];
 
@@ -10,7 +10,7 @@ class Bandana {
     let spawn = random(Bandana.spawnPoints);
     this.x = spawn.x;
     this.y = spawn.y;
-    this.r = 5;
+    this.r = 8;
   }
 
   show() {

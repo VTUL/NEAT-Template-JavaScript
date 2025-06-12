@@ -1,15 +1,7 @@
 class Enemy {
-   static spawnPoints = [
-    { x: 430, y: 100 },
-    { x: 700, y: 550 },
-    { x: 150, y: 550 },
-    { x: 1000, y: 300 }
-  ];
-
   constructor() {
-    let spawn = random(Enemy.spawnPoints); 
-    this.x = spawn.x;
-    this.y = spawn.y;
+    this.x = 1000;
+    this.y = 550;
     this.speed = 2;
     this.size = 32;
     this.changeDirTime = 0;
@@ -51,7 +43,7 @@ class Enemy {
 
  move() {
   let { player, distance } = this.findClosestPlayer();
-  let detectionRadius = 5;
+  let detectionRadius = 200;
 
   if (!this.eat && player && distance !== null && distance < detectionRadius) {
     let angle = atan2(player.y - this.y, player.x - this.x);
