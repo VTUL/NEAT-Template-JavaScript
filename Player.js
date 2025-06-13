@@ -21,8 +21,8 @@ class Player {
     this.speedBoostedUntil = 0;
     this.canEat = false;
     this.canEatUntil = 0;
-    this.x = 200; 
-    this.y = 850;
+    this.x = 100; 
+    this.y = 450;
     // 400, 220 spawn
     // 170, 350 stairs1
     this.w = 48;  

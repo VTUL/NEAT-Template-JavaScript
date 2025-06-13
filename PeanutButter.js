@@ -10,8 +10,8 @@ class PeanutButter {
     let spawn = random(PeanutButter.spawnPoints); 
     this.x = spawn.x;
     this.y = spawn.y;
-    this.w = 18;
-    this.h = 20;
+    this.w = 15;
+    this.h = 15;
   }
   show() {
       fill(135, 77, 21);

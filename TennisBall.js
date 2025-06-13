@@ -10,7 +10,7 @@ class TennisBall {
     let spawn = random(TennisBall.spawnPoints); 
     this.x = spawn.x;
     this.y = spawn.y;
-    this.r = 8;
+    this.r = 7.5;
   }
 
   show() {

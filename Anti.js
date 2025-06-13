@@ -1,34 +1,13 @@
-class Treat {
-  static spawnPoints = [
-    { x: 370, y: 470 },
-    { x: 812, y: 300 },
-    { x: 880, y: 150 },
-    { x: 450, y: 150 },
-    { x: 221, y: 378 },
-    { x: 730, y: 519 },
-    { x: 877, y: 347 },
-    { x: 313, y: 680 },
-    { x: 970, y: 205 },
-    { x: 730, y: 355 },
-    { x: 890, y: 575 },
-    { x: 650, y: 182 },
-    { x: 302, y: 550 },
-    { x: 480, y: 790 },
-    { x: 100, y: 450 },
-    { x: 80, y: 750 },
-
-  ];
-
-  constructor() {
-    let spawn = random(Treat.spawnPoints); 
-    this.x = spawn.x;
-    this.y = spawn.y;
+class Anti {
+  constructor(x,y) {; 
+    this.x = x;
+    this.y = y;
     this.r = 7.5;
   }
 
 
   show() {
-      fill(255, 193, 0);
+      fill(255, 105, 150);
       noStroke();
       ellipse(this.x, this.y, this.r * 2);
   }

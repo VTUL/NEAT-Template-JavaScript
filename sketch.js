@@ -24,6 +24,7 @@ var genPlayerTemp; //player
 var showNothing = false; 
 let treats = [];
 let enemies = []; 
+let anti = [];
 let ball;
 let ban;
 let ballRespawnTime = 0;
@@ -82,6 +83,8 @@ function setup() {
   for (let i = 0; i < 5; i++) {
     enemies.push(new Enemy());
   }
+ 
+  
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 function draw() {
@@ -130,7 +133,7 @@ function draw() {
   }
 
    //respawn enemies if killed and 10 seconds passed
- if (millis() > enemyRespawnTime) {
+ if (millis() > enemyRespawnTime && enemies.length < 15) {
     enemies.push(new Enemy());
     enemyRespawnTime = millis() + 60000; 
   }
@@ -146,6 +149,10 @@ function draw() {
   for (let i = 0; i < enemies.length; i++) {
   enemies[i].move();
   enemies[i].show();
+  }
+
+  for (let a of anti) {
+  a.show();
   }
   
 //placeholder text so player knows how to start playing
@@ -172,7 +179,27 @@ function draw() {
       population.naturalSelection();
     }
   }
+  drawGrid();
 }
+function drawGrid() {
+  let gridSize = 100; // You can adjust this size
+
+  stroke(200); // Light gray grid lines
+  strokeWeight(1);
+
+  // Draw vertical lines
+  for (let x = 0; x <= width; x += gridSize) {
+    line(x, 0, x, height);
+  }
+
+  // Draw horizontal lines
+  for (let y = 0; y <= height; y += gridSize) {
+    line(0, y, width, y);
+  }
+
+  noStroke(); // Turn off stroke for other drawings
+}
+
 //-----------------------------------------------------------------------------------
 function showBestPlayersForEachGeneration() {
   if (!genPlayerTemp.dead) { //if current gen player is not dead then update it
@@ -367,6 +394,14 @@ function handleInteractions(player) {
     pb = null;
     player.score += 10;
     PBRespawnTime = millis() + 60000;
+  }
+
+  //Anti
+  for (let i = anti.length - 1; i >= 0; i--) {
+    if (anti[i].checkCollision(player)) {
+      anti.splice(i, 1);
+      player.score -= 5;
+    }
   }
 
   //Enemies

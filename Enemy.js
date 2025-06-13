@@ -1,60 +1,38 @@
 class Enemy {
-   static spawnPoints = [
-    { x: 430, y: 100 },
-    { x: 700, y: 550 },
-    { x: 150, y: 550 },
-    { x: 1000, y: 300 }
-  ];
+ constructor() {
+    // Define possible spawn points and their tied patrol routes
+    let spawnOptions = [
+      { spawn: { x: 150, y: 660 }, patrol: [{ x: 150, y: 670 }, { x: 1000, y: 670 }] },
+      { spawn: { x: 470, y: 60 }, patrol: [{ x: 480, y: 80 }, { x: 480, y: 400 }] },
+      { spawn: { x: 250, y: 790 }, patrol: [{ x: 260, y: 800 }, { x: 800, y: 800 }] },
+      { spawn: { x: 770, y: 70 }, patrol: [{ x: 760, y: 70 }, { x: 420, y: 70 }] },
+      { spawn: { x: 500, y: 310 }, patrol: [{ x: 500, y: 320 }, { x: 200, y: 320 }] },
+      { spawn: { x: 730, y: 350 }, patrol: [{ x: 740, y: 350 }, { x: 740, y: 670 }] },
+      { spawn: { x: 1025, y: 800 }, patrol: [{ x: 1020, y: 790 }, { x: 1020, y: 320 }] },
+      { spawn: { x: 220, y: 190 }, patrol: [{ x: 220, y: 190 }, { x: 220, y: 680 }] },
+      { spawn: { x: 900, y: 350 }, patrol: [{ x: 900, y: 350 }, { x: 900, y: 670 }] },
+      { spawn: { x: 480, y: 190 }, patrol: [{ x: 490, y: 180 }, { x: 990, y: 190 }] }
+    ];
 
-  constructor() {
-    let spawn = random(Enemy.spawnPoints); 
-    this.x = spawn.x;
-    this.y = spawn.y;
-    this.speed = 2;
-    this.size = 32;
-    this.changeDirTime = 0;
-    this.directionX = 0;
-    this.directionY = 0;
-    this.eat = false;
-    this.dead = false;
+    let randomIndex = floor(random(spawnOptions.length));
+    let selectedSpawn = spawnOptions[randomIndex];
+
+    this.x = selectedSpawn.spawn.x;
+    this.y = selectedSpawn.spawn.y;
+    this.patrolPoints = selectedSpawn.patrol;
+
+    this.radius = 15;
+    this.speed = 1;
+    this.size = 30;
+
+    this.currentPatrolIndex = 0;
+    this.dropCooldown = 0; 
   }
 
+  
 
-  findClosestPlayer() {
-    // Only check humanPlayer if valid and alive
-    if (humanPlaying && humanPlayer && !humanPlayer.dead) {
-      if (typeof humanPlayer.x === 'number' && typeof humanPlayer.y === 'number') {
-        let d = dist(this.x, this.y, humanPlayer.x, humanPlayer.y);
-        return { player: humanPlayer, distance: d };
-      }
-    }
-    // No valid player found
-    return { player: null, distance: null };
-  }
-
-  randomWalk() {
-  if (millis() > this.changeDirTime) {
-    this.directionX = random([-1, 0, 1]);
-    this.directionY = random([-1, 0, 1]);
-    this.changeDirTime = millis() + random(1000, 3000);
-  }
-
-  let newX = this.x + this.speed * this.directionX * 0.5;
-  let newY = this.y + this.speed * this.directionY * 0.5;
-
-  // Only move if no collision
-  if (!this.collidesWithBlocks(newX, newY)) {
-    this.x = constrain(newX, 0, width);
-    this.y = constrain(newY, 0, height);
-  }
-}
-
- move() {
-  let { player, distance } = this.findClosestPlayer();
-  let detectionRadius = 5;
-
-  if (!this.eat && player && distance !== null && distance < detectionRadius) {
-    let angle = atan2(player.y - this.y, player.x - this.x);
+  moveTo(targetX, targetY) {
+    let angle = atan2(targetY - this.y, targetX - this.x);
     let newX = this.x + this.speed * cos(angle);
     let newY = this.y + this.speed * sin(angle);
 
@@ -62,22 +40,40 @@ class Enemy {
       this.x = newX;
       this.y = newY;
     }
-  } else if (this.eat && player && distance !== null && distance < detectionRadius) {
-    let angle = atan2(player.y - this.y, player.x - this.x);
-    let newX = this.x - this.speed * cos(angle);
-    let newY = this.y - this.speed * sin(angle);
+  }
 
-    if (!this.collidesWithBlocks(newX, newY)) {
-      this.x = newX;
-      this.y = newY;
+  move() {
+    this.patrol();
+
+     //drop anti treats
+    if (this.dropCooldown > 0) {
+      this.dropCooldown--;
+    } else {
+      if (random(1) < 0.0001) { // .001% chance per frame (adjust?)
+        this.dropAnti();
+        this.dropCooldown = 60000; // cooldown
+      }
     }
-  } else {
-    this.randomWalk();
+  }
+
+  dropAnti() {
+  anti.push(new Anti(this.x, this.y));
+}
+
+  patrol() {
+  let target = this.patrolPoints[this.currentPatrolIndex];
+
+  let d = dist(this.x, this.y, target.x, target.y);
+
+  this.moveTo(target.x, target.y);
+
+  //if close enough, advance to next patrol point
+  if (d < 5) {
+    this.currentPatrolIndex = (this.currentPatrolIndex + 1) % this.patrolPoints.length;
   }
 }
 
   show() {
-
     fill(255, 0, 0);
     ellipse(this.x, this.y, this.size, this.size);
   }
@@ -102,20 +98,19 @@ class Enemy {
   }
 
   collidesWithBlocks(x, y) {
-  // create a temporary object with enemy's x,y,w,h
-  let tempEnemy = { 
-    x: x, 
-    y: y, 
-    w: this.size, 
-    h: this.size 
-  };
+    let tempEnemy = {
+    x: x - this.size / 2,
+    y: y - this.size / 2,
+    w: this.size,
+    h: this.size
+    };
 
-  for (let block of blocks) {
-    if (block.intersects(tempEnemy)) {
-      return true;
+
+    for (let block of blocks) {
+      if (block.intersects(tempEnemy)) {
+        return true;
+      }
     }
+    return false;
   }
-  return false;
-}
-
 }
