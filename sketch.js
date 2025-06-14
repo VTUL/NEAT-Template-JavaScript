@@ -398,10 +398,22 @@ function handleInteractions(player) {
 
   //Anti
   for (let i = anti.length - 1; i >= 0; i--) {
-    if (anti[i].checkCollision(player)) {
+    if (anti[i].checkCollision(player) && !player.canEat) {
       anti.splice(i, 1);
       player.score -= 5;
     }
+    else if (anti[i].checkCollision(player) && player.canEat) {
+      anti.splice(i, 1);
+      player.score += 5;
+    }
+
+    if (anti[i]) {
+    if (player.canEat) {
+      anti[i].eat = true;  
+    } else {
+      anti[i].eat = false; 
+    }
+  }
   }
 
   //Enemies
@@ -419,9 +431,9 @@ function handleInteractions(player) {
   //only set eat if enemy still exists (not removed)
   if (enemies[i]) {
     if (player.canEat) {
-      enemies[i].eat = true;  //enemy runs away
+      enemies[i].eat = true;  
     } else {
-      enemies[i].eat = false; //enemy chases player
+      enemies[i].eat = false; 
     }
   }
 }

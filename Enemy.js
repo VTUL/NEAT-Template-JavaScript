@@ -25,6 +25,8 @@ class Enemy {
     this.speed = 1;
     this.size = 30;
 
+    this.eat = false;
+
     this.currentPatrolIndex = 0;
     this.dropCooldown = 0; 
   }
@@ -75,6 +77,12 @@ class Enemy {
 
   show() {
     fill(255, 0, 0);
+    if (this.eat) {
+      fill(0, 255, 0); // Green if eating
+    }
+    else{
+      fill(255, 0, 0); // Red if not eating
+    }
     ellipse(this.x, this.y, this.size, this.size);
   }
 

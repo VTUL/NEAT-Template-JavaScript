@@ -3,13 +3,20 @@ class Anti {
     this.x = x;
     this.y = y;
     this.r = 7.5;
+
+    this.eat = false;
   }
 
 
   show() {
+    if (this.eat) {
+      fill(0, 255, 0); 
+    }
+    else {
       fill(255, 105, 150);
-      noStroke();
-      ellipse(this.x, this.y, this.r * 2);
+    }
+    noStroke();
+    ellipse(this.x, this.y, this.r * 2);
   }
 
   checkCollision(player) {
