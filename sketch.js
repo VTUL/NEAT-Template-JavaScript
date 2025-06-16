@@ -54,7 +54,7 @@ function setup() {
 
   population = new Population(500);
 
-  wall = new Wall(MAP_DATA); //map
+  wall = new Wall(MAP_DATA); //map for collisions
 
   let blockSize = 10;
   let wallWidth = wall.getColumns() * blockSize;
@@ -157,7 +157,7 @@ function draw() {
   
 //placeholder text so player knows how to start playing
   if (!humanPlaying && !runBest && !showBestEachGen) {
-    fill(0);
+    fill(255);
     textAlign(RIGHT, BOTTOM); 
     textSize(24);
     text("Press P to play as human", width - 10, height - 10);
@@ -181,23 +181,24 @@ function draw() {
   }
   drawGrid();
 }
+//temp function to draw a grid for mapping out patrolls and treats
 function drawGrid() {
-  let gridSize = 100; // You can adjust this size
+  let gridSize = 100; 
 
-  stroke(200); // Light gray grid lines
+  stroke(200); 
   strokeWeight(1);
 
-  // Draw vertical lines
+  //vertical lines
   for (let x = 0; x <= width; x += gridSize) {
     line(x, 0, x, height);
   }
 
-  // Draw horizontal lines
+  //horizontal lines
   for (let y = 0; y <= height; y += gridSize) {
     line(0, y, width, y);
   }
 
-  noStroke(); // Turn off stroke for other drawings
+  noStroke(); 
 }
 
 //-----------------------------------------------------------------------------------
@@ -208,6 +209,7 @@ function showBestPlayersForEachGeneration() {
     genPlayerTemp.think();
     genPlayerTemp.update();
     genPlayerTemp.show();
+    handleInteractions(genPlayerTemp);
   } else { //if dead move on to the next generation
     upToGen++;
     if (upToGen >= population.genPlayers.length) { //if at the end then return to the start and stop doing it
@@ -238,6 +240,7 @@ function showBestEverPlayer() {
     population.bestPlayer.think();
     population.bestPlayer.update();
     population.bestPlayer.show();
+    handleInteractions(bestPlayer);
   } else { //once dead
     runBest = false; //stop replaying it
     population.bestPlayer = population.bestPlayer.cloneForReplay(); //reset the best player so it can play again
