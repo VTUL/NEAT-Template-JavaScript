@@ -1,35 +1,49 @@
 class Enemy {
  constructor() {
-    // Define possible spawn points and their tied patrol routes
-    let spawnOptions = [
-      { spawn: { x: 150, y: 660 }, patrol: [{ x: 150, y: 670 }, { x: 1000, y: 670 }] },
-      { spawn: { x: 470, y: 60 }, patrol: [{ x: 480, y: 80 }, { x: 480, y: 400 }] },
-      { spawn: { x: 250, y: 790 }, patrol: [{ x: 260, y: 800 }, { x: 800, y: 800 }] },
-      { spawn: { x: 770, y: 70 }, patrol: [{ x: 760, y: 70 }, { x: 420, y: 70 }] },
-      { spawn: { x: 500, y: 310 }, patrol: [{ x: 500, y: 320 }, { x: 200, y: 320 }] },
-      { spawn: { x: 730, y: 350 }, patrol: [{ x: 740, y: 350 }, { x: 740, y: 670 }] },
-      { spawn: { x: 1025, y: 800 }, patrol: [{ x: 1020, y: 790 }, { x: 1020, y: 320 }] },
-      { spawn: { x: 220, y: 190 }, patrol: [{ x: 220, y: 190 }, { x: 220, y: 680 }] },
-      { spawn: { x: 900, y: 350 }, patrol: [{ x: 900, y: 350 }, { x: 900, y: 670 }] },
-      { spawn: { x: 480, y: 190 }, patrol: [{ x: 490, y: 180 }, { x: 990, y: 190 }] }
+     let spawnOptions = [
+      { patrol: [{ x: 150, y: 670 }, { x: 1000, y: 670 }] },
+      { patrol: [{ x: 330, y: 550 }, { x: 480, y: 410 }] },
+      { patrol: [{ x: 230, y: 200 }, { x: 380, y: 90 }] },
+      { patrol: [{ x: 70, y: 480 }, { x: 220, y: 300 }] },
+      { patrol: [{ x: 990, y: 200 }, { x: 990, y: 350 }] },
+      { patrol: [{ x: 800, y: 100 }, { x: 800, y: 350 }] },
+      { patrol: [{ x: 800, y: 770 }, { x: 1020, y: 770 }] },
+      { patrol: [{ x: 160, y: 670 }, { x: 160, y: 870 }] },
+      { patrol: [{ x: 480, y: 80 }, { x: 480, y: 400 }] },
+      { patrol: [{ x: 260, y: 800 }, { x: 800, y: 800 }] },
+      { patrol: [{ x: 760, y: 70 }, { x: 420, y: 70 }] },
+      { patrol: [{ x: 500, y: 320 }, { x: 200, y: 320 }] },
+      { patrol: [{ x: 740, y: 350 }, { x: 740, y: 670 }] },
+      { patrol: [{ x: 1020, y: 790 }, { x: 1020, y: 320 }] },
+      { patrol: [{ x: 220, y: 190 }, { x: 220, y: 680 }] },
+      { patrol: [{ x: 900, y: 350 }, { x: 900, y: 670 }] },
+      { patrol: [{ x: 490, y: 180 }, { x: 990, y: 190 }] }
     ];
 
     let randomIndex = floor(random(spawnOptions.length));
     let selectedSpawn = spawnOptions[randomIndex];
 
-    this.x = selectedSpawn.spawn.x;
-    this.y = selectedSpawn.spawn.y;
     this.patrolPoints = selectedSpawn.patrol;
+
+    //random spawn position along patrol line
+    let t = random(0, 1); 
+    let p0 = this.patrolPoints[0];
+    let p1 = this.patrolPoints[1];
+
+    this.x = lerp(p0.x, p1.x, t);
+    this.y = lerp(p0.y, p1.y, t);
 
     this.radius = 15;
     this.speed = 1;
     this.size = 30;
 
-    this.eat = false;
+    this.playInvin = false;
 
     this.currentPatrolIndex = 0;
     this.dropCooldown = 0; 
-  }
+
+    this.isActive = true; 
+}
 
   
 
@@ -45,9 +59,15 @@ class Enemy {
   }
 
   move() {
+     // .01% chance per frame to disappear
+    if (random(1) < 0.001) { 
+        this.isActive = false;
+        return; // Stop moving if disappearing
+    }
+
     this.patrol();
 
-     //drop anti treats
+    // Drop anti-treats
     if (this.dropCooldown > 0) {
       this.dropCooldown--;
     } else {
@@ -71,18 +91,12 @@ class Enemy {
 
   //if close enough, advance to next patrol point
   if (d < 5) {
-    this.currentPatrolIndex = (this.currentPatrolIndex + 1) % this.patrolPoints.length;
+    this.currentPatrolIndex = (this.currentPatrolIndex + 1) % this.patrolPoints.length; 
   }
 }
 
   show() {
     fill(255, 0, 0);
-    if (this.eat) {
-      fill(0, 255, 0); // Green if eating
-    }
-    else{
-      fill(255, 0, 0); // Red if not eating
-    }
     ellipse(this.x, this.y, this.size, this.size);
   }
 

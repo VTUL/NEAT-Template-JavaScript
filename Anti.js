@@ -4,7 +4,7 @@ class Anti {
     this.y = y;
     this.r = 7.5;
 
-    this.eat = false;
+    this.playInvin = false;
   }
 
 

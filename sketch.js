@@ -135,7 +135,7 @@ function draw() {
    //respawn enemies if killed and 10 seconds passed
  if (millis() > enemyRespawnTime && enemies.length < 15) {
     enemies.push(new Enemy());
-    enemyRespawnTime = millis() + 60000; 
+    enemyRespawnTime = millis() + 5000; 
   }
 
   //respawn treats if it was collected and 3 seconds passed
@@ -146,10 +146,16 @@ function draw() {
     treatRespawnTime = millis() + 3000; 
   }
 
-  for (let i = 0; i < enemies.length; i++) {
+  //backwards loop for easier splicing
+  for (let i = enemies.length - 1; i >= 0; i--) {
   enemies[i].move();
   enemies[i].show();
+
+  if (!enemies[i].isActive) {
+    enemies.splice(i, 1); //.01% chance to disappear
   }
+  }
+
 
   for (let a of anti) {
   a.show();
@@ -174,6 +180,11 @@ function draw() {
   } else { //if just evolving normally
     if (!population.done()) { //if any players are alive then update them
       population.updateAlive();
+      for (let i = 0; i < population.players.length; i++) {
+        if (!population.players[i].dead) {
+          handleInteractions(population.players[i]);
+      }
+  }
     } else { //all dead
       //genetic algorithm
       population.naturalSelection();
@@ -374,6 +385,7 @@ function handleInteractions(player) {
     if (treats[i].checkCollision(player)) {
       treats.splice(i, 1);
       player.score += 1;
+      player.lastScoreMillis = millis();
     }
   }
 
@@ -386,8 +398,8 @@ function handleInteractions(player) {
 
   //Bandana
   if (ban && ban.checkCollision(player)) {
-    player.canEat = true;
-    player.canEatUntil = millis() + 10000;
+    player.isInvincible = true;
+    player.isInvinUntil = millis() + 10000;
     ban = null;
     bandanaRespawnTime = millis() + 60000;
   }
@@ -397,46 +409,38 @@ function handleInteractions(player) {
     pb = null;
     player.score += 10;
     PBRespawnTime = millis() + 60000;
+    player.lastScoreMillis = millis();
   }
 
   //Anti
   for (let i = anti.length - 1; i >= 0; i--) {
-    if (anti[i].checkCollision(player) && !player.canEat) {
+    if (anti[i].checkCollision(player) && !player.isInvincible) {
       anti.splice(i, 1);
       player.score -= 5;
     }
-    else if (anti[i].checkCollision(player) && player.canEat) {
-      anti.splice(i, 1);
-      player.score += 5;
-    }
 
+    //get rid of make in
     if (anti[i]) {
-    if (player.canEat) {
-      anti[i].eat = true;  
+    if (player.isInvincible) {
+      anti[i].playInvin = true;  
     } else {
-      anti[i].eat = false; 
+      anti[i].playInvin = false; 
     }
   }
   }
 
   //Enemies
   for (let i = enemies.length - 1; i >= 0; i--) {
-  if (enemies[i].checkCollision(player) && !player.canEat) {
+  if (enemies[i].checkCollision(player) && !player.isInvincible) {
     player.dead = true;
   }
-  else if (enemies[i].checkCollision(player) && player.canEat) {
-    enemies[i].dead = true;
-    enemies.splice(i, 1);
-    enemyRespawnTime = millis() + 10000;
-    continue;  //skip to next iteration since this enemy is removed
-  }
 
-  //only set eat if enemy still exists (not removed)
+  //random chance of enemy being
   if (enemies[i]) {
-    if (player.canEat) {
-      enemies[i].eat = true;  
+    if (player.isInvincible) {
+      enemies[i].playInvin = true;  
     } else {
-      enemies[i].eat = false; 
+      enemies[i].playInvin = false; 
     }
   }
 }

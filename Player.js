@@ -19,15 +19,16 @@ class Player {
     this.boostedSpeed = 10;
     this.speed = this.baseSpeed;
     this.speedBoostedUntil = 0;
-    this.canEat = false;
-    this.canEatUntil = 0;
-    this.x = 100; 
-    this.y = 450;
+    this.isInvinUntil = 0;
+    this.x = 150; 
+    this.y = 650;
     // 400, 220 spawn
     // 170, 350 stairs1
     this.w = 48;  
     this.h = 32;
     this.dir = "d"; //the direction the player is facing
+    this.isInvincible = false;
+    this.lastScoreMillis = millis();
   }
 
 
@@ -35,16 +36,8 @@ class Player {
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   show() {
-     //wrap from one stairs to another, left to right
-    /*if (this.x + this.w < 0 && this.y + this.h < 610 && this.y + this.h > 548) {
-      this.x = width;  
-      this.y = 800;
-    }
-    else if (this.x > width && this.y + this.h < 868 && this.y + this.h > 778) {
-      this.x = -this.w; 
-      this.y = 560;
-    }*/
 
+    //stairs1 left and right
     if (this.x + this.w < 0 && this.y + this.h < 610 && this.y + this.h > 548) {
       this.x = width;  
       this.y = 800;
@@ -64,38 +57,30 @@ class Player {
       this.y = 850;
     }
 
-      //wrap horizontallyMore actions
-    //if (this.x + this.w < 0) {
-      //this.x = width;
-    //} else if (this.x > width) {
-     // this.x = -this.w;
-    //}
-
-
-    //wrap vertically
-    //if (this.y + this.h < 0) {
-      //this.y = height;
-    //} else if (this.y > height) {
-      //this.y = -this.h;
-    //}
-
     //draw the player sprite
     push();
-  translate(this.x + this.w / 2, this.y + this.h / 2);
-  //flip the sprite based on direction
-  if (this.facing == "a") {
-    scale(-1, 1); 
-  } else if (this.facing == "w") {
-    rotate(-HALF_PI); 
-  } else if (this.facing == "s") {
-    rotate(HALF_PI); 
+    translate(this.x + this.w / 2, this.y + this.h / 2);
+    //flip the sprite based on direction
+    if (this.facing == "a") {
+      scale(-1, 1); 
+    } else if (this.facing == "w") {
+      rotate(-HALF_PI); 
+    } else if (this.facing == "s") {
+     rotate(HALF_PI); 
+    }
+
+    imageMode(CENTER);
+
+    if (this.isInvincible) {
+      tint(150, 255, 150); //green for invincible
+  } else {
+      noTint();
   }
 
-  imageMode(CENTER);
-  image(dog, 0, 0, this.w, this.h);
-  imageMode(CORNER);
+    image(dog, 0, 0, this.w, this.h);
+    imageMode(CORNER);
 
-  pop();
+    pop();
 
     //sprite
     //fill(0, 0, 255);
@@ -133,6 +118,8 @@ class Player {
         break;
       }
     }  
+
+  //this.lifespan++;
 }
 
     //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -148,10 +135,10 @@ class Player {
       this.speed = this.baseSpeed;
     }
 
-    if (millis() < this.canEatUntil) {
-      this.canEat = true;
+    if (millis() < this.isInvinUntil) {
+      this.isInvincible = true;
     } else {
-      this.canEat = false;
+      this.isInvincible = false;
     }
 
     if (humanPlaying) {
@@ -168,7 +155,7 @@ class Player {
         this.move("d");
       }
 
-      
+      this.lifespan++;
   }
 
   // Insert AI-related update logic here if needed
@@ -185,8 +172,13 @@ class Player {
     //distance to power-ups?
     //distance to anti-power-ups?
 
+    let timeSinceScore = millis() - this.lastScoreMillis;
 
-  }
+    if (timeSinceScore > 120000) { //120 seconds in milliseconds
+      this.dead = true;
+    }
+
+}
 
   //Code-Bullet's Pacman AI example for method to call in look()
   //sets some inputs for the NN for whether or not there is a wall directly next to it in all directions
