@@ -11,8 +11,8 @@ class Player {
     this.score = 0;
     this.gen = 0;
 
-    this.genomeInputs = 5;
-    this.genomeOutputs = 2;
+    this.genomeInputs = 8; // 4 for walls, 4 for enemies
+    this.genomeOutputs = 4; // Up, Right, Down, Left
     this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
 
     this.baseSpeed = 5;
@@ -29,6 +29,7 @@ class Player {
     this.dir = "d"; //the direction the player is facing
     this.isInvincible = false;
     this.lastScoreMillis = millis();
+    
   }
 
 
@@ -72,7 +73,7 @@ class Player {
     imageMode(CENTER);
 
     if (this.isInvincible) {
-      tint(150, 255, 150); //green for invincible
+      tint(0, 255, 0); //green for invincible
   } else {
       noTint();
   }
@@ -81,10 +82,6 @@ class Player {
     imageMode(CORNER);
 
     pop();
-
-    //sprite
-    //fill(0, 0, 255);
-    //rect(this.x, this.y, this.w, this.h);
     }
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   move(direction) {
@@ -141,22 +138,40 @@ class Player {
       this.isInvincible = false;
     }
 
-    if (humanPlaying) {
-      if (keyIsDown(87)) { // W
-        this.move("w");
+    for (let enemy of enemies) {
+      if (enemy.checkCollision(this) && !this.isInvincible) { 
+        this.dead = true;
+        break;
       }
-      if (keyIsDown(83)) { // S
-        this.move("s");
-      }
-      if (keyIsDown(65)) { // A
-        this.move("a");
-      }
-      if (keyIsDown(68)) { // D
-        this.move("d");
-      }
+    }
 
-      this.lifespan++;
+    let timeSinceScore = millis() - this.lastScoreMillis;
+
+    if (timeSinceScore > 120000) { // 120 seconds
+      this.dead = true;
+    }
+
+
+    if (humanPlaying) {
+    if (keyIsDown(87)) { // W
+      this.move("w");
+    }
+    if (keyIsDown(83)) { // S
+      this.move("s");
+    }
+    if (keyIsDown(65)) { // A
+      this.move("a");
+    }
+    if (keyIsDown(68)) { // D
+      this.move("d");
+    }
+    this.lifespan++;
+  } else { // AI control
+    this.look();
+    this.think();
+    this.lifespan++;
   }
+  
 
   // Insert AI-related update logic here if needed
 }
@@ -164,79 +179,144 @@ class Player {
     //----------------------------------------------------------------------------------------------------------------------------------------------------------
 
   look() {
-    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
 
-    //distance to walls? collision detection
-    //distance to enemies?
-    //distance to food?
-    //distance to power-ups?
-    //distance to anti-power-ups?
+    this.vision = [];
 
-    let timeSinceScore = millis() - this.lastScoreMillis;
+    // Push distances to vision array
+    this.vision.push(...this.getWallDistances());
+    this.vision.push(...this.getMultDistances(enemies));
+    this.vision.push(...this.getMultDistances(treats));
+    this.vision.push(...this.getMultDistances(anti));
+    this.vision.push(...this.getSingDistance(ban));
+    this.vision.push(...this.getSingDistance(ball));
+    this.vision.push(...this.getSingDistance(pb));
 
-    if (timeSinceScore > 120000) { //120 seconds in milliseconds
-      this.dead = true;
+  }
+
+
+getWallDistances() {
+  let maxVision = 300;
+
+  let distances = [maxVision, maxVision, maxVision, maxVision]; // up, right, down, left
+
+  for (let block of blocks) {
+    let dx = block.x - this.x;
+    let dy = block.y - this.y;
+
+    // Up
+    if (dy < 0 && abs(dx) < this.w && abs(dy) < maxVision) {
+      distances[0] = min(distances[0], abs(dy));
     }
+    // Right
+    if (dx > 0 && abs(dy) < this.h && abs(dx) < maxVision) {
+      distances[1] = min(distances[1], abs(dx));
+    }
+    // Down
+    if (dy > 0 && abs(dx) < this.w && abs(dy) < maxVision) {
+      distances[2] = min(distances[2], abs(dy));
+    }
+    // Left
+    if (dx < 0 && abs(dy) < this.h && abs(dx) < maxVision) {
+      distances[3] = min(distances[3], abs(dx));
+    }
+  }
 
+  // Return inverse distances (as inputs typically are 1/distance)
+  return distances.map(d => 1 / d);
 }
 
-  //Code-Bullet's Pacman AI example for method to call in look()
-  //sets some inputs for the NN for whether or not there is a wall directly next to it in all directions
-  /*void setDistanceToWalls() {
+//gets distance of array items
+getMultDistances(obj) {
+  let maxVision = 300;
+  let distances = [maxVision, maxVision, maxVision, maxVision]; // up, right, down, left
 
-    PVector matrixPosition = pixelToTile(pacman.pos); //our player pos just coords?
-    PVector[] directions = new  PVector[4]; 
-    for (int i = 0; i< 4; i++) {//add 4 directions to the array
-      directions[i] = new PVector(pacman.vel.x, pacman.vel.y);
-      directions[i].rotate(PI/2 *i);
-      directions[i].x = round(directions[i].x);
-      directions[i].y = round(directions[i].y);
+  for (let o of obj) {
+    let dx = o.x - this.x;
+    let dy = o.y - this.y;
+
+    if (dy < 0 && abs(dx) < this.w && abs(dy) < maxVision) { // Up
+      distances[0] = min(distances[0], abs(dy));
     }
-
-    int visionIndex = 4;
-    for (PVector dir : directions) {//for each direction 
-      PVector lookingPosition = new PVector(matrixPosition.x + dir.x, matrixPosition.y+ dir.y);//look int that direction
-      if (originalTiles[(int)lookingPosition.y][(int)lookingPosition.x].wall) {//if there is a wall in that direction
-        vision[visionIndex] = 1;
-      } else {
-        vision[visionIndex] = 0;
-      }
-
-      while (true) {//keep look in that direction until you reach a dot or a wall
-        if (originalTiles[(int)lookingPosition.y][(int)lookingPosition.x].wall) {//if wall
-          vision[visionIndex + 4] = 0;
-          break;
-        }
-
-        if (pacman.tiles[(int)lookingPosition.y][(int)lookingPosition.x].dot && !pacman.tiles[(int)lookingPosition.y][(int)lookingPosition.x].eaten) {//if dot 
-          vision[visionIndex + 4] = 1;//this allows the players to see in which direction a dot is
-          break;
-        }
-
-        lookingPosition.add(dir);//look further in that direction if neither a dot nor a wall was found
-      }
-      visionIndex +=1;
+    if (dx > 0 && abs(dy) < this.h && abs(dx) < maxVision) { // Right
+      distances[1] = min(distances[1], abs(dx));
     }
-  }*/
+    if (dy > 0 && abs(dx) < this.w && abs(dy) < maxVision) { // Down
+      distances[2] = min(distances[2], abs(dy));
+    }
+    if (dx < 0 && abs(dy) < this.h && abs(dx) < maxVision) { // Left
+      distances[3] = min(distances[3], abs(dx));
+    }
+  }
+
+  return distances.map(d => d === maxVision ? 0 : 1 / d); // Return 0 if nothing found
+}
+
+//gets single item
+getSingDistance(obj) {
+  if (!obj) return [0, 0, 0, 0]; // Safeguard for null/undefined objects
+
+  let maxVision = 300;
+  let distances = [maxVision, maxVision, maxVision, maxVision]; // up, right, down, left
+
+  let dx = obj.x - this.x;
+  let dy = obj.y - this.y;
+
+  if (dy < 0 && abs(dx) < this.w && abs(dy) < maxVision) { // Up
+    distances[0] = min(distances[0], abs(dy));
+  }
+  if (dx > 0 && abs(dy) < this.h && abs(dx) < maxVision) { // Right
+    distances[1] = min(distances[1], abs(dx));
+  }
+  if (dy > 0 && abs(dx) < this.w && abs(dy) < maxVision) { // Down
+    distances[2] = min(distances[2], abs(dy));
+  }
+  if (dx < 0 && abs(dy) < this.h && abs(dx) < maxVision) { // Left
+    distances[3] = min(distances[3], abs(dx));
+  }
+
+  return distances.map(d => d === maxVision ? 0 : 1 / d); // Return 0 if nothing found
+}
+
+
+
+  //-----------------------------------------------------------------------------------------------------------------------------------------------------
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   //gets the output of the this.brain then converts them to actions
   think() {
+  this.decision = this.brain.feedForward(this.vision);
 
-      var max = 0;
-      var maxIndex = 0;
-      //get the output of the neural network
-      this.decision = this.brain.feedForward(this.vision);
+  //pair directions with their confidence
+  let directions = ["w", "d", "s", "a"];
+  let dirConfidences = this.decision
+    .map((conf, i) => ({ dir: directions[i], conf }))
+    .sort((a, b) => b.conf - a.conf); // Sort descending by confidence
 
-      for (var i = 0; i < this.decision.length; i++) {
-        if (this.decision[i] > max) {
-          max = this.decision[i];
-          maxIndex = i;
-        }
-      }
+  if (dirConfidences[0].conf < 0.5) return; // low confidence, no move
 
-      //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+  //try each direction in order of confidence
+  for (let { dir } of dirConfidences) {
+    if (this.canMove(dir)) {
+      this.move(dir);
+      break;
     }
+  }
+}
+
+//helper method to check if a move is possible (not blocked by wall)
+canMove(direction) {
+  let dx = 0, dy = 0;
+  switch (direction) {
+    case "a": dx = -this.speed; break;
+    case "d": dx = this.speed; break;
+    case "w": dy = -this.speed; break;
+    case "s": dy = this.speed; break;
+  }
+
+  //check if path is blocked at full step (not pixel by pixel here)
+  return !this.collidesWithBlocks(this.x + dx, this.y + dy, this.w, this.h);
+}
+
     //---------------------------------------------------------------------------------------------------------------------------------------------------------
     //returns a clone of this player with the same brian
   clone() {
@@ -268,11 +348,68 @@ class Player {
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   //fot Genetic algorithm
   calculateFitness() {
-    this.fitness = random(10);
-    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+    this.fitness = this.score + this.lifespan * 0.1; 
 
-    //this.fitness = this.score + this.lifespan / 100; //example fitness function
+    if (this.dead) this.fitness -= 10;
+
+    let nearestTreat = this.getNearestMult(treats);
+    let nearestEnemy = this.getNearestMult(enemies);
+    let nearestAnti = this.getNearestMult(anti);
+
+  //good
+    if (nearestTreat) {
+      let d = dist(this.x, this.y, nearestTreat.x, nearestTreat.y);
+      this.fitness += 1 / (d + 1);
+    }
+
+    if (ban) {
+    let d = dist(this.x, this.y, ban.x, ban.y);
+    this.fitness += 3 / (d + 1); 
+   }
+
+  if (ball) {
+    let d = dist(this.x, this.y, ball.x, ball.y);
+    this.fitness += 3 / (d + 1);
   }
+
+  if (pb) {
+    let d = dist(this.x, this.y, pb.x, pb.y);
+    this.fitness += 5 / (d + 1); 
+  }
+
+
+  //bad
+    if (nearestEnemy && !this.isInvincible) {
+      let d = dist(this.x, this.y, nearestEnemy.x, nearestEnemy.y);
+      this.fitness -= 5 / (d + 1);
+    }
+
+    if (nearestAnti && !this.isInvincible) {
+      let d = dist(this.x, this.y, nearestEnemy.x, nearestEnemy.y);
+      this.fitness -= 1 / (d + 1);
+    }
+
+    if (timeSinceScore > 60000) { // 60 seconds
+      this.fitness -= 1;
+    }
+}
+
+
+  getNearestMult(obj) {
+  if (obj.length == 0) return null;
+
+  let nearest = obj[0];
+  let minDist = dist(this.x, this.y, nearest.x, nearest.y);
+
+  for (let o of obj) {
+    let d = dist(this.x, this.y, o.x, o.y);
+    if (d < minDist) {
+      nearest = o;
+      minDist = d;
+    }
+  }
+  return nearest;
+}
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   crossover(parent2) {

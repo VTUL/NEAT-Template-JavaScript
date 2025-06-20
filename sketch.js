@@ -78,6 +78,7 @@ function setup() {
   ballRespawnTime = millis() + 10000;
   ban = new Bandana();
   bandanaRespawnTime = millis() + 20000;
+  pb = new PeanutButter();
   PBRespawnTime = millis() + 60000;
 
   for (let i = 0; i < 5; i++) {
@@ -321,18 +322,18 @@ function keyPressed() {
       //toggle showBest
       showBest = !showBest;
       break;
-      // case '+': //speed up frame rate
-      //   speed += 10;
-      //   frameRate(speed);
-      //   prvarln(speed);
-      //   break;
-      // case '-': //slow down frame rate
-      //   if(speed > 10) {
-      //     speed -= 10;
-      //     frameRate(speed);
-      //     prvarln(speed);
-      //   }
-      //   break;
+       case '+': //speed up frame rate
+         speed += 10;
+         frameRate(speed);
+         prvarln(speed);
+         break;
+       case '-': //slow down frame rate
+         if(speed > 10) {
+           speed -= 10;
+           frameRate(speed);
+           prvarln(speed);
+         }
+         break;
     case 'B': //run the best
       runBest = !runBest;
       break;
