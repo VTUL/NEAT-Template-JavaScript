@@ -116,7 +116,7 @@ class Enemy {
     let distanceSq = dx * dx + dy * dy;
 
     let radius = this.size / 2;
-    return distanceSq < radius * radius;
+    return distanceSq < (radius + 2) * (radius + 2);
   }
 
   collidesWithBlocks(x, y) {

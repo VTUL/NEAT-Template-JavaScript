@@ -29,11 +29,10 @@ class Player {
     this.dir = "d"; //the direction the player is facing
     this.isInvincible = false;
     this.lastScoreMillis = millis();
+    //this.sprite = new Sprite(dog, this.x, this.y, .5);
+    this.frame = 0;
     
   }
-
-
- 
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   show() {
@@ -61,27 +60,45 @@ class Player {
     //draw the player sprite
     push();
     translate(this.x + this.w / 2, this.y + this.h / 2);
-    //flip the sprite based on direction
+
     if (this.facing == "a") {
-      scale(-1, 1); 
+        scale(-1, 1);
     } else if (this.facing == "w") {
-      rotate(-HALF_PI); 
+        rotate(-HALF_PI);
     } else if (this.facing == "s") {
-     rotate(HALF_PI); 
+        rotate(HALF_PI);
     }
 
     imageMode(CENTER);
 
     if (this.isInvincible) {
-      tint(0, 255, 0); //green for invincible
-  } else {
+      tint(0, 255, 0); // green for invincible
+    } else {
       noTint();
-  }
+    }
 
-    image(dog, 0, 0, this.w, this.h);
+    let frameCount = 6; // total frames in sprite sheet
+    let frameWidth = dog.width / frameCount;
+    let frameHeight = dog.height;
+
+    image(
+      dog,
+      0,
+      0,
+      this.w,
+      this.h,
+      frameWidth * floor(this.frame),  // sx
+      0,                              // sy
+      frameWidth,                     // sWidth
+      frameHeight                     // sHeight
+    );
+
+    this.frame += 0.1;
+    if (this.frame >= frameCount) this.frame = 0;
+
     imageMode(CORNER);
-
     pop();
+    
     }
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   move(direction) {
@@ -138,20 +155,6 @@ class Player {
       this.isInvincible = false;
     }
 
-    for (let enemy of enemies) {
-      if (enemy.checkCollision(this) && !this.isInvincible) { 
-        this.dead = true;
-        break;
-      }
-    }
-
-    let timeSinceScore = millis() - this.lastScoreMillis;
-
-    if (timeSinceScore > 120000) { // 120 seconds
-      this.dead = true;
-    }
-
-
     if (humanPlaying) {
     if (keyIsDown(87)) { // W
       this.move("w");
@@ -171,6 +174,12 @@ class Player {
     this.think();
     this.lifespan++;
   }
+
+  let timeSinceScore = millis() - this.lastScoreMillis;
+
+    if (timeSinceScore > 120000) { // 120 seconds
+      this.dead = true;
+    }
   
 
   // Insert AI-related update logic here if needed
@@ -290,9 +299,12 @@ getSingDistance(obj) {
   let directions = ["w", "d", "s", "a"];
   let dirConfidences = this.decision
     .map((conf, i) => ({ dir: directions[i], conf }))
-    .sort((a, b) => b.conf - a.conf); // Sort descending by confidence
+    .sort((a, b) => b.conf - a.conf); //sort descending by confidence
 
-  if (dirConfidences[0].conf < 0.5) return; // low confidence, no move
+  if (dirConfidences[0].conf < 0.5){
+    this.move(random(['w', 'a', 's', 'd']));
+    return;
+  }  //low confidence, random move so its not stuck
 
   //try each direction in order of confidence
   for (let { dir } of dirConfidences) {

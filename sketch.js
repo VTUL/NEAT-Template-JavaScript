@@ -44,7 +44,7 @@ let blocks = [];
 function preload(){
   bg = loadImage("images/updated_base_map.png");
   blockImg = loadImage("images/square.png");
-  dog = loadImage("images/dogside.png");
+  dog = loadImage("spriteSheets/Dog_template_smaller.png");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -133,7 +133,7 @@ function draw() {
     bandanaRespawnTime = millis() + 60000;
   }
 
-   //respawn enemies if killed and 10 seconds passed
+   //respawn enemies if killed and 5 seconds passed
  if (millis() > enemyRespawnTime && enemies.length < 15) {
     enemies.push(new Enemy());
     enemyRespawnTime = millis() + 5000; 
