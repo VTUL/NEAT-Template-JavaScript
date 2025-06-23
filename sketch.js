@@ -172,6 +172,7 @@ function draw() {
 
   
   drawToScreen();
+
   if (showBestEachGen) { //show the best of each gen
     showBestPlayersForEachGeneration();
   } else if (humanPlaying) { //if the user is controling the ship[
@@ -191,7 +192,7 @@ function draw() {
       population.naturalSelection();
     }
   }
-  drawGrid();
+  //drawGrid(); 
 }
 //temp function to draw a grid for mapping out patrolls and treats
 function drawGrid() {

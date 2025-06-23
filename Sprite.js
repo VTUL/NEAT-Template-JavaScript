@@ -1,25 +1,25 @@
-function Sprite(sheet, x, y, scl, frameWidth, frameHeight) {
+function Sprite(sheet, w, h, frameCount) {
     this.sheet = sheet;
-    this.scale = scl;
-    this.x = x;
-    this.y = y;
+    this.w = w; //displayed width
+    this.h = h; //displayed height
+    this.frameCount = frameCount; //frames in sheet
 
-    this.frameW = frameWidth; // individual frame width
-    this.frameH = frameHeight; // individual frame height
+    this.frameWidth = this.sheet.width / this.frameCount;
+    this.frameHeight = this.sheet.height;
 
     this.frame = 0;
-    this.frames = sheet.width / this.frameW; // total number of frames
 
     this.draw = function() {
         image(
             this.sheet,
-            this.x, this.y, this.frameW * this.scale, this.frameH * this.scale, // destination: where and how big to draw
-            this.frameW * floor(this.frame), 0,                                  // source: which part of the sheet
-            this.frameW, this.frameH                                             // source: frame size
+            0, 0, this.w, this.h,                          
+            this.frameWidth * floor(this.frame), 0,         
+            this.frameWidth, this.frameHeight               
         );
 
-        this.frame += 0.1;
-        if (this.frame >= this.frames) {
+        //animate
+        this.frame += 0.1; 
+        if (this.frame >= this.frameCount) {
             this.frame = 0;
         }
     }

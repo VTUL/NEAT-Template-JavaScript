@@ -22,15 +22,12 @@ class Player {
     this.isInvinUntil = 0;
     this.x = 150; 
     this.y = 650;
-    // 400, 220 spawn
-    // 170, 350 stairs1
     this.w = 48;  
     this.h = 32;
     this.dir = "d"; //the direction the player is facing
     this.isInvincible = false;
     this.lastScoreMillis = millis();
-    //this.sprite = new Sprite(dog, this.x, this.y, .5);
-    this.frame = 0;
+    this.sprite = new Sprite(dog, this.w, this.h, 6);
     
   }
 
@@ -72,29 +69,13 @@ class Player {
     imageMode(CENTER);
 
     if (this.isInvincible) {
-      tint(0, 255, 0); // green for invincible
+      tint(0, 255, 0); //green for invincible
     } else {
       noTint();
     }
 
-    let frameCount = 6; // total frames in sprite sheet
-    let frameWidth = dog.width / frameCount;
-    let frameHeight = dog.height;
+    this.sprite.draw();
 
-    image(
-      dog,
-      0,
-      0,
-      this.w,
-      this.h,
-      frameWidth * floor(this.frame),  // sx
-      0,                              // sy
-      frameWidth,                     // sWidth
-      frameHeight                     // sHeight
-    );
-
-    this.frame += 0.1;
-    if (this.frame >= frameCount) this.frame = 0;
 
     imageMode(CORNER);
     pop();
@@ -114,11 +95,13 @@ class Player {
       case "s": dy = this.speed; break;
     }
 
-    //incremental movement with collision checking
+    //incremental movement with collision checking, AI currently gets stuck 
+    //in top right corner of map occasionally or loop with wrapping points
     for (let i = 0; i < Math.abs(dx); i++) {
       let newX = this.x + Math.sign(dx);
       if (!this.collidesWithBlocks(newX, this.y, this.w, this.h)) {
         this.x = newX;
+        this.updateFitness();
       } else {
         break;
       }
@@ -128,12 +111,11 @@ class Player {
       let newY = this.y + Math.sign(dy);
       if (!this.collidesWithBlocks(this.x, newY, this.w, this.h)) {
         this.y = newY;
+        this.updateFitness();
       } else {
         break;
       }
     }  
-
-  //this.lifespan++;
 }
 
     //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -360,51 +342,53 @@ canMove(direction) {
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   //fot Genetic algorithm
   calculateFitness() {
-    this.fitness = this.score + this.lifespan * 0.1; 
-
     if (this.dead) this.fitness -= 10;
 
-    let nearestTreat = this.getNearestMult(treats);
-    let nearestEnemy = this.getNearestMult(enemies);
-    let nearestAnti = this.getNearestMult(anti);
+    if (millis() - this.lastScoreMillis > 60000) { //inactivity penalty (die after 2 mins)
+        this.fitness -= 1;
+    }
+}
 
-  //good
+//update fitness every frame instead of after all players die
+updateFitness() {
+    this.fitness = this.score + this.lifespan * 0.1;
+
+    //good
+    let nearestTreat = this.getNearestMult(treats);
     if (nearestTreat) {
-      let d = dist(this.x, this.y, nearestTreat.x, nearestTreat.y);
-      this.fitness += 1 / (d + 1);
+        let d = dist(this.x, this.y, nearestTreat.x, nearestTreat.y);
+        this.fitness += 1 / (d + 1);
     }
 
     if (ban) {
-    let d = dist(this.x, this.y, ban.x, ban.y);
-    this.fitness += 3 / (d + 1); 
-   }
+        let d = dist(this.x, this.y, ban.x, ban.y);
+        this.fitness += 3 / (d + 1);
+    }
 
-  if (ball) {
-    let d = dist(this.x, this.y, ball.x, ball.y);
-    this.fitness += 3 / (d + 1);
-  }
+    if (ball) {
+        let d = dist(this.x, this.y, ball.x, ball.y);
+        this.fitness += 3 / (d + 1);
+    }
 
-  if (pb) {
-    let d = dist(this.x, this.y, pb.x, pb.y);
-    this.fitness += 5 / (d + 1); 
-  }
+    if (pb) {
+        let d = dist(this.x, this.y, pb.x, pb.y);
+        this.fitness += 5 / (d + 1);
+    }
 
-
-  //bad
+    //bad
+    let nearestEnemy = this.getNearestMult(enemies);
     if (nearestEnemy && !this.isInvincible) {
-      let d = dist(this.x, this.y, nearestEnemy.x, nearestEnemy.y);
-      this.fitness -= 5 / (d + 1);
+        let d = dist(this.x, this.y, nearestEnemy.x, nearestEnemy.y);
+        this.fitness -= 5 / (d + 1);
     }
 
+    let nearestAnti = this.getNearestMult(anti);
     if (nearestAnti && !this.isInvincible) {
-      let d = dist(this.x, this.y, nearestEnemy.x, nearestEnemy.y);
-      this.fitness -= 1 / (d + 1);
-    }
-
-    if (timeSinceScore > 60000) { // 60 seconds
-      this.fitness -= 1;
+        let d = dist(this.x, this.y, nearestAnti.x, nearestAnti.y);
+        this.fitness -= 1 / (d + 1);
     }
 }
+
 
 
   getNearestMult(obj) {
