@@ -96,9 +96,13 @@ class Enemy {
 }
 
   show() {
-    fill(255, 0, 0);
-    ellipse(this.x, this.y, this.size, this.size);
-  }
+  push();
+  translate(this.x, this.y);
+  imageMode(CENTER);
+  image(squirrel, 0, 0, this.size, this.radius);
+  pop();
+}
+
 
   checkCollision(player) {
     if (!player) return false;

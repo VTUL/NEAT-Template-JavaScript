@@ -23,33 +23,30 @@ class Treat {
     let spawn = random(Treat.spawnPoints); 
     this.x = spawn.x;
     this.y = spawn.y;
-    this.r = 7.5;
+    this.w = 20;
+    this.h = 20;
   }
 
 
   show() {
-      fill(255, 193, 0);
-      noStroke();
-      ellipse(this.x, this.y, this.r * 2);
+      image(yum, this.x, this.y, this.w, this.h);
   }
 
   checkCollision(player) {
-    let playerLeft = player.x;
-    let playerRight = player.x + player.w;
-    let playerTop = player.y;
-    let playerBottom = player.y + player.h;
+  let thisLeft = this.x;
+  let thisRight = this.x + this.w;
+  let thisTop = this.y;
+  let thisBottom = this.y + this.h;
 
-    let closestX = constrain(this.x, playerLeft, playerRight);
-    let closestY = constrain(this.y, playerTop, playerBottom);
+  let playerLeft = player.x;
+  let playerRight = player.x + player.w;
+  let playerTop = player.y;
+  let playerBottom = player.y + player.h;
 
-    let dx = this.x - closestX;
-    let dy = this.y - closestY;
-    let distanceSq = dx * dx + dy * dy;
+  let overlapX = thisRight > playerLeft && thisLeft < playerRight;
+  let overlapY = thisBottom > playerTop && thisTop < playerBottom;
 
-    if (distanceSq < this.r * this.r) {
-      this.collected = true;
-      return true;
-    }
-    return false;
-  }
+  return overlapX && overlapY;
+}
+
 }

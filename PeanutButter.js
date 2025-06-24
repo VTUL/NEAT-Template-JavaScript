@@ -10,17 +10,14 @@ class PeanutButter {
     let spawn = random(PeanutButter.spawnPoints); 
     this.x = spawn.x;
     this.y = spawn.y;
-    this.w = 15;
-    this.h = 15;
+    this.w = 25;
+    this.h = 25;
   }
   show() {
-      fill(135, 77, 21);
-      noStroke();
-      rect(this.x, this.y, this.w, this.h);
+    image(peanut, this.x, this.y, this.w, this.h);
   }
 
 checkCollision(player) {
-  // Assuming this object and player have x, y, w, h (x,y = top-left corner)
   let thisLeft = this.x;
   let thisRight = this.x + this.w;
   let thisTop = this.y;
@@ -31,7 +28,6 @@ checkCollision(player) {
   let playerTop = player.y;
   let playerBottom = player.y + player.h;
 
-  // Check if rectangles overlap on x and y axes
   let overlapX = thisRight > playerLeft && thisLeft < playerRight;
   let overlapY = thisBottom > playerTop && thisTop < playerBottom;
 

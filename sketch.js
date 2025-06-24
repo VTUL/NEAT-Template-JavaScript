@@ -36,6 +36,10 @@ let pb;
 var bg;
 var blockImg;
 var dog;
+var acorn;
+var squirrel;
+var peanut;
+var yum;
 let wall;
 let blocks = [];
 
@@ -44,6 +48,10 @@ let blocks = [];
 function preload(){
   bg = loadImage("images/updated_base_map.png");
   blockImg = loadImage("images/square.png");
+  acorn = loadImage("images/Acorn_Item.png");
+  squirrel = loadImage("spriteSheets/Enemy_template.png");
+  yum = loadImage("images/Dog_Treat.png");
+  peanut = loadImage("images/Peanut_Butter.png");
   dog = loadImage("spriteSheets/Dog_template_smaller.png");
 }
 

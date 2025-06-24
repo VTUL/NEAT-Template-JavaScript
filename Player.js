@@ -28,11 +28,16 @@ class Player {
     this.isInvincible = false;
     this.lastScoreMillis = millis();
     this.sprite = new Sprite(dog, this.w, this.h, 6);
+    this.previousX = this.x;
+    this.previousY = this.y;
+    this.lastDistanceToTreat = Infinity;
     
   }
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   show() {
+
+    //the map wrapping is where ai gets stuck a lot, or they get stuck in corners
 
     //stairs1 left and right
     if (this.x + this.w < 0 && this.y + this.h < 610 && this.y + this.h > 548) {
@@ -138,38 +143,48 @@ class Player {
     }
 
     if (humanPlaying) {
-    if (keyIsDown(87)) { // W
-      this.move("w");
+      if (keyIsDown(87)) { // W
+        this.move("w");
+      }
+      if (keyIsDown(83)) { // S
+        this.move("s");
+      }
+      if (keyIsDown(65)) { // A
+        this.move("a");
+      }
+      if (keyIsDown(68)) { // D
+        this.move("d");
+      }
+      this.lifespan++;
+    } else { // AI control
+      this.look();
+      this.think();
+      this.lifespan++;
     }
-    if (keyIsDown(83)) { // S
-      this.move("s");
-    }
-    if (keyIsDown(65)) { // A
-      this.move("a");
-    }
-    if (keyIsDown(68)) { // D
-      this.move("d");
-    }
-    this.lifespan++;
-  } else { // AI control
-    this.look();
-    this.think();
-    this.lifespan++;
-  }
 
-  let timeSinceScore = millis() - this.lastScoreMillis;
+    let timeSinceScore = millis() - this.lastScoreMillis;
 
-    if (timeSinceScore > 120000) { // 120 seconds
+    if (timeSinceScore > 20000) { // 20 seconds
+      this.fitness -= 100;
       this.dead = true;
     }
   
+    if (this.x === this.previousX && this.y === this.previousY) {
+      this.fitness -= 10; //small penalty per frame
+    }
 
-  // Insert AI-related update logic here if needed
+    
+    this.previousX = this.x;
+    this.previousY = this.y;
+
+    /*if (this.fitness < -100) { //fitness too low
+      this.dead = true;
+    }*/ 
 }
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------
 
-  look() {
+    look() {
 
     this.vision = [];
 
@@ -184,9 +199,10 @@ class Player {
 
   }
 
-
+//vision not wide enough?
 getWallDistances() {
   let maxVision = 300;
+  let coneWidth = 80;
 
   let distances = [maxVision, maxVision, maxVision, maxVision]; // up, right, down, left
 
@@ -194,79 +210,93 @@ getWallDistances() {
     let dx = block.x - this.x;
     let dy = block.y - this.y;
 
-    // Up
-    if (dy < 0 && abs(dx) < this.w && abs(dy) < maxVision) {
+     // Up cone
+    if (dy < 0 && abs(dx) < coneWidth && abs(dy) < maxVision) {
       distances[0] = min(distances[0], abs(dy));
     }
-    // Right
-    if (dx > 0 && abs(dy) < this.h && abs(dx) < maxVision) {
+    // Right cone
+    if (dx > 0 && abs(dy) < coneWidth && abs(dx) < maxVision) {
       distances[1] = min(distances[1], abs(dx));
     }
-    // Down
-    if (dy > 0 && abs(dx) < this.w && abs(dy) < maxVision) {
+    // Down cone
+    if (dy > 0 && abs(dx) < coneWidth && abs(dy) < maxVision) {
       distances[2] = min(distances[2], abs(dy));
     }
-    // Left
-    if (dx < 0 && abs(dy) < this.h && abs(dx) < maxVision) {
+    // Left cone
+    if (dx < 0 && abs(dy) < coneWidth && abs(dx) < maxVision) {
       distances[3] = min(distances[3], abs(dx));
     }
   }
 
-  // Return inverse distances (as inputs typically are 1/distance)
+  //return inverse distances (as inputs typically are 1/distance)
   return distances.map(d => 1 / d);
 }
 
 //gets distance of array items
 getMultDistances(obj) {
   let maxVision = 300;
+  let coneWidth = 80; // wider cone tolerance
+
   let distances = [maxVision, maxVision, maxVision, maxVision]; // up, right, down, left
 
   for (let o of obj) {
     let dx = o.x - this.x;
     let dy = o.y - this.y;
 
-    if (dy < 0 && abs(dx) < this.w && abs(dy) < maxVision) { // Up
+    // Up cone
+    if (dy < 0 && abs(dx) < coneWidth && abs(dy) < maxVision) {
       distances[0] = min(distances[0], abs(dy));
     }
-    if (dx > 0 && abs(dy) < this.h && abs(dx) < maxVision) { // Right
+    // Right cone
+    if (dx > 0 && abs(dy) < coneWidth && abs(dx) < maxVision) {
       distances[1] = min(distances[1], abs(dx));
     }
-    if (dy > 0 && abs(dx) < this.w && abs(dy) < maxVision) { // Down
+    // Down cone
+    if (dy > 0 && abs(dx) < coneWidth && abs(dy) < maxVision) {
       distances[2] = min(distances[2], abs(dy));
     }
-    if (dx < 0 && abs(dy) < this.h && abs(dx) < maxVision) { // Left
+    // Left cone
+    if (dx < 0 && abs(dy) < coneWidth && abs(dx) < maxVision) {
       distances[3] = min(distances[3], abs(dx));
     }
   }
 
-  return distances.map(d => d === maxVision ? 0 : 1 / d); // Return 0 if nothing found
+  return distances.map(d => d === maxVision ? 0 : 1 / d); // normalize or zero if unseen
 }
+
 
 //gets single item
 getSingDistance(obj) {
-  if (!obj) return [0, 0, 0, 0]; // Safeguard for null/undefined objects
+  if (!obj) return [0, 0, 0, 0];
 
   let maxVision = 300;
+  let coneWidth = 80;
+
   let distances = [maxVision, maxVision, maxVision, maxVision]; // up, right, down, left
 
   let dx = obj.x - this.x;
   let dy = obj.y - this.y;
 
-  if (dy < 0 && abs(dx) < this.w && abs(dy) < maxVision) { // Up
-    distances[0] = min(distances[0], abs(dy));
+  // Up
+  if (dy < 0 && abs(dx) < coneWidth && abs(dy) < maxVision) {
+    distances[0] = abs(dy);
   }
-  if (dx > 0 && abs(dy) < this.h && abs(dx) < maxVision) { // Right
-    distances[1] = min(distances[1], abs(dx));
+  // Right
+  if (dx > 0 && abs(dy) < coneWidth && abs(dx) < maxVision) {
+    distances[1] = abs(dx);
   }
-  if (dy > 0 && abs(dx) < this.w && abs(dy) < maxVision) { // Down
-    distances[2] = min(distances[2], abs(dy));
+  // Down
+  if (dy > 0 && abs(dx) < coneWidth && abs(dy) < maxVision) {
+    distances[2] = abs(dy);
   }
-  if (dx < 0 && abs(dy) < this.h && abs(dx) < maxVision) { // Left
-    distances[3] = min(distances[3], abs(dx));
+  // Left
+  if (dx < 0 && abs(dy) < coneWidth && abs(dx) < maxVision) {
+    distances[3] = abs(dx);
   }
 
-  return distances.map(d => d === maxVision ? 0 : 1 / d); // Return 0 if nothing found
+  return distances.map(d => d === maxVision ? 0 : 1 / d);
 }
+
 
 
 
@@ -276,6 +306,7 @@ getSingDistance(obj) {
   //gets the output of the this.brain then converts them to actions
   think() {
   this.decision = this.brain.feedForward(this.vision);
+  //should there be weight here on if enemy is in a direction to avoid?
 
   //pair directions with their confidence
   let directions = ["w", "d", "s", "a"];
@@ -284,9 +315,9 @@ getSingDistance(obj) {
     .sort((a, b) => b.conf - a.conf); //sort descending by confidence
 
   if (dirConfidences[0].conf < 0.5){
-    this.move(random(['w', 'a', 's', 'd']));
+    this.move(random(['w', 'a', 's', 'd'])); //add diagonal movements?
     return;
-  }  //low confidence, random move so its not stuck
+  }  //low confidence, random move so its not stuck - doesn't seem to help all that much
 
   //try each direction in order of confidence
   for (let { dir } of dirConfidences) {
@@ -343,49 +374,48 @@ canMove(direction) {
   //fot Genetic algorithm
   calculateFitness() {
     if (this.dead) this.fitness -= 10;
-
-    if (millis() - this.lastScoreMillis > 60000) { //inactivity penalty (die after 2 mins)
-        this.fitness -= 1;
-    }
 }
 
 //update fitness every frame instead of after all players die
 updateFitness() {
-    this.fitness = this.score + this.lifespan * 0.1;
+    this.fitness = this.score * 50 + this.lifespan * 0.1;
 
     //good
     let nearestTreat = this.getNearestMult(treats);
     if (nearestTreat) {
-        let d = dist(this.x, this.y, nearestTreat.x, nearestTreat.y);
-        this.fitness += 1 / (d + 1);
+    let d = dist(this.x, this.y, nearestTreat.x, nearestTreat.y);
+    if (d < this.lastDistanceToTreat) {
+        this.fitness += 25; //reward moving closer?
     }
+    this.lastDistanceToTreat = d;
+}
 
     if (ban) {
         let d = dist(this.x, this.y, ban.x, ban.y);
-        this.fitness += 3 / (d + 1);
+        this.fitness += 10 / (d + 1);
     }
 
     if (ball) {
         let d = dist(this.x, this.y, ball.x, ball.y);
-        this.fitness += 3 / (d + 1);
+        this.fitness += 10 / (d + 1);
     }
 
     if (pb) {
         let d = dist(this.x, this.y, pb.x, pb.y);
-        this.fitness += 5 / (d + 1);
+        this.fitness += 20 / (d + 1);
     }
 
     //bad
     let nearestEnemy = this.getNearestMult(enemies);
     if (nearestEnemy && !this.isInvincible) {
         let d = dist(this.x, this.y, nearestEnemy.x, nearestEnemy.y);
-        this.fitness -= 5 / (d + 1);
+        this.fitness -= 25 / (d + 1);
     }
 
     let nearestAnti = this.getNearestMult(anti);
     if (nearestAnti && !this.isInvincible) {
         let d = dist(this.x, this.y, nearestAnti.x, nearestAnti.y);
-        this.fitness -= 1 / (d + 1);
+        this.fitness -= 5 / (d + 1);
     }
 }
 

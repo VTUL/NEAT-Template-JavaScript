@@ -9,14 +9,7 @@ class Anti {
 
 
   show() {
-    if (this.eat) {
-      fill(0, 255, 0); 
-    }
-    else {
-      fill(255, 105, 150);
-    }
-    noStroke();
-    ellipse(this.x, this.y, this.r * 2);
+    image(acorn, this.x, this.y, this.w, this.h);
   }
 
   checkCollision(player) {
