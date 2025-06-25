@@ -9,7 +9,7 @@ class Anti {
 
 
   show() {
-    image(acorn, this.x, this.y, this.w, this.h);
+    image(acorn, this.x, this.y, this.r * 2, this.r * 2);
   }
 
   checkCollision(player) {

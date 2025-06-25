@@ -20,8 +20,8 @@ class Player {
     this.speed = this.baseSpeed;
     this.speedBoostedUntil = 0;
     this.isInvinUntil = 0;
-    this.x = 150; 
-    this.y = 650;
+    this.x = 180; 
+    this.y = 600;
     this.w = 48;  
     this.h = 32;
     this.dir = "d"; //the direction the player is facing
@@ -31,6 +31,8 @@ class Player {
     this.previousX = this.x;
     this.previousY = this.y;
     this.lastDistanceToTreat = Infinity;
+    this.stallFrames = 0;
+
     
   }
 
@@ -170,16 +172,22 @@ class Player {
     }
   
     if (this.x === this.previousX && this.y === this.previousY) {
-      this.fitness -= 10; //small penalty per frame
+      this.stallFrames++;
+      if (this.stallFrames > 15) {
+        this.fitness -= 5; //increasing penalty the longer it stalls
+      }
+    } else {
+      this.stallFrames = 0; //reset on movement
+      this.fitness += 5;
     }
-
-    
+  
     this.previousX = this.x;
     this.previousY = this.y;
 
-    /*if (this.fitness < -100) { //fitness too low
+    /*if(this.fitness < -150) {
       this.dead = true;
-    }*/ 
+    }*/
+
 }
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -373,7 +381,8 @@ canMove(direction) {
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   //fot Genetic algorithm
   calculateFitness() {
-    if (this.dead) this.fitness -= 10;
+    //this.fitness = score*score;
+    if (this.dead) this.fitness -= 100;
 }
 
 //update fitness every frame instead of after all players die

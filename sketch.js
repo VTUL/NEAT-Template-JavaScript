@@ -78,7 +78,7 @@ function setup() {
     }
   }
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 15; i++) {
     treats.push(new Treat());
   }
 
@@ -142,7 +142,7 @@ function draw() {
   }
 
    //respawn enemies if killed and 5 seconds passed
- if (millis() > enemyRespawnTime && enemies.length < 15) {
+ if (millis() > enemyRespawnTime && enemies.length < 10) {
     enemies.push(new Enemy());
     enemyRespawnTime = millis() + 5000; 
   }

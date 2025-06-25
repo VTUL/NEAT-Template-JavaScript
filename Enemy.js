@@ -41,6 +41,7 @@ class Enemy {
 
     this.currentPatrolIndex = 0;
     this.dropCooldown = 0; 
+    this.facing = "d";
 
     this.isActive = true; 
 }
@@ -55,6 +56,12 @@ class Enemy {
     if (!this.collidesWithBlocks(newX, newY)) {
       this.x = newX;
       this.y = newY;
+    }
+
+    if (abs(targetX - this.x) > abs(targetY - this.y)) {
+      this.facing = targetX < this.x ? "a" : "d"; //left or right
+    } else {
+      this.facing = targetY < this.y ? "w" : "s"; //up or down
     }
   }
 
@@ -98,6 +105,13 @@ class Enemy {
   show() {
   push();
   translate(this.x, this.y);
+  if (this.facing == "a") {
+        scale(-1, 1);
+    } else if (this.facing == "w") {
+        rotate(-HALF_PI);
+    } else if (this.facing == "s") {
+        rotate(HALF_PI);
+    }
   imageMode(CENTER);
   image(squirrel, 0, 0, this.size, this.radius);
   pop();
