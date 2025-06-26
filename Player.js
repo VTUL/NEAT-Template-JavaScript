@@ -20,7 +20,7 @@ class Player {
     this.speed = this.baseSpeed;
     this.speedBoostedUntil = 0;
     this.isInvinUntil = 0;
-    this.x = 180; 
+    this.x = 200; 
     this.y = 600;
     this.w = 48;  
     this.h = 32;
@@ -42,23 +42,13 @@ class Player {
     //the map wrapping is where ai gets stuck a lot, or they get stuck in corners
 
     //stairs1 left and right
-    if (this.x + this.w < 0 && this.y + this.h < 610 && this.y + this.h > 548) {
-      this.x = width;  
-      this.y = 800;
+    if (this.x + this.w < 0 && this.y + this.h > 400 && this.y + this.h < 600) {
+      this.x = width;
+      this.y = 460;  
     }
-    else if (this.x > width && this.y + this.h < 868 && this.y + this.h > 778) {
+    else if (this.x > width && this.y + this.h > 400 && this.y + this.h < 600) {
       this.x = -this.w; 
-      this.y = 560;
-    }
-
-    //stairs2 down and up
-    if (this.x < 278 && this.x > 170 && this.y + this.h > height) {
-      this.x = 700;  
-      this.y = 850;
-    }
-    else if (this.x > 680 && this.x < 730 && this.y + this.h > height) {
-      this.x = 230; 
-      this.y = 850;
+      this.y = 460;
     }
 
     //draw the player sprite

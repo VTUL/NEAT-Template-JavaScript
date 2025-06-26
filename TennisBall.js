@@ -1,9 +1,9 @@
 class TennisBall {
   static spawnPoints = [
-    { x: 200, y: 200 },
+    { x: 200, y: 240 },
     { x: 750, y: 100 },
-    { x: 500, y: 200 },
-    { x: 1000, y: 200 }
+    { x: 800, y: 570 },
+    { x: 102, y: 840 }
   ];
 
   constructor() {

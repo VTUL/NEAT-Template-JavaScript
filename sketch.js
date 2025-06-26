@@ -46,7 +46,7 @@ let blocks = [];
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function preload(){
-  bg = loadImage("images/updated_base_map.png");
+  bg = loadImage("images/Library_Map.png");
   blockImg = loadImage("images/square.png");
   acorn = loadImage("images/Acorn_Item.png");
   squirrel = loadImage("spriteSheets/Enemy_template.png");
@@ -200,7 +200,7 @@ function draw() {
       population.naturalSelection();
     }
   }
-  //drawGrid(); 
+  drawGrid(); 
 }
 //temp function to draw a grid for mapping out patrolls and treats
 function drawGrid() {

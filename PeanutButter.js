@@ -1,9 +1,9 @@
 class PeanutButter {
   static spawnPoints = [
-    { x: 460, y: 150 },
-    { x: 700, y: 800 },
-    { x: 180, y: 600 },
-    { x: 990, y: 770 }
+    { x: 400, y: 90 },
+    { x: 730, y: 800 },
+    { x: 200, y: 600 },
+    { x: 985, y: 700 }
   ];
 
   constructor() {

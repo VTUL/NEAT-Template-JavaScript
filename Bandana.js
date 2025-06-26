@@ -1,9 +1,9 @@
 class Bandana {
   static spawnPoints = [
-    { x: 180, y: 450 },
-    { x: 900, y: 550 },
-    { x: 600, y: 650 },
-    { x: 800, y: 250 }
+    { x: 180, y: 400 },
+    { x: 920, y: 600 },
+    { x: 600, y: 640 },
+    { x: 800, y: 240 }
   ];
 
   constructor() {
@@ -14,7 +14,7 @@ class Bandana {
   }
 
   show() {
-    fill(161, 97, 219);
+    fill(120, 40, 255);
     noStroke();
     ellipse(this.x, this.y, this.r * 2);
   }
