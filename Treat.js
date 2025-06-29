@@ -3,21 +3,49 @@ class Treat {
     { x: 90, y: 90 },
     { x: 290, y: 230 },
     { x: 290, y: 500 },
+    { x: 200, y: 400 },
     { x: 550, y: 450 },
     { x: 900, y: 420 },
+    { x: 540, y: 100 },   
+    { x: 550, y: 300 },  
+    { x: 1020, y: 465 },
+    { x: 90, y: 665 },
+    { x: 220, y: 665 },
+    { x: 200, y: 830 },
+    { x: 350, y: 665 },
+    { x: 500, y: 630 },
+    { x: 600, y: 750 },
+    { x: 720, y: 730 },
+    { x: 850, y: 700 },
+    { x: 1010, y: 800 },
+    { x: 1010, y: 600 },
+    { x: 1010, y: 400 },
+    { x: 1010, y: 100 },
+    { x: 800, y: 400 },
+    { x: 250, y: 830 },
+    { x: 290, y: 90 },
+    { x: 390, y: 230 },
+    { x: 790, y: 230 },
+    { x: 790, y: 830 }
   ];
 
   constructor() {
-    let spawn = random(Treat.spawnPoints); 
-    this.x = spawn.x;
-    this.y = spawn.y;
+   let index = Math.floor(Math.random() * Treat.spawnPoints.length);
+    this.spawn = Treat.spawnPoints.splice(index, 1)[0]; 
+
+    this.x = this.spawn.x;
+    this.y = this.spawn.y;
     this.w = 20;
     this.h = 20;
   }
 
-
   show() {
-      image(yum, this.x, this.y, this.w, this.h);
+    image(yum, this.x, this.y, this.w, this.h);
+  }
+
+  //return spawnpoint to the array
+  eaten(){
+    Treat.spawnPoints.push(this.spawn);
   }
 
   checkCollision(player) {

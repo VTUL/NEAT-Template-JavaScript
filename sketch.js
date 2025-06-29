@@ -78,7 +78,7 @@ function setup() {
     }
   }
 
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 10; i++) {
     treats.push(new Treat());
   }
 
@@ -176,6 +176,14 @@ function draw() {
     textAlign(RIGHT, BOTTOM); 
     textSize(24);
     text("Press P to play as human", width - 10, height - 10);
+  }
+
+  //placeholder text for debugging
+  if (!runBest ) {
+    fill(255);
+    textAlign(LEFT, BOTTOM); 
+    textSize(24);
+    text("Press Space to see all AI runs", 10, height - 10);
   }
 
   
@@ -393,6 +401,7 @@ function handleInteractions(player) {
   //Treats
   for (let i = treats.length - 1; i >= 0; i--) {
     if (treats[i].checkCollision(player)) {
+      treats[i].eaten(); 
       treats.splice(i, 1);
       player.score += 1;
       player.lastScoreMillis = millis();
