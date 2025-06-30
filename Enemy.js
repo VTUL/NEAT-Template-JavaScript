@@ -35,9 +35,9 @@ class Enemy {
     this.x = lerp(p0.x, p1.x, t);
     this.y = lerp(p0.y, p1.y, t);
 
-    this.radius = 15;
+    this.radius = 20;
     this.speed = 1;
-    this.size = 30;
+    this.size = 40;
 
     this.playInvin = false;
 
@@ -45,7 +45,8 @@ class Enemy {
     this.dropCooldown = 0; 
     this.facing = "d";
 
-    this.isActive = true; 
+    this.isActive = true;
+    this.sprite = new Sprite(squirrel, this.size, this.radius, 3);
 }
 
   
@@ -115,7 +116,8 @@ class Enemy {
         rotate(HALF_PI);
     }
   imageMode(CENTER);
-  image(squirrel, 0, 0, this.size, this.radius);
+  //image(squirrel, 0, 0, this.size, this.radius);
+  this.sprite.draw();
   pop();
 }
 

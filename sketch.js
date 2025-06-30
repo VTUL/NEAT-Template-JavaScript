@@ -49,7 +49,7 @@ function preload(){
   bg = loadImage("images/Library_Map.png");
   blockImg = loadImage("images/square.png");
   acorn = loadImage("images/Acorn_Item.png");
-  squirrel = loadImage("spriteSheets/Enemy_template.png");
+  squirrel = loadImage("spriteSheets/Enemy_Side_Template.png");
   yum = loadImage("images/Dog_Treat.png");
   peanut = loadImage("images/Peanut_Butter.png");
   dog = loadImage("spriteSheets/Dog_template_smaller.png");

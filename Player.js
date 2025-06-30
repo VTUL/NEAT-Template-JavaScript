@@ -306,7 +306,7 @@ getSingDistance(obj) {
   this.decision = this.brain.feedForward(this.vision);
   //should there be weight here on if enemy is in a direction to avoid?
 
-  //pair directions with their confidence
+  //pair directions with their confidence - completely remove 
   let directions = ["w", "d", "s", "a"];
   let dirConfidences = this.decision
     .map((conf, i) => ({ dir: directions[i], conf }))
