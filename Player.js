@@ -12,13 +12,12 @@ class Player {
     this.gen = 0;
 
     this.genomeInputs = 8; // 4 for walls, 4 for enemies
-    this.genomeOutputs = 4; // Up, Right, Down, Left
+    this.genomeOutputs = 5; // Up, Right, Down, Left, Sprint
     this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
 
     this.baseSpeed = 5;
     this.boostedSpeed = 10;
     this.speed = this.baseSpeed;
-    this.speedBoostedUntil = 0;
     this.isInvinUntil = 0;
     this.x = 200; 
     this.y = 600;
@@ -32,6 +31,13 @@ class Player {
     this.previousY = this.y;
     this.lastDistanceToTreat = Infinity;
     this.stallFrames = 0;
+
+    this.stamina = 100; 
+    this.maxStamina = 100;
+    this.staminaDrainRate = 0.8; //per frame when sprinting
+    this.staminaRegenRate = this.maxStamina / (30 * 60); //regen over 30 seconds at 60 fps
+    this.isSprinting = false;
+
 
     
   }
@@ -122,12 +128,6 @@ class Player {
         return;
       }
       
-    if (millis() < this.speedBoostedUntil) {
-      this.speed = this.boostedSpeed;
-    } else {
-      this.speed = this.baseSpeed;
-    }
-
     if (millis() < this.isInvinUntil) {
       this.isInvincible = true;
     } else {
@@ -147,6 +147,24 @@ class Player {
       if (keyIsDown(68)) { // D
         this.move("d");
       }
+
+      this.isSprinting = keyIsDown(SHIFT) && this.stamina > 0;
+
+      if (this.isSprinting) {
+        this.speed = this.boostedSpeed;
+        this.stamina -= this.staminaDrainRate;
+      if (this.stamina < 0) {
+        this.stamina = 0;
+      }
+      } else {
+        this.speed = this.baseSpeed;
+        if (this.stamina < this.maxStamina) {
+          this.stamina += this.staminaRegenRate;
+          if (this.stamina > this.maxStamina) {
+            this.stamina = this.maxStamina;
+          }
+       }
+  }
       this.lifespan++;
     } else { // AI control
       this.look();
@@ -157,7 +175,6 @@ class Player {
     let timeSinceScore = millis() - this.lastScoreMillis;
 
     if (timeSinceScore > 20000) { // 20 seconds
-      this.fitness -= 100;
       this.dead = true;
     }
   
@@ -174,9 +191,9 @@ class Player {
     this.previousX = this.x;
     this.previousY = this.y;
 
-    /*if(this.fitness < -150) {
-      this.dead = true;
-    }*/
+    // Inside `if (humanPlaying)` section
+  
+
 
 }
 
@@ -303,27 +320,47 @@ getSingDistance(obj) {
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   //gets the output of the this.brain then converts them to actions
   think() {
-  this.decision = this.brain.feedForward(this.vision);
-  //should there be weight here on if enemy is in a direction to avoid?
+    this.decision = this.brain.feedForward(this.vision);
 
-  //pair directions with their confidence - completely remove 
-  let directions = ["w", "d", "s", "a"];
-  let dirConfidences = this.decision
-    .map((conf, i) => ({ dir: directions[i], conf }))
-    .sort((a, b) => b.conf - a.conf); //sort descending by confidence
+    // sprint decision
+    let wantsToSprint = this.decision[4] > 0.5; // treat as true/false
 
-  if (dirConfidences[0].conf < 0.5){
-    this.move(random(['w', 'a', 's', 'd'])); //add diagonal movements?
-    return;
-  }  //low confidence, random move so its not stuck - doesn't seem to help all that much
-
-  //try each direction in order of confidence
-  for (let { dir } of dirConfidences) {
-    if (this.canMove(dir)) {
-      this.move(dir);
-      break;
+    //decide sprinting
+    if (wantsToSprint && this.stamina > 0) {
+      this.isSprinting = true;
+      this.speed = this.boostedSpeed;
+      this.stamina -= this.staminaDrainRate;
+    if (this.stamina < 0) this.stamina = 0;
+    } else {
+      this.isSprinting = false;
+      this.speed = this.baseSpeed;
+      if (this.stamina < this.maxStamina) {
+        this.stamina += this.staminaRegenRate;
+        if (this.stamina > this.maxStamina) {
+          this.stamina = this.maxStamina;
+        }
+      }
     }
+
+//movement decision
+let directions = ["w", "d", "s", "a"];
+let dirConfidences = this.decision
+  .slice(0, 4) // first four are movement
+  .map((conf, i) => ({ dir: directions[i], conf }))
+  .sort((a, b) => b.conf - a.conf);
+
+if (dirConfidences[0].conf < 0.5) {
+  this.move(random(['w', 'a', 's', 'd']));
+  return;
+}
+
+for (let { dir } of dirConfidences) {
+  if (this.canMove(dir)) {
+    this.move(dir);
+    break;
   }
+}
+
 }
 
 //helper method to check if a move is possible (not blocked by wall)

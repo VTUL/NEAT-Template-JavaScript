@@ -187,6 +187,7 @@ function draw() {
   }
 
   
+  
   drawToScreen();
 
   if (showBestEachGen) { //show the best of each gen
@@ -208,7 +209,27 @@ function draw() {
       population.naturalSelection();
     }
   }
-  drawGrid(); 
+  //drawGrid(); 
+
+  if (humanPlaying && humanPlayer && humanPlayer.stamina !== undefined) {
+  let barWidth = 200;
+  let barHeight = 20;
+  let staminaRatio = humanPlayer.stamina / humanPlayer.maxStamina;
+
+  //bar bg
+  fill(50);
+  rect(20, 20, barWidth, barHeight);
+
+  //stamina
+  fill(0, 200, 255);
+  rect(20, 20, barWidth * staminaRatio, barHeight);
+
+  //border
+  stroke(255);
+  noFill();
+  rect(20, 20, barWidth, barHeight);
+}
+
 }
 //temp function to draw a grid for mapping out patrolls and treats
 function drawGrid() {
@@ -410,7 +431,7 @@ function handleInteractions(player) {
 
   //Tennis Ball
   if (ball && ball.checkCollision(player)) {
-    player.speedBoostedUntil = millis() + 3000;
+    player.stamina = player.maxStamina; //reset stamina
     ball = null;
     ballRespawnTime = millis() + 10000;
   }

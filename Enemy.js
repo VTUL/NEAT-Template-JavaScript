@@ -35,9 +35,9 @@ class Enemy {
     this.x = lerp(p0.x, p1.x, t);
     this.y = lerp(p0.y, p1.y, t);
 
-    this.radius = 20;
+    this.radius = 18;
     this.speed = 1;
-    this.size = 40;
+    this.size = 36;
 
     this.playInvin = false;
 
