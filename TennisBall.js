@@ -11,6 +11,9 @@ class TennisBall {
     this.x = spawn.x;
     this.y = spawn.y;
     this.r = 7.5;
+
+    this.life = millis() + 30000;
+    this.idList = [];
   }
 
   show() {

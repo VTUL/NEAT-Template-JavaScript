@@ -3,10 +3,10 @@ class Enemy {
      let spawnOptions = [
       { patrol: [{ x: 60, y: 100 }, { x: 1020, y: 100 }] },
       { patrol: [{ x: 60, y: 240 }, { x: 1020, y: 240 }] },
-      { patrol: [{ x: 60, y: 480 }, { x: 1020, y: 480 }] },
-      { patrol: [{ x: 60, y: 400 }, { x: 1020, y: 400 }] },
+      { patrol: [{ x: 100, y: 480 }, { x: 1020, y: 480 }] },
+      { patrol: [{ x: 100, y: 400 }, { x: 1020, y: 400 }] },
       { patrol: [{ x: 550, y: 100 }, { x: 550, y: 500 }] },
-      { patrol: [{ x: 60, y: 100 }, { x: 60, y: 500 }] },
+      { patrol: [{ x: 60, y: 100 }, { x: 60, y: 400 }] },
       { patrol: [{ x: 1020, y: 100 }, { x: 1020, y: 830 }] },
       { patrol: [{ x: 90, y: 500 }, { x: 90, y: 830 }] },
       { patrol: [{ x: 220, y: 500 }, { x: 220, y: 830 }] },
@@ -36,7 +36,7 @@ class Enemy {
     this.y = lerp(p0.y, p1.y, t);
 
     this.radius = 18;
-    this.speed = 1;
+    this.speed = 3;
     this.size = 36;
 
     this.playInvin = false;

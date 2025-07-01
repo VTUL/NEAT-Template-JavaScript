@@ -25,7 +25,7 @@ class Treat {
     { x: 250, y: 830 },
     { x: 290, y: 90 },
     { x: 390, y: 230 },
-    { x: 790, y: 230 },
+    { x: 690, y: 230 },
     { x: 790, y: 830 }
   ];
 
@@ -37,6 +37,10 @@ class Treat {
     this.y = this.spawn.y;
     this.w = 20;
     this.h = 20;
+
+    this.life = millis() + 30000;
+
+    this.idList = [];
   }
 
   show() {

@@ -60,7 +60,7 @@ function setup() {
   let canvas = createCanvas(1080, 900);
   canvas.parent("canvasContainer");
 
-  population = new Population(500);
+  population = new Population(500); //maybe make smaller, lots of lag/slowdown
 
   wall = new Wall(MAP_DATA); //map for collisions
 
@@ -83,23 +83,23 @@ function setup() {
   }
 
   ball = new TennisBall();
-  ballRespawnTime = millis() + 10000;
+  ballRespawnTime = 0; // allow immediate usage on start
   ban = new Bandana();
-  bandanaRespawnTime = millis() + 20000;
+  bandanaRespawnTime = 0;
   pb = new PeanutButter();
-  PBRespawnTime = millis() + 60000;
+  PBRespawnTime = 0;
 
   for (let i = 0; i < 5; i++) {
     enemies.push(new Enemy());
   }
  
-  
 }
+
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 function draw() {
   background(255);
 
-//add treats/collectibles to the screen
+  //add treats/collectibles to the screen
   if (bg) {
     image(bg, 0, 0, width, height); 
   }
@@ -120,57 +120,73 @@ function draw() {
     ban.show();
   }
 
-  if (!pb && millis() > PBRespawnTime) {
-    pb = new PeanutButter();
-    PBRespawnTime = millis() + 60000;
-  }
-
   if (pb) {
     pb.show();
   }
 
-   //respawn ball if it was collected and 10 seconds passed
-  if (!ball && millis() > ballRespawnTime) {
+  // Respawn Peanut Butter if missing and timer passed
+  if ((!pb || pb.life < millis()) && millis() > PBRespawnTime) {
+    pb = new PeanutButter();
+    PBRespawnTime = millis() + 60000;
+  } else if (pb && pb.life < millis()) {
+    // Mark pb for respawn and clear current instance
+    pb = null;
+    PBRespawnTime = millis() + 60000;
+  }
+
+  // Respawn Tennis Ball if missing and timer passed
+  if ((!ball || ball.life < millis()) && millis() > ballRespawnTime) {
     ball = new TennisBall();
+    ballRespawnTime = millis() + 10000;
+  } else if (ball && ball.life < millis()) {
+    ball = null;
     ballRespawnTime = millis() + 10000;
   }
 
-  //respawn bandana if it was collected and 60 seconds passed
-  if (!ban && millis() > bandanaRespawnTime) {
+  // Respawn Bandana if missing and timer passed
+  if ((!ban || ban.life < millis()) && millis() > bandanaRespawnTime) {
     ban = new Bandana();
+    bandanaRespawnTime = millis() + 60000;
+  } else if (ban && ban.life < millis()) {
+    ban = null;
     bandanaRespawnTime = millis() + 60000;
   }
 
-   //respawn enemies if killed and 5 seconds passed
- if (millis() > enemyRespawnTime && enemies.length < 10) {
+  // Respawn enemies if killed and timer passed
+  if (millis() > enemyRespawnTime && enemies.length < 10) {
     enemies.push(new Enemy());
-    enemyRespawnTime = millis() + 5000; 
+    enemyRespawnTime = millis() + 5000;
   }
 
-  //respawn treats if it was collected and 3 seconds passed
- if (treats.length <= 5 && millis() > treatRespawnTime) {
-    if(treats.length < 15){
-      treats.push(new Treat());
-    }
+  // Respawn treats if count low and timer passed
+  if (millis() > treatRespawnTime && treats.length < 15) {
+    treats.push(new Treat());
     treatRespawnTime = millis() + 3000; 
   }
 
-  //backwards loop for easier splicing
+  // Remove expired treats
+  for (let i = treats.length - 1; i >= 0; i--) {
+    if (treats[i].life < millis()) {
+      treats[i].eaten(); //return spawn point to the array if needed
+      treats.splice(i, 1);
+    }
+  }
+
+  // Move and show enemies, remove inactive
   for (let i = enemies.length - 1; i >= 0; i--) {
-  enemies[i].move();
-  enemies[i].show();
+    enemies[i].move();
+    enemies[i].show();
 
-  if (!enemies[i].isActive) {
-    enemies.splice(i, 1); //.01% chance to disappear
+    if (!enemies[i].isActive) {
+      enemies.splice(i, 1);
+    }
   }
-  }
-
 
   for (let a of anti) {
-  a.show();
+    a.show();
   }
   
-//placeholder text so player knows how to start playing
+  //placeholder text so player knows how to start playing
   if (!humanPlaying && !runBest && !showBestEachGen) {
     fill(255);
     textAlign(RIGHT, BOTTOM); 
@@ -185,14 +201,12 @@ function draw() {
     textSize(24);
     text("Press Space to see all AI runs", 10, height - 10);
   }
-
-  
   
   drawToScreen();
 
   if (showBestEachGen) { //show the best of each gen
     showBestPlayersForEachGeneration();
-  } else if (humanPlaying) { //if the user is controling the ship[
+  } else if (humanPlaying) { //if the user is controling the ship
     showHumanPlaying();
   } else if (runBest) { //if replaying the best ever game
     showBestEverPlayer();
@@ -202,8 +216,8 @@ function draw() {
       for (let i = 0; i < population.players.length; i++) {
         if (!population.players[i].dead) {
           handleInteractions(population.players[i]);
+        }
       }
-  }
     } else { //all dead
       //genetic algorithm
       population.naturalSelection();
@@ -212,25 +226,26 @@ function draw() {
   //drawGrid(); 
 
   if (humanPlaying && humanPlayer && humanPlayer.stamina !== undefined) {
-  let barWidth = 200;
-  let barHeight = 20;
-  let staminaRatio = humanPlayer.stamina / humanPlayer.maxStamina;
+    let barWidth = 200;
+    let barHeight = 20;
+    let staminaRatio = humanPlayer.stamina / humanPlayer.maxStamina;
 
-  //bar bg
-  fill(50);
-  rect(20, 20, barWidth, barHeight);
+    //bar bg
+    fill(50);
+    rect(20, 20, barWidth, barHeight);
 
-  //stamina
-  fill(0, 200, 255);
-  rect(20, 20, barWidth * staminaRatio, barHeight);
+    //stamina
+    fill(0, 200, 255);
+    rect(20, 20, barWidth * staminaRatio, barHeight);
 
-  //border
-  stroke(255);
-  noFill();
-  rect(20, 20, barWidth, barHeight);
+    //border
+    stroke(255);
+    noFill();
+    rect(20, 20, barWidth, barHeight);
+  }
 }
 
-}
+
 //temp function to draw a grid for mapping out patrolls and treats
 function drawGrid() {
   let gridSize = 100; 
@@ -421,32 +436,31 @@ function handleInteractions(player) {
 
   //Treats
   for (let i = treats.length - 1; i >= 0; i--) {
-    if (treats[i].checkCollision(player)) {
-      treats[i].eaten(); 
-      treats.splice(i, 1);
+    if (treats[i].checkCollision(player) && !treats[i].idList.includes(player.uuid)) {
       player.score += 1;
+      treats[i].idList.push(player.uuid); //add player id to the treat
       player.lastScoreMillis = millis();
     }
   }
 
   //Tennis Ball
-  if (ball && ball.checkCollision(player)) {
+  if (ball && ball.checkCollision(player) && !ball.idList.includes(player.uuid)) {
     player.stamina = player.maxStamina; //reset stamina
-    ball = null;
+    ball.idList.push(player.uuid); //add player id
     ballRespawnTime = millis() + 10000;
   }
 
   //Bandana
-  if (ban && ban.checkCollision(player)) {
+  if (ban && ban.checkCollision(player && !ban.idList.includes(player.uuid))) {
     player.isInvincible = true;
     player.isInvinUntil = millis() + 10000;
-    ban = null;
+    ban.idList.push(player.uuid); //add player id
     bandanaRespawnTime = millis() + 60000;
   }
 
    //Peanut Butter
-  if (pb && pb.checkCollision(player)) {
-    pb = null;
+  if (pb && pb.checkCollision(player)&& !pb.idList.includes(player.uuid)) {
+    pb.idList.push(player.uuid); //add player id
     player.score += 10;
     PBRespawnTime = millis() + 60000;
     player.lastScoreMillis = millis();
@@ -454,12 +468,12 @@ function handleInteractions(player) {
 
   //Anti
   for (let i = anti.length - 1; i >= 0; i--) {
-    if (anti[i].checkCollision(player) && !player.isInvincible) {
-      anti.splice(i, 1);
+    if (anti[i].checkCollision(player) && !player.isInvincible && !anti[i].idList.includes(player.uuid)) {
+      anti[i].idList.push(player.uuid); //add player id
       player.score -= 5;
     }
 
-    //get rid of make in
+    //get rid of anti penalty
     if (anti[i]) {
     if (player.isInvincible) {
       anti[i].playInvin = true;  
@@ -475,7 +489,7 @@ function handleInteractions(player) {
     player.dead = true;
   }
 
-  //random chance of enemy being
+  //enemy invincibility handling
   if (enemies[i]) {
     if (player.isInvincible) {
       enemies[i].playInvin = true;  
@@ -486,4 +500,3 @@ function handleInteractions(player) {
 }
 
 }
-

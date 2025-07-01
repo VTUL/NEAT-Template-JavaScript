@@ -12,6 +12,9 @@ class PeanutButter {
     this.y = spawn.y;
     this.w = 25;
     this.h = 25;
+
+    this.life = millis() + 30000;
+    this.idList = [];
   }
   show() {
     image(peanut, this.x, this.y, this.w, this.h);

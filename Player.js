@@ -19,8 +19,8 @@ class Player {
     this.boostedSpeed = 10;
     this.speed = this.baseSpeed;
     this.isInvinUntil = 0;
-    this.x = 200; 
-    this.y = 600;
+    this.x = 20; 
+    this.y = 470;
     this.w = 48;  
     this.h = 32;
     this.dir = "d"; //the direction the player is facing
@@ -38,7 +38,7 @@ class Player {
     this.staminaRegenRate = this.maxStamina / (30 * 60); //regen over 30 seconds at 60 fps
     this.isSprinting = false;
 
-
+    this.uuid = self.crypto.randomUUID();
     
   }
 
