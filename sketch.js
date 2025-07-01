@@ -431,6 +431,7 @@ function keyPressed() {
   }
 }
 
+//maybe have unique function for humanplayer where things disappear
 function handleInteractions(player) {
   if (player.dead) return;
 
