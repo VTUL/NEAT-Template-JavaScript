@@ -11,7 +11,7 @@ class Player {
     this.score = 0;
     this.gen = 0;
 
-    this.genomeInputs = 8; // 4 for walls, 4 for enemies
+    this.genomeInputs = 4 + 4 + 2 * 5; // walls + enemies + 5 items (treats, anti, ban, ball, pb)
     this.genomeOutputs = 5; // Up, Right, Down, Left, Sprint
     this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
 
@@ -199,20 +199,40 @@ class Player {
 
     //----------------------------------------------------------------------------------------------------------------------------------------------------------
 
-    look() {
+  look() {
+  this.vision = [];
 
-    this.vision = [];
+  // 4 values for walls
+  this.vision.push(...this.getWallDistances());
 
-    // Push distances to vision array
-    this.vision.push(...this.getWallDistances());
-    this.vision.push(...this.getMultDistances(enemies));
-    this.vision.push(...this.getMultDistances(treats));
-    this.vision.push(...this.getMultDistances(anti));
-    this.vision.push(...this.getSingDistance(ban));
-    this.vision.push(...this.getSingDistance(ball));
-    this.vision.push(...this.getSingDistance(pb));
+  // 4 values for enemies (same format as walls)
+  this.vision.push(...this.getEnemyDistances(enemies));
 
-  }
+  // Each of these now returns 2 values: [distance, direction]
+  this.vision.push(...this.getMultDistances(treats));
+  this.vision.push(...this.getMultDistances(anti));
+  this.vision.push(...this.getSingDistance(ban));
+  this.vision.push(...this.getSingDistance(ball));
+  this.vision.push(...this.getSingDistance(pb));
+}
+
+
+getDirectionBucket(dx, dy) {
+  let angle = atan2(dy, dx); // -PI to PI
+  angle = degrees(angle);
+  if (angle < 0) angle += 360;
+
+  // 8-direction compass (every 45°)
+  if (angle >= 337.5 || angle < 22.5) return 4;   // East
+  if (angle >= 22.5 && angle < 67.5) return 3;    // NE
+  if (angle >= 67.5 && angle < 112.5) return 2;   // North
+  if (angle >= 112.5 && angle < 157.5) return 1;  // NW
+  if (angle >= 157.5 && angle < 202.5) return 8;  // West
+  if (angle >= 202.5 && angle < 247.5) return 7;  // SW
+  if (angle >= 247.5 && angle < 292.5) return 6;  // South
+  if (angle >= 292.5 && angle < 337.5) return 5;  // SE
+}
+
 
 //vision not wide enough?
 getWallDistances() {
@@ -249,6 +269,34 @@ getWallDistances() {
 
 //gets distance of array items
 getMultDistances(obj) {
+  if (obj.length === 0) return [0, 0]; //nothing seen
+
+  let maxVision = 300;
+  let nearest = null;
+  let minDist = maxVision;
+
+  for (let o of obj) {
+    let dx = o.x - this.x;
+    let dy = o.y - this.y;
+    let d = dist(this.x, this.y, o.x, o.y);
+
+    if (d < minDist) {
+      minDist = d;
+      nearest = { dx, dy, dist: d };
+    }
+  }
+
+  if (nearest) {
+    let normalizedDist = 1 / (nearest.dist + 1); //avoid div by 0
+    let directionBucket = this.getDirectionBucket(nearest.dx, nearest.dy);
+    return [normalizedDist, directionBucket];
+  }
+
+  return [0, 0]; //nothing seen, return zero distance and direction
+}
+
+
+getEnemyDistances(obj) {
   let maxVision = 300;
   let coneWidth = 80; // wider cone tolerance
 
@@ -282,35 +330,19 @@ getMultDistances(obj) {
 
 //gets single item
 getSingDistance(obj) {
-  if (!obj) return [0, 0, 0, 0];
-
-  let maxVision = 300;
-  let coneWidth = 80;
-
-  let distances = [maxVision, maxVision, maxVision, maxVision]; // up, right, down, left
+  if (!obj) return [0, 0];
 
   let dx = obj.x - this.x;
   let dy = obj.y - this.y;
+  let d = dist(this.x, this.y, obj.x, obj.y);
 
-  // Up
-  if (dy < 0 && abs(dx) < coneWidth && abs(dy) < maxVision) {
-    distances[0] = abs(dy);
-  }
-  // Right
-  if (dx > 0 && abs(dy) < coneWidth && abs(dx) < maxVision) {
-    distances[1] = abs(dx);
-  }
-  // Down
-  if (dy > 0 && abs(dx) < coneWidth && abs(dy) < maxVision) {
-    distances[2] = abs(dy);
-  }
-  // Left
-  if (dx < 0 && abs(dy) < coneWidth && abs(dx) < maxVision) {
-    distances[3] = abs(dx);
-  }
+  if (d > 300) return [0, 0]; // Out of vision
 
-  return distances.map(d => d === maxVision ? 0 : 1 / d);
+  let normalizedDist = 1 / (d + 1);
+  let directionBucket = this.getDirectionBucket(dx, dy);
+  return [normalizedDist, directionBucket];
 }
+
 
 
 
@@ -454,8 +486,6 @@ updateFitness() {
         this.fitness -= 5 / (d + 1);
     }
 }
-
-
 
   getNearestMult(obj) {
   if (obj.length == 0) return null;

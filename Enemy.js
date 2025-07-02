@@ -1,6 +1,6 @@
 class Enemy {
- constructor() {
-     let spawnOptions = [
+
+   static spawnOptions = [
       { patrol: [{ x: 60, y: 100 }, { x: 1020, y: 100 }] },
       { patrol: [{ x: 60, y: 240 }, { x: 1020, y: 240 }] },
       { patrol: [{ x: 100, y: 480 }, { x: 1020, y: 480 }] },
@@ -22,10 +22,12 @@ class Enemy {
   
     ];
 
-    let randomIndex = floor(random(spawnOptions.length));
-    let selectedSpawn = spawnOptions[randomIndex];
+ constructor() {
+    
 
-    this.patrolPoints = selectedSpawn.patrol;
+    let randomIndex = floor(random(Enemy.spawnOptions.length));
+    this.spawn = Enemy.spawnOptions.splice(randomIndex, 1)[0];
+    this.patrolPoints = this.spawn.patrol;
 
     //random spawn position along patrol line
     let t = random(0, 1); 
@@ -47,6 +49,10 @@ class Enemy {
 
     this.isActive = true;
     this.sprite = new Sprite(squirrel, this.size, this.radius, 3);
+
+    this.spawnTime = millis();  //store the spawn time
+    this.collisionDelay = 3000; //3 seconds
+
 }
 
   
@@ -70,10 +76,14 @@ class Enemy {
 
   move() {
      // .01% chance per frame to disappear
-    if (random(1) < 0.001) { 
-        this.isActive = false;
-        return; // Stop moving if disappearing
+    if (random(1) < 0.001) {
+      if (this.spawn) {
+        Enemy.spawnOptions.push(this.spawn); //reusable
+      }
+    this.isActive = false;
+    return;
     }
+
 
     this.patrol();
 
@@ -123,7 +133,8 @@ class Enemy {
 
 
   checkCollision(player) {
-    if (!player) return false;
+    //collision delay to prevent immediate collision on player
+    if (!player || millis() - this.spawnTime < this.collisionDelay) return false;
 
     let playerLeft = player.x;
     let playerRight = player.x + player.w;
@@ -138,6 +149,7 @@ class Enemy {
     let distanceSq = dx * dx + dy * dy;
 
     let radius = this.size / 2;
+
     return distanceSq < (radius + 2) * (radius + 2);
   }
 

@@ -42,8 +42,6 @@ var peanut;
 var yum;
 let wall;
 let blocks = [];
-let pendingReset = false;
-
 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -80,12 +78,8 @@ function setup() {
     }
   }
 
-  //maybe not have a timer for beginning spawns
   for (let i = 0; i < 15; i++) {
-    if (millis() > treatRespawnTime) {
-      treats.push(new Treat());
-      treatRespawnTime = millis() + 1000; 
-    }
+    treats.push(new Treat());
   }
 
   ball = new TennisBall();
@@ -104,11 +98,6 @@ function setup() {
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 function draw() {
   background(255);
-
-  /*if (pendingReset) {
-  resetGame();
-  pendingReset = false;
-  }*/
 
   //add treats/collectibles to the screen
   if (bg) {
@@ -186,7 +175,7 @@ function draw() {
     } else { //all dead
       //genetic algorithm
       population.naturalSelection();
-      //pendingReset = true; //game state reset at next frame
+      //resetGame(); //reset the game state for the next generation
     }
   }
   //drawGrid(); 
@@ -235,7 +224,7 @@ function handleRespawns() {
   //respawn treats if count low and timer passed
   if (millis() > treatRespawnTime && treats.length < 15) {
     treats.push(new Treat());
-    treatRespawnTime = millis() + 1000; 
+    treatRespawnTime = millis() + 3000; 
   }
 
   //remove expired treats
@@ -529,25 +518,35 @@ function handleInteractions(player) {
 
 //function to reset the game state
 function resetGame() {
+  // Clear all dynamic game state
+  treats = [];
+  enemies = [];
+  anti = [];
 
-  //clear arrays
-  treats.length = 0;
-  enemies.length = 0;
-  anti.length = 0;
+  ball = null;
+  ban = null;
+  pb = null;
 
+  // Reset collectibles
   ball = new TennisBall();
   ban = new Bandana();
   pb = new PeanutButter();
 
-  //reset timers
+  // Set their respawn times based on current millis
   ballRespawnTime = millis() + 10000;
   bandanaRespawnTime = millis() + 60000;
   PBRespawnTime = millis() + 60000;
+
+  // Reset treat timer
   treatRespawnTime = millis() + 3000;
   enemyRespawnTime = millis() + 5000;
 
-  for (let i = 0; i < 15; i++) treats.push(new Treat());
-  for (let i = 0; i < 5; i++) enemies.push(new Enemy());
+  // Add initial treats and enemies
+  for (let i = 0; i < 15; i++) {
+    treats.push(new Treat());
+  }
+  for (let i = 0; i < 5; i++) {
+    enemies.push(new Enemy());
+  }
 }
-
 
