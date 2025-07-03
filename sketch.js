@@ -1,22 +1,14 @@
-
-//this is a template to add a NEAT ai to any game
-//note //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-//this means that there is some information specific to the game to input here
-
-
 var nextConnectionNo = 1000;
 var population;
 var speed = 60;
 
-
-var showBest = true; //true if only show the best of the previous generation
+var showBest = false; //true if only show the best of the previous generation
 var runBest = false; //true if replaying the best ever game
 var humanPlaying = false; //true if the user is playing
 
 var humanPlayer;
 
-
-var showBrain = false;
+var showBrain = true;
 var showBestEachGen = false;
 var upToGen = 0;
 var genPlayerTemp; //player
@@ -25,14 +17,14 @@ var showNothing = false;
 let treats = [];
 let enemies = []; 
 let anti = [];
-let ball;
-let ban;
-let ballRespawnTime = 0;
+let balls = [];
+let bandanas = [];
+let ballsRespawnTime = 0;
 let treatRespawnTime = 0;
 let PBRespawnTime = 0;
 let bandanaRespawnTime = 0;
 let enemyRespawnTime = 0;
-let pb;
+let pb = [];
 var bg;
 var blockImg;
 var dog;
@@ -60,7 +52,7 @@ function setup() {
   let canvas = createCanvas(1080, 900);
   canvas.parent("canvasContainer");
 
-  population = new Population(500);
+  population = new Population(100);
 
   wall = new Wall(MAP_DATA); //map for collisions
 
@@ -78,25 +70,36 @@ function setup() {
     }
   }
 
-  for (let i = 0; i < 10; i++) {
+  resetGameState();
+  
+}
+
+function resetGameState() {
+  treats = [];
+  enemies = [];
+  balls = [];
+  bandanas = [];
+  pb = [];
+
+  for (let i = 0; i < 20; i++) {
     treats.push(new Treat());
   }
 
-  ball = new TennisBall();
+  balls.push(new TennisBall());
+  bandanas.push(new Bandana());
+  pb.push(new PeanutButter());
+
   ballRespawnTime = millis() + 10000;
-  ban = new Bandana();
   bandanaRespawnTime = millis() + 20000;
-  pb = new PeanutButter();
   PBRespawnTime = millis() + 60000;
 
   for (let i = 0; i < 5; i++) {
     enemies.push(new Enemy());
   }
- 
-  
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 function draw() {
+  frameRate(30)
   background(255);
 
 //add treats/collectibles to the screen
@@ -108,36 +111,36 @@ function draw() {
     blocks[i].show();
 
 
-  for (let i = treats.length - 1; i >= 0; i--) {
+  for (let i = 0; i < treats.length; i++) {
     treats[i].show();
   }
 
-  if (ball) {
-    ball.show();
+  if (balls?.length >= 1) {
+    balls[0].show();
   }
 
-  if (ban) {
-    ban.show();
+  if (bandanas?.length >= 1) {
+    bandanas[0].show();
   }
 
-  if (!pb && millis() > PBRespawnTime) {
-    pb = new PeanutButter();
+  if (pb?.length < 1 && millis() > PBRespawnTime) {
+    pb.push(new PeanutButter());
     PBRespawnTime = millis() + 60000;
   }
 
-  if (pb) {
-    pb.show();
+  if (pb?.length >= 1) {
+    pb[0].show();
   }
 
-   //respawn ball if it was collected and 10 seconds passed
-  if (!ball && millis() > ballRespawnTime) {
-    ball = new TennisBall();
-    ballRespawnTime = millis() + 10000;
+   //respawn balls if it was collected and 10 seconds passed
+  if (balls.length === 0 && millis() > ballsRespawnTime) {
+    balls.push(new TennisBall());
+    ballsRespawnTime = millis() + 10000;
   }
 
   //respawn bandana if it was collected and 60 seconds passed
-  if (!ban && millis() > bandanaRespawnTime) {
-    ban = new Bandana();
+  if (bandanas.length === 0 && millis() > bandanaRespawnTime) {
+    bandanas.push(new Bandana());
     bandanaRespawnTime = millis() + 60000;
   }
 
@@ -148,11 +151,9 @@ function draw() {
   }
 
   //respawn treats if it was collected and 3 seconds passed
- if (treats.length <= 5 && millis() > treatRespawnTime) {
-    if(treats.length < 15){
+ if (treats.length <= 15 && millis() > treatRespawnTime) {
       treats.push(new Treat());
-    }
-    treatRespawnTime = millis() + 3000; 
+    treatRespawnTime = millis() + 1000; 
   }
 
   //backwards loop for easier splicing
@@ -207,6 +208,7 @@ function draw() {
     } else { //all dead
       //genetic algorithm
       population.naturalSelection();
+      resetGameState();
     }
   }
   //drawGrid(); 
@@ -276,7 +278,7 @@ function showHumanPlaying() {
     humanPlayer.look();
     humanPlayer.update();
     humanPlayer.show();
-    handleInteractions(humanPlayer); //handle interactions with treats, enemies, and the tennis ball
+    handleInteractions(humanPlayer); //handle interactions with treats, enemies, and the tennis balls
 
   }
   else { //once done return to ai
@@ -337,12 +339,12 @@ function writeInfo() {
     info += "Score: " + population.bestPlayer.score + "<br>";
     info += "Gen: " + population.gen + "<br>";
   } else {
-    if (showBest) {
+    // if (showBest) {
       info += "Score: " + population.players[0].score + "<br>";
       info += "Gen: " + population.gen + "<br>";
       info += "Species: " + population.species.length + "<br>";
       info += "Global Best Score: " + population.bestScore + "<br>";
-    }
+    // }
   }
 
   // Write the info to the HTML div
@@ -429,24 +431,24 @@ function handleInteractions(player) {
     }
   }
 
-  //Tennis Ball
-  if (ball && ball.checkCollision(player)) {
+  //Tennis balls
+  if (balls?.length >= 0 && balls[0]?.checkCollision(player)) {
     player.stamina = player.maxStamina; //reset stamina
-    ball = null;
-    ballRespawnTime = millis() + 10000;
+    balls = [];
+    ballsRespawnTime = millis() + 10000;
   }
 
   //Bandana
-  if (ban && ban.checkCollision(player)) {
+  if (bandanas?.length >= 0 && bandanas[0]?.checkCollision(player)) {
     player.isInvincible = true;
     player.isInvinUntil = millis() + 10000;
-    ban = null;
+    bandanas = [];
     bandanaRespawnTime = millis() + 60000;
   }
 
    //Peanut Butter
-  if (pb && pb.checkCollision(player)) {
-    pb = null;
+  if (pb?.length >= 0 && pb[0]?.checkCollision(player)) {
+    pb = [];
     player.score += 10;
     PBRespawnTime = millis() + 60000;
     player.lastScoreMillis = millis();
@@ -473,6 +475,7 @@ function handleInteractions(player) {
   for (let i = enemies.length - 1; i >= 0; i--) {
   if (enemies[i].checkCollision(player) && !player.isInvincible) {
     player.dead = true;
+    player.fitnessPenalty += 200;
   }
 
   //random chance of enemy being

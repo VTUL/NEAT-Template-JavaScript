@@ -94,6 +94,9 @@ class Population {
 
 
     var averageSum = this.getAvgFitnessSum();
+
+    console.log("Average Fitness  " + averageSum + "  Best Fitness Score  " + this.species[this.species.length -1].bestFitness + "  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+
     var children = [];
     for (var j = 0; j < this.species.length; j++) { //for each this.species
       children.push(this.species[j].champ.clone()); //add champion without any mutation

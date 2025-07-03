@@ -32,10 +32,7 @@ class Genome {
     this.nextNode++;
     this.nodes[this.biasNode].layer = 0;
 
-
-
   }
-
 
   fullyConnect(innovationHistory) {
 

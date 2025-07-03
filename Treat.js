@@ -31,7 +31,7 @@ class Treat {
 
   constructor() {
    let index = Math.floor(Math.random() * Treat.spawnPoints.length);
-    this.spawn = Treat.spawnPoints.splice(index, 1)[0]; 
+    this.spawn = Treat.spawnPoints[index]; 
 
     this.x = this.spawn.x;
     this.y = this.spawn.y;
