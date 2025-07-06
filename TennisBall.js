@@ -1,10 +1,12 @@
 class TennisBall {
-  static spawnPoints = [
+  static originalSpawnPoints = [
     { x: 200, y: 240 },
     { x: 750, y: 100 },
     { x: 800, y: 570 },
     { x: 102, y: 840 }
   ];
+
+   static spawnPoints = [...TennisBall.originalSpawnPoints];
 
   constructor() {
     let spawn = random(TennisBall.spawnPoints); 
@@ -19,7 +21,11 @@ class TennisBall {
   show() {
     fill(123, 245, 60);
     noStroke();
-    ellipse(this.x, this.y, this.r * 2);
+    image(tennis, this.x, this.y, this.r*2, this.r*2);
+  }
+
+  static resetSpawns() {
+    TennisBall.spawnPoints = [...TennisBall.originalSpawnPoints];
   }
 
 checkCollision(player) {

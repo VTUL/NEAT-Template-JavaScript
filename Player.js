@@ -11,7 +11,7 @@ class Player {
     this.score = 0;
     this.gen = 0;
 
-    this.genomeInputs = 4 + 4 + 2 * 5; // walls + enemies + 5 items (treats, anti, ban, ball, pb)
+    this.genomeInputs = 14; // walls + enemies + 5 items (treats, anti, ban, ball, pb)
     this.genomeOutputs = 5; // Up, Right, Down, Left, Sprint
     this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
 

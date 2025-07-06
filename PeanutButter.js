@@ -1,10 +1,12 @@
 class PeanutButter {
-  static spawnPoints = [
+  static originalSpawnPoints = [
     { x: 400, y: 90 },
     { x: 730, y: 800 },
     { x: 200, y: 600 },
     { x: 985, y: 700 }
   ];
+
+  static spawnPoints = [...PeanutButter.originalSpawnPoints];
 
   constructor() {
     let spawn = random(PeanutButter.spawnPoints); 
@@ -18,6 +20,10 @@ class PeanutButter {
   }
   show() {
     image(peanut, this.x, this.y, this.w, this.h);
+  }
+
+  static resetSpawns() {
+    PeanutButter.spawnPoints = [...PeanutButter.originalSpawnPoints];
   }
 
 checkCollision(player) {

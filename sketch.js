@@ -33,6 +33,8 @@ let PBRespawnTime = 0;
 let bandanaRespawnTime = 0;
 let enemyRespawnTime = 0;
 let pb;
+
+//images
 var bg;
 var blockImg;
 var dog;
@@ -40,6 +42,9 @@ var acorn;
 var squirrel;
 var peanut;
 var yum;
+var glasses;
+var tennis;
+
 let wall;
 let blocks = [];
 let pendingReset = false;
@@ -54,7 +59,9 @@ function preload(){
   squirrel = loadImage("spriteSheets/Enemy_Side_Template.png");
   yum = loadImage("images/Dog_Treat.png");
   peanut = loadImage("images/Peanut_Butter.png");
-  dog = loadImage("spriteSheets/Dog_template_smaller.png");
+  dog = loadImage("spriteSheets/Dog_walk.png");
+  glasses = loadImage("images/SunGlasses.png");
+  tennis = loadImage("images/Ball-1.png.png");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -84,7 +91,7 @@ function setup() {
   for (let i = 0; i < 15; i++) {
     if (millis() > treatRespawnTime) {
       treats.push(new Treat());
-      treatRespawnTime = millis() + 1000; 
+      treatRespawnTime = millis() + 500; 
     }
   }
 
@@ -105,19 +112,14 @@ function setup() {
 function draw() {
   background(255);
 
-  /*if (pendingReset) {
-  resetGame();
-  pendingReset = false;
-  }*/
-
   //add treats/collectibles to the screen
   if (bg) {
     image(bg, 0, 0, width, height); 
   }
 
-  for(var i = 0; i < blocks.length; i++)
-    blocks[i].show();
-
+  //for(var i = 0; i < blocks.length; i++){
+    //blocks[i].show();
+  //}
 
   for (let i = treats.length - 1; i >= 0; i--) {
     treats[i].show();
@@ -156,7 +158,7 @@ function draw() {
     fill(255);
     textAlign(RIGHT, BOTTOM); 
     textSize(24);
-    text("Press P to play as human", width - 10, height - 10);
+    text("Press P to play as human", width - 10, height - 4);
   }
 
   //placeholder text for debugging
@@ -164,7 +166,7 @@ function draw() {
     fill(255);
     textAlign(LEFT, BOTTOM); 
     textSize(24);
-    text("Press Space to see all AI runs", 10, height - 10);
+    text("Press Space to see all AI runs", 10, height - 4);
   }
   
   drawToScreen();
@@ -186,7 +188,7 @@ function draw() {
     } else { //all dead
       //genetic algorithm
       population.naturalSelection();
-      //pendingReset = true; //game state reset at next frame
+      resetGame(); //reset the game state for the next generation
     }
   }
   //drawGrid(); 
@@ -383,6 +385,12 @@ function writeInfo() {
       info += "Species: " + population.species.length + "<br>";
       info += "Global Best Score: " + population.bestScore + "<br>";
     }
+    else{
+      //when all runs visible 
+      info += "Gen: " + population.gen + "<br>";
+      info += "Species: " + population.species.length + "<br>";
+      info += "Global Best Score: " + population.bestScore + "<br>";
+    }
   }
 
   //write the info to the HTML div
@@ -449,8 +457,7 @@ function keyPressed() {
           genPlayerTemp = population.genPlayers[upToGen].cloneForReplay();
         }
       } else if (humanPlaying) { //if the user is playing then move player right
-
-        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+        humanPlayer.move("d");
       }
       break;
   }
@@ -477,7 +484,7 @@ function handleInteractions(player) {
   }
 
   //Bandana
-  if (ban && ban.checkCollision(player && !ban.idList.includes(player.uuid))) {
+  if (ban && ban.checkCollision(player) && !ban.idList.includes(player.uuid)) {
     player.isInvincible = true;
     player.isInvinUntil = millis() + 10000;
     ban.idList.push(player.uuid); //add player id
@@ -530,24 +537,40 @@ function handleInteractions(player) {
 //function to reset the game state
 function resetGame() {
 
-  //clear arrays
   treats.length = 0;
   enemies.length = 0;
   anti.length = 0;
 
+  Treat.resetSpawns();
+  Enemy.resetSpawns();
+  TennisBall.resetSpawns();
+  Bandana.resetSpawns();
+  PeanutButter.resetSpawns();
+
+  // Reset collectible items
   ball = new TennisBall();
   ban = new Bandana();
   pb = new PeanutButter();
 
-  //reset timers
-  ballRespawnTime = millis() + 10000;
-  bandanaRespawnTime = millis() + 60000;
-  PBRespawnTime = millis() + 60000;
-  treatRespawnTime = millis() + 3000;
-  enemyRespawnTime = millis() + 5000;
+  // Reset timers for collectible respawns
+  ballRespawnTime = millis() + 10000;       // Tennis ball in 10 seconds
+  bandanaRespawnTime = millis() + 60000;    // Bandana in 60 seconds
+  PBRespawnTime = millis() + 60000;         // Peanut butter in 60 seconds
+  treatRespawnTime = millis() + 1000;       // Treats every 1 second
+  enemyRespawnTime = millis() + 5000;       // Enemies every 5 seconds
 
-  for (let i = 0; i < 15; i++) treats.push(new Treat());
-  for (let i = 0; i < 5; i++) enemies.push(new Enemy());
+  // Repopulate the initial number of treats and enemies
+  for (let i = 0; i < 15; i++) {
+    treats.push(new Treat());
+  }
+
+  for (let i = 0; i < 5; i++) {
+    enemies.push(new Enemy());
+  }
+
+  // You can also reset any collectible history arrays here if needed
+  // e.g., treatCollectionHistory = [], etc.
+
 }
 
 

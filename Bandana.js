@@ -1,10 +1,13 @@
 class Bandana {
-  static spawnPoints = [
+  // Originally named/planned to be a "Bandana" item, but is now sunglasses.
+  static originalSpawnPoints = [
     { x: 180, y: 400 },
     { x: 920, y: 600 },
     { x: 600, y: 640 },
     { x: 800, y: 240 }
   ];
+
+  static spawnPoints = [...Bandana.originalSpawnPoints];
 
   constructor() {
     let spawn = random(Bandana.spawnPoints);
@@ -20,7 +23,11 @@ class Bandana {
   show() {
     fill(120, 40, 255);
     noStroke();
-    ellipse(this.x, this.y, this.r * 2);
+    image(glasses, this.x, this.y, this.r*3, this.r*3);
+  }
+
+  static resetSpawns() {
+    Bandana.spawnPoints = [...Bandana.originalSpawnPoints];
   }
 
 checkCollision(player) {
