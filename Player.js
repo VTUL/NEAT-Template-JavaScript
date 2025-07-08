@@ -19,14 +19,16 @@ class Player {
     this.boostedSpeed = 10;
     this.speed = this.baseSpeed;
     this.isInvinUntil = 0;
-    this.x = 20; 
-    this.y = 470;
+    this.x = 40; 
+    this.y = 450;
     this.w = 48;  
     this.h = 32;
     this.dir = "d"; //the direction the player is facing
     this.isInvincible = false;
     this.lastScoreMillis = millis();
-    this.sprite = new Sprite(dog, this.w, this.h, 6);
+    this.sprite = new Sprite(dog, this.w, this.h, 4);
+    this.spriteUp = new Sprite(dogUp, this.h, this.w, 4);
+    this.spriteDown = new Sprite(dogDown, this.h, this.w, 4);
     this.previousX = this.x;
     this.previousY = this.y;
     this.lastDistanceToTreat = Infinity;
@@ -59,15 +61,32 @@ class Player {
 
     //draw the player sprite
     push();
-    translate(this.x + this.w / 2, this.y + this.h / 2);
+    const cx = this.x + this.w / 2;
+    const cy = this.y + this.h / 2;
 
-    if (this.facing == "a") {
-        scale(-1, 1);
-    } else if (this.facing == "w") {
-        rotate(-HALF_PI);
-    } else if (this.facing == "s") {
-        rotate(HALF_PI);
-    }
+  translate(cx, cy);
+
+  // Handle flipping
+  if (this.facing === "a") {
+    scale(-1, 1);
+  }
+
+  imageMode(CENTER);
+
+  if (this.isInvincible) {
+    tint(0, 255, 0);
+  } else {
+    noTint();
+  }
+
+  // Draw appropriate sprite
+  if (this.facing === "w") {
+    this.spriteUp.draw();
+  } else if (this.facing === "s") {
+    this.spriteDown.draw();
+  } else {
+    this.sprite.draw();
+  }
 
     imageMode(CENTER);
 
@@ -77,7 +96,7 @@ class Player {
       noTint();
     }
 
-    this.sprite.draw();
+    
 
 
     imageMode(CORNER);

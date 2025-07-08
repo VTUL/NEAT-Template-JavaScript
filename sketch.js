@@ -42,7 +42,7 @@ var acorn;
 var squirrel;
 var peanut;
 var yum;
-var glasses;
+var bed;
 var tennis;
 
 let wall;
@@ -57,10 +57,13 @@ function preload(){
   blockImg = loadImage("images/square.png");
   acorn = loadImage("images/Acorn_Item.png");
   squirrel = loadImage("spriteSheets/Enemy_Side_Template.png");
+  squirrelDown = loadImage("spriteSheets/Enemy_Vertical_1.png");
   yum = loadImage("images/Dog_Treat.png");
   peanut = loadImage("images/Peanut_Butter.png");
   dog = loadImage("spriteSheets/Dog_walk.png");
-  glasses = loadImage("images/SunGlasses.png");
+  dogUp = loadImage("spriteSheets/Dog_Overhead_Walk_2.png");
+  dogDown = loadImage("spriteSheets/dog-overhead.png");
+  bed = loadImage("images/Dog_Bed-1.png.png");
   tennis = loadImage("images/Ball-1.png.png");
 }
 

@@ -23,7 +23,7 @@ class Bandana {
   show() {
     fill(120, 40, 255);
     noStroke();
-    image(glasses, this.x, this.y, this.r*3, this.r*3);
+    image(tennis, this.x, this.y, this.r*2, this.r*2);
   }
 
   static resetSpawns() {

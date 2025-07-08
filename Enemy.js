@@ -3,7 +3,7 @@ class Enemy {
   static originalSpawnOptions = [
     { patrol: [{ x: 60, y: 100 }, { x: 1020, y: 100 }] },
     { patrol: [{ x: 60, y: 240 }, { x: 1020, y: 240 }] },
-    { patrol: [{ x: 100, y: 480 }, { x: 1020, y: 480 }] },
+    { patrol: [{ x: 190, y: 480 }, { x: 1020, y: 480 }] },
     { patrol: [{ x: 100, y: 400 }, { x: 1020, y: 400 }] },
     { patrol: [{ x: 550, y: 100 }, { x: 550, y: 500 }] },
     { patrol: [{ x: 60, y: 100 }, { x: 60, y: 400 }] },
@@ -20,7 +20,7 @@ class Enemy {
     { patrol: [{ x: 980, y: 500 }, { x: 980, y: 830 }] }
   ];
 
-  // Working list, will be mutated by splice()
+  
   static spawnOptions = [...Enemy.originalSpawnOptions];
 
   static resetSpawns() {
@@ -52,9 +52,10 @@ class Enemy {
 
     this.isActive = true;
     this.sprite = new Sprite(squirrel, this.size, this.radius, 3);
+    this.spriteDown = new Sprite(squirrelDown, this.radius, this.size, 4);
 
     this.spawnTime = millis();
-    this.collisionDelay = 3000;
+    this.collisionDelay = 1500; //if enemy spawns on player, no insta-kill
   }
 
   moveTo(targetX, targetY) {
@@ -115,13 +116,18 @@ class Enemy {
     translate(this.x, this.y);
     if (this.facing == "a") {
       scale(-1, 1);
+      this.sprite.draw();
     } else if (this.facing == "w") {
-      rotate(-HALF_PI);
+      scale(-1, -1); //placeholder but sprite jumps a bit
+      this.spriteDown.draw();
     } else if (this.facing == "s") {
-      rotate(HALF_PI);
+      this.spriteDown.draw();
+    }
+    else{
+      this.sprite.draw();
     }
     imageMode(CENTER);
-    this.sprite.draw();
+    
     pop();
   }
 

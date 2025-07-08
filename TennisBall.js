@@ -1,9 +1,9 @@
 class TennisBall {
   static originalSpawnPoints = [
-    { x: 200, y: 240 },
-    { x: 750, y: 100 },
+    { x: 200, y: 215 },
+    { x: 750, y: 80 },
     { x: 800, y: 570 },
-    { x: 102, y: 840 }
+    { x: 102, y: 830 }
   ];
 
    static spawnPoints = [...TennisBall.originalSpawnPoints];
@@ -21,7 +21,7 @@ class TennisBall {
   show() {
     fill(123, 245, 60);
     noStroke();
-    image(tennis, this.x, this.y, this.r*2, this.r*2);
+    image(bed, this.x, this.y, this.r*5, this.r*5);
   }
 
   static resetSpawns() {
