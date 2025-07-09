@@ -37,6 +37,7 @@ class Treat {
     this.y = this.spawn.y;
     this.w = 20;
     this.h = 20;
+    this.pickedUpBy = [];
   }
 
   show() {

@@ -9,10 +9,13 @@ class Player {
     this.dead = false;
     this.score = 0;
     this.gen = 0;
-    this.distanceMarker = 0;
-    this.distanceRewardModifier = 1;
-    this.pickupRewardModifier = 8;
+    this.distanceInterval = 20;
+    this.distanceReward = 100;
+    this.pickupRewardModifier = 1000;
+    this.distance = 0;
     this.fitnessPenalty = 0;
+    this.penaltyModifier = 100;
+    this.distanceModifier = 500;
 
     this.genomeInputs = 10; // 4 for walls, 5 for pickups 1 for enemies
     this.genomeOutputs = 4; // Up, Right, Down, Left, Sprint
@@ -24,8 +27,8 @@ class Player {
     this.boostedSpeed = 10;
     this.speed = this.baseSpeed;
     this.isInvinUntil = 0;
-    this.x = 275;
-    this.y = 450;
+    this.x = 516;
+    this.y = 375;
     this.w = 48;
     this.h = 32;
     this.dir = "d"; //the direction the player is facing
@@ -35,6 +38,9 @@ class Player {
     this.previousX = this.x;
     this.previousY = this.y;
     this.stallFrames = 0;
+
+    this.distanceTrackerX = this.x;
+    this.distanceTrackerY = this.y;
 
     this.stamina = 100;
     this.maxStamina = 100;
@@ -101,7 +107,11 @@ class Player {
           )
         ) {
           this.x = this.x - this.speed;
-          this.distanceMarker += this.speed;
+          if((Math.abs(this.distanceTrackerX - this.x) > this.distanceInterval || Math.abs(this.distanceTrackerY - this.y) > this.distanceInterval)) {
+            this.distanceTrackerX = this.x;
+            this.distanceTrackerY = this.y;
+            this.distance += this.distanceReward;
+          }
         } else {
           this.fitnessPenalty += 1;
         }
@@ -116,7 +126,11 @@ class Player {
           )
         ) {
           this.x = this.x + this.speed;
-          this.distanceMarker += this.speed;
+          if((Math.abs(this.distanceTrackerX - this.x) > this.distanceInterval || Math.abs(this.distanceTrackerY - this.y) > this.distanceInterval)) {
+            this.distanceTrackerX = this.x;
+            this.distanceTrackerY = this.y;
+            this.distance += this.distanceReward;
+          }
         } else {
           this.fitnessPenalty += 1;
         }
@@ -125,13 +139,17 @@ class Player {
         if (
           !this.collidesWithBlocks(
             this.x,
-            this.y - this.speed - 2,
+            this.y - this.speed - 5,
             this.w,
             this.h
           )
         ) {
           this.y = this.y - this.speed;
-          this.distanceMarker += this.speed;
+          if((Math.abs(this.distanceTrackerX - this.x) > this.distanceInterval || Math.abs(this.distanceTrackerY - this.y) > this.distanceInterval)) {
+            this.distanceTrackerX = this.x;
+            this.distanceTrackerY = this.y;
+            this.distance += this.distanceReward;
+          }
         } else {
           this.fitnessPenalty += 1;
         }
@@ -140,13 +158,17 @@ class Player {
         if (
           !this.collidesWithBlocks(
             this.x,
-            this.y + this.speed + 2,
+            this.y + this.speed + 5,
             this.w,
             this.h
           )
         ) {
           this.y = this.y + this.speed;
-          this.distanceMarker += this.speed;
+          if((Math.abs(this.distanceTrackerX - this.x) > this.distanceInterval || Math.abs(this.distanceTrackerY - this.y) > this.distanceInterval)) {
+            this.distanceTrackerX = this.x;
+            this.distanceTrackerY = this.y;
+            this.distance += this.distanceReward;
+          }
         } else {
           this.fitnessPenalty += 1;
         }
@@ -189,8 +211,9 @@ class Player {
       this.lifespan++;
     } 
 
+    // console.info("ID: ", this.id);
     // console.info("Fitness Penalty: ", this.fitnessPenalty);
-    // console.info("Distance Marker: ", this.distanceMarker);
+    // console.info("Distance: ", this.distance);
     // console.info("X: ", this.x);
     // console.info("Y: ", this.y);
 
@@ -212,6 +235,11 @@ class Player {
     this.vision.push(map(this.getWallDistances(this.checkRight), 1, 30, 0, 1));
     this.vision.push(map(this.getWallDistances(this.checkDown), 1, 30, 0, 1));
     this.vision.push(map(this.getWallDistances(this.checkLeft), 1, 30, 0, 1));
+
+    // console.info("Vision Raw - Up: ", this.getWallDistances(this.checkUp))
+    // console.info("Vision Raw - Right: ", this.getWallDistances(this.checkRight))
+    // console.info("Vision Raw - Down: ", this.getWallDistances(this.checkDown))
+    // console.info("Vision Raw - Left: ", this.getWallDistances(this.checkLeft))
 
     this.vision.push(map(this.getDistance(enemies, centerX, centerY), 0, 1500, 0, 1));
     this.vision.push(map(this.getDistance(treats, centerX, centerY), 0, 1500, 0, 1));
@@ -242,7 +270,7 @@ class Player {
 
   checkUp(i) {
     return (
-      this.collidesWithBlocks(this.x, this.y - i, this.w, this.h)
+      this.collidesWithBlocks(this.x, this.y - i - 10, this.w, this.h)
     );
   }
 
@@ -260,7 +288,7 @@ class Player {
 
   checkLeft(i) {
     return (
-      this.collidesWithBlocks(this.x - i, this.y, this.w, this.h)
+      this.collidesWithBlocks(this.x - i - 5, this.y, this.w, this.h)
     );
   }
 
@@ -269,6 +297,7 @@ class Player {
       return 1500;
     }
     return targets?.reduce((accumulator, currentValue) => {
+      if(currentValue.pickedUpBy?.includes(this.id)) {return accumulator};
       const temp =
         Math.abs(centerX - currentValue.x) + Math.abs(centerY - currentValue.y);
       if (temp < accumulator) {
@@ -306,6 +335,17 @@ class Player {
   think() {
     let max = 0;
     let maxIndex;
+    // console.info("Vision - Up: ", this.vision[0]);
+    // console.info("Vision - Right: ", this.vision[1]);
+    // console.info("Vision - Down: ", this.vision[2]);
+    // console.info("Vision - Left: ", this.vision[3]);
+    // console.info("Vision - Enemies: ", this.vision[4]);
+    // console.info("Vision - Treats: ", this.vision[5]);
+    // console.info("Vision - Anti: ", this.vision[6]);
+    // console.info("Vision - Bandanas: ", this.vision[7]);
+    // console.info("Vision - Ball: ", this.vision[8]);
+    // console.info("Vision - PB: ", this.vision[9]);
+
     this.decision = this.brain.feedForward(this.vision);
 
     //movement decision
@@ -314,7 +354,8 @@ class Player {
       // if (this.self == population[0] && !this.dead) {
       //   console.info(i + ": ", this.canMove(directions[i]));
       // }
-      if (this.decision[i] > max && this.canMove(directions[i])) {
+      // if (this.decision[i] > max && this.canMove(directions[i])) {
+      if (this.decision[i] > max) {
         max = this.decision[i];
         maxIndex = i;
       }
@@ -385,7 +426,8 @@ class Player {
   }
 
   calculateFitness() {
-    this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier)  - this.fitnessPenalty;
+    // this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier)  - this.fitnessPenalty;
+    this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distance * this.distanceModifier) - (this.fitnessPenalty * this.penaltyModifier);
   }
 
   crossover(parent2) {

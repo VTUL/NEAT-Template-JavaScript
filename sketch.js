@@ -52,7 +52,7 @@ function setup() {
   let canvas = createCanvas(1080, 900);
   canvas.parent("canvasContainer");
 
-  population = new Population(100);
+  population = new Population(500);
 
   wall = new Wall(MAP_DATA); //map for collisions
 
@@ -98,7 +98,7 @@ function resetGameState() {
   }
 }
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
-function draw() {
+function draw(){
   frameRate(30)
   background(255);
 
@@ -166,6 +166,12 @@ function draw() {
   }
   }
 
+  // if(population.players.length > 0){
+  //   stroke('blue');
+  // strokeWeight(5);
+  // point(population.players[0].x,population.players[0].y)
+  // }
+
 
   for (let a of anti) {
   a.show();
@@ -192,7 +198,7 @@ function draw() {
   drawToScreen();
 
   if (showBestEachGen) { //show the best of each gen
-    showBestPlayersForEachGeneration();
+    showBestdForEachGeneration();
   } else if (humanPlaying) { //if the user is controling the ship[
     showHumanPlaying();
   } else if (runBest) { //if replaying the best ever game
@@ -423,9 +429,10 @@ function handleInteractions(player) {
 
   //Treats
   for (let i = treats.length - 1; i >= 0; i--) {
-    if (treats[i].checkCollision(player)) {
-      treats[i].eaten(); 
-      treats.splice(i, 1);
+    if (treats[i].checkCollision(player) && !treats[i].pickedUpBy.includes(player.id)) {
+      // treats[i].eaten(); 
+      treats[i].pickedUpBy.push(player.id);
+      // treats.splice(i, 1);
       player.score += 1;
       player.lastScoreMillis = millis();
     }
@@ -475,7 +482,7 @@ function handleInteractions(player) {
   for (let i = enemies.length - 1; i >= 0; i--) {
   if (enemies[i].checkCollision(player) && !player.isInvincible) {
     player.dead = true;
-    player.fitnessPenalty += 200;
+    player.fitnessPenalty += 500;
   }
 
   //random chance of enemy being
