@@ -25,14 +25,14 @@ var showNothing = false;
 let treats = [];
 let enemies = []; 
 let anti = [];
-let ball;
-let ban;
-let ballRespawnTime = 0;
+let balls = [];
+let bandanas = [];
+let ballsRespawnTime = 0;
 let treatRespawnTime = 0;
 let PBRespawnTime = 0;
 let bandanaRespawnTime = 0;
 let enemyRespawnTime = 0;
-let pb;
+let pb = [];
 
 //images
 var bg;
@@ -89,30 +89,14 @@ function setup() {
       }
     }
   }
+  
+  resetGame();
 
-  //maybe not have a timer for beginning spawns
-  for (let i = 0; i < 15; i++) {
-    if (millis() > treatRespawnTime) {
-      treats.push(new Treat());
-      treatRespawnTime = millis() + 500; 
-    }
-  }
-
-  ball = new TennisBall();
-  ballRespawnTime = 0; // allow immediate usage on start
-  ban = new Bandana();
-  bandanaRespawnTime = 0;
-  pb = new PeanutButter();
-  PBRespawnTime = 0;
-
-  for (let i = 0; i < 5; i++) {
-    enemies.push(new Enemy());
-  }
- 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 function draw() {
+  frameRate(30);
   background(255);
 
   //add treats/collectibles to the screen
@@ -120,24 +104,20 @@ function draw() {
     image(bg, 0, 0, width, height); 
   }
 
-  //for(var i = 0; i < blocks.length; i++){
-    //blocks[i].show();
-  //}
+  for(var i = 0; i < blocks.length; i++){
+    blocks[i].show();
+  }
 
   for (let i = treats.length - 1; i >= 0; i--) {
     treats[i].show();
   }
 
-  if (ball) {
-    ball.show();
+  if (balls?.length >= 1) {
+    balls[0].show();
   }
 
-  if (ban) {
-    ban.show();
-  }
-
-  if (pb) {
-    pb.show();
+  if (bandanas?.length >= 1) {
+    bandanas[0].show();
   }
 
   handleRespawns(); //handle respawning of items
@@ -148,9 +128,15 @@ function draw() {
     enemies[i].show();
 
     if (!enemies[i].isActive) {
-      enemies.splice(i, 1); 
+      enemies.splice(i, 1); //0.1% chance to disappear
     }
   }
+
+  // if(population.players.length > 0){
+  //   stroke('blue');
+  // strokeWeight(5);
+  // point(population.players[0].x,population.players[0].y)
+  // }
 
   for (let a of anti) {
     a.show();
@@ -204,51 +190,37 @@ function draw() {
 
 function handleRespawns() {
   //respawn Peanut Butter if missing and timer passed
-  if ((!pb || pb.life < millis()) && millis() > PBRespawnTime) {
-    pb = new PeanutButter();
-    PBRespawnTime = millis() + 60000;
-  } else if (pb && pb.life < millis()) {
-    //mark pb for respawn and clear current instance
-    pb = null;
+  if (pb?.length < 1 && millis() > PBRespawnTime) {
+    pb.push(new PeanutButter());
     PBRespawnTime = millis() + 60000;
   }
 
-  //respawn Tennis Ball if missing and timer passed
-  if ((!ball || ball.life < millis()) && millis() > ballRespawnTime) {
-    ball = new TennisBall();
-    ballRespawnTime = millis() + 10000;
-  } else if (ball && ball.life < millis()) {
-    ball = null;
-    ballRespawnTime = millis() + 10000;
+  if (pb?.length >= 1) {
+    pb[0].show();
   }
 
-  //respawn Bandana if missing and timer passed
-  if ((!ban || ban.life < millis()) && millis() > bandanaRespawnTime) {
-    ban = new Bandana();
-    bandanaRespawnTime = millis() + 60000;
-  } else if (ban && ban.life < millis()) {
-    ban = null;
+   //respawn balls if it was collected and 10 seconds passed
+  if (balls.length === 0 && millis() > ballsRespawnTime) {
+    balls.push(new TennisBall());
+    ballsRespawnTime = millis() + 10000;
+  }
+
+  //respawn bandana if it was collected and 60 seconds passed
+  if (bandanas.length === 0 && millis() > bandanaRespawnTime) {
+    bandanas.push(new Bandana());
     bandanaRespawnTime = millis() + 60000;
   }
 
-  //respawn enemies if gone and timer passed
-  if (millis() > enemyRespawnTime && enemies.length < 5) {
+   //respawn enemies if killed and 5 seconds passed
+ if (millis() > enemyRespawnTime && enemies.length < 10) {
     enemies.push(new Enemy());
-    enemyRespawnTime = millis() + 5000;
+    enemyRespawnTime = millis() + 5000; 
   }
 
-  //respawn treats if count low and timer passed
-  if (millis() > treatRespawnTime && treats.length < 15) {
-    treats.push(new Treat());
+  //respawn treats if it was collected and 3 seconds passed
+ if (treats.length <= 15 && millis() > treatRespawnTime) {
+      treats.push(new Treat());
     treatRespawnTime = millis() + 1000; 
-  }
-
-  //remove expired treats
-  for (let i = treats.length - 1; i >= 0; i--) {
-    if (treats[i].life < millis()) {
-      treats[i].eaten(); //return spawn point to the array if needed
-      treats.splice(i, 1);
-    }
   }
 
   //remove expired anti items
@@ -480,23 +452,23 @@ function handleInteractions(player) {
   }
 
   //Tennis Ball
-  if (ball && ball.checkCollision(player) && !ball.idList.includes(player.uuid)) {
+  if (balls?.length >= 0 && balls[0]?.checkCollision(player) && !balls[0].idList.includes(player.uuid)) {
     player.stamina = player.maxStamina; //reset stamina
-    ball.idList.push(player.uuid); //add player id
+    balls[0].idList.push(player.uuid); //add player id
     ballRespawnTime = millis() + 10000;
   }
 
   //Bandana
-  if (ban && ban.checkCollision(player) && !ban.idList.includes(player.uuid)) {
+  if (bandanas?.length >= 0 && bandanas[0]?.checkCollision(player) && !bandanas[0].idList.includes(player.uuid)) {
     player.isInvincible = true;
     player.isInvinUntil = millis() + 10000;
-    ban.idList.push(player.uuid); //add player id
+    bandanas[0].idList.push(player.uuid); //add player id
     bandanaRespawnTime = millis() + 60000;
   }
 
    //Peanut Butter
-  if (pb && pb.checkCollision(player)&& !pb.idList.includes(player.uuid)) {
-    pb.idList.push(player.uuid); //add player id
+  if (pb?.length >= 0 && pb[0]?.checkCollision(player) && !pb[0].idList.includes(player.uuid)) {
+    pb[0].idList.push(player.uuid); //add player id
     player.score += 10;
     PBRespawnTime = millis() + 60000;
     player.lastScoreMillis = millis();
@@ -539,6 +511,11 @@ function handleInteractions(player) {
 
 //function to reset the game state
 function resetGame() {
+  treats = [];
+  enemies = [];
+  balls = [];
+  bandanas = [];
+  pb = [];
 
   treats.length = 0;
   enemies.length = 0;
@@ -550,20 +527,18 @@ function resetGame() {
   Bandana.resetSpawns();
   PeanutButter.resetSpawns();
 
-  // Reset collectible items
-  ball = new TennisBall();
-  ban = new Bandana();
-  pb = new PeanutButter();
+  balls.push(new TennisBall());
+  bandanas.push(new Bandana());
+  pb.push(new PeanutButter());
 
-  // Reset timers for collectible respawns
-  ballRespawnTime = millis() + 10000;       // Tennis ball in 10 seconds
-  bandanaRespawnTime = millis() + 60000;    // Bandana in 60 seconds
-  PBRespawnTime = millis() + 60000;         // Peanut butter in 60 seconds
-  treatRespawnTime = millis() + 1000;       // Treats every 1 second
-  enemyRespawnTime = millis() + 5000;       // Enemies every 5 seconds
+  //reset timers for collectible respawns
+  ballRespawnTime = millis() + 10000;       //tennis ball in 10 seconds
+  bandanaRespawnTime = millis() + 60000;    //bandana in 60 seconds
+  PBRespawnTime = millis() + 60000;         //peanut butter in 60 seconds
+  treatRespawnTime = millis() + 1000;       //treats every 1 second
+  enemyRespawnTime = millis() + 5000;       //enemies every 5 seconds
 
-  // Repopulate the initial number of treats and enemies
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 20; i++) {
     treats.push(new Treat());
   }
 
@@ -571,8 +546,7 @@ function resetGame() {
     enemies.push(new Enemy());
   }
 
-  // You can also reset any collectible history arrays here if needed
-  // e.g., treatCollectionHistory = [], etc.
+                          
 
 }
 
