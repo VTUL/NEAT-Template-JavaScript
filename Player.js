@@ -9,13 +9,16 @@ class Player {
     this.dead = false;
     this.score = 0;
     this.gen = 0;
-    this.distanceInterval = 20;
-    this.distanceReward = 100;
-    this.pickupRewardModifier = 1000;
+    this.distanceInterval = 50;
+    this.distanceReward = 10;
+    this.pickupRewardModifier = 1;
     this.distance = 0;
     this.fitnessPenalty = 0;
-    this.penaltyModifier = 100;
-    this.distanceModifier = 500;
+    this.penaltyModifier = 1;
+    this.distanceModifier = 1.5;
+    this.deathPenalty = 0;
+    this.deathPenaltyAmount = 125;
+    this.deathModifier = 1;
 
     this.genomeInputs = 10; // 4 for walls, 5 for pickups 1 for enemies
     this.genomeOutputs = 4; // Up, Right, Down, Left, Sprint
@@ -211,9 +214,9 @@ class Player {
       this.lifespan++;
     } 
 
-    // console.info("ID: ", this.id);
-    // console.info("Fitness Penalty: ", this.fitnessPenalty);
-    // console.info("Distance: ", this.distance);
+    console.info("ID: ", this.id);
+    console.info("Fitness Penalty: ", this.fitnessPenalty);
+    console.info("Distance: ", this.distance);
     // console.info("X: ", this.x);
     // console.info("Y: ", this.y);
 
@@ -426,8 +429,11 @@ class Player {
   }
 
   calculateFitness() {
-    // this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier)  - this.fitnessPenalty;
-    this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distance * this.distanceModifier) - (this.fitnessPenalty * this.penaltyModifier);
+    // There are 4 elements that affect fitness: distance moved (positive), positive collectibles, time spent running into a wall (negative), and enemy collision. All except death should be exponential (the more a player does it, the worse it is for their score)
+    // Starting point for penalty amounts:
+    // The penalty for dying should be the same as the penalty for running into the wall for 5 seconds. 125
+    // Picking up a normal treat should be the same amount moving the full distance horizontally across the screen. 160
+    this.fitness = ((this.score * 160) * (this.score * 160) * this.pickupRewardModifier) + (this.distance * this.distance * this.distanceModifier) - (this.fitnessPenalty * this.fitnessPenalty * this.penaltyModifier) - (this.deathPenalty * this.deathModifier);
   }
 
   crossover(parent2) {

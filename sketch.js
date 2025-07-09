@@ -482,7 +482,7 @@ function handleInteractions(player) {
   for (let i = enemies.length - 1; i >= 0; i--) {
   if (enemies[i].checkCollision(player) && !player.isInvincible) {
     player.dead = true;
-    player.fitnessPenalty += 500;
+    player.deathPenalty += player.deathPenaltyAmount;
   }
 
   //random chance of enemy being
