@@ -1,23 +1,29 @@
 class Enemy {
   // Full, unchanging original list
   static originalSpawnOptions = [
-    { patrol: [{ x: 60, y: 100 }, { x: 1020, y: 100 }] },
-    { patrol: [{ x: 60, y: 240 }, { x: 1020, y: 240 }] },
-    { patrol: [{ x: 190, y: 480 }, { x: 1020, y: 480 }] },
-    { patrol: [{ x: 100, y: 400 }, { x: 1020, y: 400 }] },
-    { patrol: [{ x: 550, y: 100 }, { x: 550, y: 500 }] },
-    { patrol: [{ x: 60, y: 100 }, { x: 60, y: 400 }] },
-    { patrol: [{ x: 1020, y: 100 }, { x: 1020, y: 830 }] },
-    { patrol: [{ x: 90, y: 500 }, { x: 90, y: 830 }] },
-    { patrol: [{ x: 220, y: 500 }, { x: 220, y: 830 }] },
-    { patrol: [{ x: 350, y: 500 }, { x: 350, y: 830 }] },
-    { patrol: [{ x: 90, y: 600 }, { x: 350, y: 600 }] },
-    { patrol: [{ x: 90, y: 830 }, { x: 350, y: 830 }] },
-    { patrol: [{ x: 350, y: 640 }, { x: 720, y: 640 }] },
-    { patrol: [{ x: 350, y: 770 }, { x: 720, y: 770 }] },
-    { patrol: [{ x: 730, y: 500 }, { x: 730, y: 830 }] },
-    { patrol: [{ x: 855, y: 500 }, { x: 855, y: 830 }] },
-    { patrol: [{ x: 980, y: 500 }, { x: 980, y: 830 }] }
+    { spawn: {x: -10, y: 100 }, patrol: [{ x: 60, y: 100 }, { x: 500, y: 100 }] },
+    { spawn: {x: 1090, y: 100 }, patrol: [{ x: 1020, y: 100 }, { x: 560, y: 100 }] },
+    { spawn: { x: -10, y: 240 }, patrol: [{ x: 60, y: 240 }, { x: 500, y: 240 }] },
+    { spawn: { x: 1090, y: 240 }, patrol: [{ x: 1020, y: 240 }, { x: 560, y: 240 }] },
+    { spawn: { x: 1090, y: 240 }, patrol: [{ x: 1020, y: 240 }, { x: 560, y: 240 }] },
+    { spawn: { x: 1090, y: 480 },  patrol: [{ x: 1020, y: 480 }, { x: 560, y: 480 }] },
+    { spawn: { x: -10, y: 480 },  patrol: [{ x: 100, y: 480 }, { x: 500, y: 480 }] },
+    { spawn: { x: 1090, y: 400 },  patrol: [{ x: 1020, y: 400 }, { x: 560, y: 400 }] },
+    { spawn: { x: -10, y: 400 },  patrol: [{ x: 100, y: 400 }, { x: 500, y: 400 }] },
+    { spawn: { x: 550, y: -10}, patrol: [{ x: 550, y: 100 }, { x: 550, y: 500 }] },
+    { spawn: { x: 500, y: -10}, patrol: [{ x: 500, y: 100 }, { x: 500, y: 500 }] },
+    { spawn: {x: 60, y: -10}, patrol: [{ x: 60, y: 100 }, { x: 60, y: 400 }] },
+    { spawn: { x: 1020, y: 910}, patrol: [{ x: 1020, y: 830 }, { x: 1020, y: 100 }] },
+    { spawn: { x: 90, y: 910}, patrol: [{ x: 90, y: 830 }, { x: 90, y: 500 }] },
+    { spawn: { x: 220, y: 910}, patrol: [{ x: 220, y: 830 }, { x: 220, y: 500 }] },
+    { spawn: {x: 350, y: 910}, patrol: [{ x: 350, y: 830 }, { x: 350, y: 500 }] },
+    { spawn: {x: -10, y: 600}, patrol: [{ x: 90, y: 600 }, { x: 350, y: 600 }] },
+    { spawn: {x: -10, y: 830}, patrol: [{ x: 90, y: 830 }, { x: 350, y: 830 }] },
+    { spawn: {x: 1090, y: 590}, patrol: [{ x: 350, y: 640 }, { x: 720, y: 640 }] },
+    { spawn: {x: 350, y: 910}, patrol: [{ x: 350, y: 770 }, { x: 720, y: 770 }] },
+    { spawn: {x: 730, y: 910}, patrol: [{ x: 730, y: 830 }, { x: 730, y: 500 }] },
+    { spawn: {x: 855, y: 910}, patrol: [{ x: 855, y: 830 }, { x: 855, y: 500 }] },
+    { spawn: {x: 980, y: 910}, patrol: [{ x: 980, y: 830 }, { x: 980, y: 500 }] }
   ];
 
   
@@ -33,12 +39,12 @@ class Enemy {
     this.patrolPoints = this.spawn.patrol;
 
     //random spawn position along patrol line
-    let t = random(0, 1);
-    let p0 = this.patrolPoints[0];
-    let p1 = this.patrolPoints[1];
+    //let t = random(0, 1);
+   //let p0 = this.patrolPoints[0];
+    //let p1 = this.patrolPoints[1];
 
-    this.x = lerp(p0.x, p1.x, t);
-    this.y = lerp(p0.y, p1.y, t);
+    this.x = this.spawn.spawn.x;
+    this.y = this.spawn.spawn.y;
 
     this.radius = 18;
     this.speed = 3;
@@ -55,7 +61,7 @@ class Enemy {
     this.spriteDown = new Sprite(squirrelDown, this.radius, this.size, 4);
 
     this.spawnTime = millis();
-    this.collisionDelay = 1500; //if enemy spawns on player, no insta-kill
+    //this.collisionDelay = 1500; //if enemy spawns on player, no insta-kill
   }
 
   moveTo(targetX, targetY) {
@@ -63,10 +69,10 @@ class Enemy {
     let newX = this.x + this.speed * cos(angle);
     let newY = this.y + this.speed * sin(angle);
 
-    if (!this.collidesWithBlocks(newX, newY)) {
-      this.x = newX;
-      this.y = newY;
-    }
+    
+    this.x = newX;
+    this.y = newY;
+    
 
     if (abs(targetX - this.x) > abs(targetY - this.y)) {
       this.facing = targetX < this.x ? "a" : "d";
@@ -102,6 +108,7 @@ class Enemy {
   }
 
   patrol() {
+
     let target = this.patrolPoints[this.currentPatrolIndex];
     let d = dist(this.x, this.y, target.x, target.y);
     this.moveTo(target.x, target.y);
@@ -151,7 +158,7 @@ class Enemy {
     return distanceSq < (radius + 2) * (radius + 2);
   }
 
-  collidesWithBlocks(x, y) {
+  /*collidesWithBlocks(x, y) {
     let tempEnemy = {
       x: x - this.size / 2,
       y: y - this.size / 2,
@@ -165,5 +172,5 @@ class Enemy {
       }
     }
     return false;
-  }
+  }*/
 }
