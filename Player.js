@@ -18,7 +18,7 @@ class Player {
     this.distanceModifier = 500;
 
     this.genomeInputs = 10; // 4 for walls, 5 for pickups 1 for enemies
-    this.genomeOutputs = 4; // Up, Right, Down, Left, Sprint
+    this.genomeOutputs = 5; // Up, Right, Down, Left, Sprint
     this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
 
     this.uuid = crypto.randomUUID();
@@ -56,17 +56,17 @@ class Player {
   }
 
   show() {
-    // if (this.x + this.w < 0 && this.y + this.h > 400 && this.y + this.h < 600) {
-    //   this.x = width;
-    //   this.y = 460;
-    // } else if (
-    //   this.x > width &&
-    //   this.y + this.h > 400 &&
-    //   this.y + this.h < 600
-    // ) {
-    //   this.x = -this.w;
-    //   this.y = 460;
-    // }
+     /*if (this.x + this.w < 0 && this.y + this.h > 400 && this.y + this.h < 600) {
+       this.x = width;
+       this.y = 460;
+     } else if (
+      this.x > width &&
+       this.y + this.h > 400 &&
+       this.y + this.h < 600
+     ) {
+       this.x = -this.w;
+       this.y = 460;
+     }*/
 
      //draw the player sprite
      push();
@@ -99,7 +99,7 @@ class Player {
     imageMode(CORNER);
     pop();
 
-    //colision box
+    //collision box
     noFill();
     stroke(255, 0, 0);
     rect(this.x, this.y, this.w, this.h);
@@ -383,7 +383,7 @@ class Player {
 
     //movement decision
     let directions = ["w", "d", "s", "a"];
-    for (var i = 0; i < this.decision.length; i++) {
+    for (let i = 0; i < 4; i++) {
       // if (this.self == population[0] && !this.dead) {
       //   console.info(i + ": ", this.canMove(directions[i]));
       // }
@@ -393,6 +393,8 @@ class Player {
         maxIndex = i;
       }
     }
+
+    this.isSprinting = this.decision[4] >= 1 && this.stamina > 0;
     // if (this.self == population[0] && !this.dead) {
     //     console.info("chosen direction: ", directions[maxIndex]);
     //   }

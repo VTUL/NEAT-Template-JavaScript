@@ -5,15 +5,16 @@ class Enemy {
     { spawn: {x: 1090, y: 100 }, patrol: [{ x: 1020, y: 100 }, { x: 560, y: 100 }] },
     { spawn: { x: -10, y: 240 }, patrol: [{ x: 60, y: 240 }, { x: 500, y: 240 }] },
     { spawn: { x: 1090, y: 240 }, patrol: [{ x: 1020, y: 240 }, { x: 560, y: 240 }] },
-    { spawn: { x: 1090, y: 240 }, patrol: [{ x: 1020, y: 240 }, { x: 560, y: 240 }] },
     { spawn: { x: 1090, y: 480 },  patrol: [{ x: 1020, y: 480 }, { x: 560, y: 480 }] },
     { spawn: { x: -10, y: 480 },  patrol: [{ x: 100, y: 480 }, { x: 500, y: 480 }] },
     { spawn: { x: 1090, y: 400 },  patrol: [{ x: 1020, y: 400 }, { x: 560, y: 400 }] },
     { spawn: { x: -10, y: 400 },  patrol: [{ x: 100, y: 400 }, { x: 500, y: 400 }] },
-    { spawn: { x: 550, y: -10}, patrol: [{ x: 550, y: 100 }, { x: 550, y: 500 }] },
-    { spawn: { x: 500, y: -10}, patrol: [{ x: 500, y: 100 }, { x: 500, y: 500 }] },
+    { spawn: { x: 580, y: -10}, patrol: [{ x: 580, y: 100 }, { x: 580, y: 500 }] },
+    { spawn: { x: 530, y: -10}, patrol: [{ x: 530, y: 100 }, { x: 530, y: 500 }] },
+    { spawn: { x: 480, y: -10}, patrol: [{ x: 480, y: 100 }, { x: 480, y: 500 }] },
     { spawn: {x: 60, y: -10}, patrol: [{ x: 60, y: 100 }, { x: 60, y: 400 }] },
-    { spawn: { x: 1020, y: 910}, patrol: [{ x: 1020, y: 830 }, { x: 1020, y: 100 }] },
+    { spawn: { x: 1020, y: 910}, patrol: [{ x: 1020, y: 830 }, { x: 1020, y: 500 }] },
+    { spawn: { x: 1020, y: -10}, patrol: [{ x: 1020, y: 100 }, { x: 1020, y: 440 }] },
     { spawn: { x: 90, y: 910}, patrol: [{ x: 90, y: 830 }, { x: 90, y: 500 }] },
     { spawn: { x: 220, y: 910}, patrol: [{ x: 220, y: 830 }, { x: 220, y: 500 }] },
     { spawn: {x: 350, y: 910}, patrol: [{ x: 350, y: 830 }, { x: 350, y: 500 }] },
@@ -46,9 +47,9 @@ class Enemy {
     this.x = this.spawn.spawn.x;
     this.y = this.spawn.spawn.y;
 
-    this.radius = 18;
+    this.h = 18;
     this.speed = 3;
-    this.size = 36;
+    this.w = 36;
 
     this.playInvin = false;
 
@@ -57,8 +58,8 @@ class Enemy {
     this.facing = "d";
 
     this.isActive = true;
-    this.sprite = new Sprite(squirrel, this.size, this.radius, 3);
-    this.spriteDown = new Sprite(squirrelDown, this.radius, this.size, 4);
+    this.sprite = new Sprite(squirrel, this.w, this.h, 3);
+    this.spriteDown = new Sprite(squirrelDown, this.h, this.w, 4);
 
     this.spawnTime = millis();
     //this.collisionDelay = 1500; //if enemy spawns on player, no insta-kill
@@ -108,55 +109,68 @@ class Enemy {
   }
 
   patrol() {
+  let target = this.patrolPoints[this.currentPatrolIndex];
+  let d = dist(this.x, this.y, target.x, target.y);
 
-    let target = this.patrolPoints[this.currentPatrolIndex];
-    let d = dist(this.x, this.y, target.x, target.y);
+  if (d < 5) {
+    this.x = target.x;
+    this.y = target.y;
+  
+    this.currentPatrolIndex = (this.currentPatrolIndex + 1) % this.patrolPoints.length;
+  } else {
     this.moveTo(target.x, target.y);
-
-    if (d < 5) {
-      this.currentPatrolIndex = (this.currentPatrolIndex + 1) % this.patrolPoints.length;
-    }
   }
+}
+
 
   show() {
     push();
-    translate(this.x, this.y);
-    if (this.facing == "a") {
+    const cx = this.x + this.w / 2;
+    const cy = this.y + this.h / 2;
+
+    translate(cx, cy);
+
+    if (this.facing === "a") {
       scale(-1, 1);
-      this.sprite.draw();
-    } else if (this.facing == "w") {
-      scale(-1, -1); //placeholder but sprite jumps a bit
-      this.spriteDown.draw();
-    } else if (this.facing == "s") {
-      this.spriteDown.draw();
-    }
-    else{
-      this.sprite.draw();
-    }
+   }
+
     imageMode(CENTER);
+
+  //different sprites for different directions
+    if (this.facing === "w") {
+      scale(-1, -1);
+      this.spriteDown.draw();
+    } else if (this.facing === "s") {
+      this.spriteDown.draw();
+    } else {
+      this.sprite.draw();
+    }
+
+    imageMode(CORNER);
+    pop();
     
     pop();
+    noFill();
+    stroke(255, 0, 0);
+    rect(this.x, this.y, this.w, this.h);
   }
 
   checkCollision(player) {
-    if (!player || millis() - this.spawnTime < this.collisionDelay) return false;
+  let thisLeft = this.x;
+  let thisRight = this.x + this.w;
+  let thisTop = this.y;
+  let thisBottom = this.y + this.h;
 
-    let playerLeft = player.x;
-    let playerRight = player.x + player.w;
-    let playerTop = player.y;
-    let playerBottom = player.y + player.h;
+  let playerLeft = player.x;
+  let playerRight = player.x + player.w;
+  let playerTop = player.y;
+  let playerBottom = player.y + player.h;
 
-    let closestX = constrain(this.x, playerLeft, playerRight);
-    let closestY = constrain(this.y, playerTop, playerBottom);
+  let overlapX = thisRight > playerLeft && thisLeft < playerRight;
+  let overlapY = thisBottom > playerTop && thisTop < playerBottom;
 
-    let dx = this.x - closestX;
-    let dy = this.y - closestY;
-    let distanceSq = dx * dx + dy * dy;
-
-    let radius = this.size / 2;
-
-    return distanceSq < (radius + 2) * (radius + 2);
-  }
+  return overlapX && overlapY;
+}
 
   /*collidesWithBlocks(x, y) {
     let tempEnemy = {

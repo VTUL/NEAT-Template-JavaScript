@@ -151,13 +151,23 @@ function draw() {
   }
 
   //placeholder text for debugging
-  if (!runBest ) {
+  if (showBest) {
     fill(255);
     textAlign(LEFT, BOTTOM); 
     textSize(24);
     text("Press Space to see all AI runs", 10, height - 4);
   }
+
+  //lets player know if AI is playing
+  if (!humanPlaying) {
+    fill(255);
+    textAlign(CENTER, TOP); 
+    textSize(32);
+    text("AI Playing", 540, 15);
+  }
+
   
+
   drawToScreen();
 
   if (showBestEachGen) { //show the best of each gen
@@ -185,6 +195,7 @@ function draw() {
   if (humanPlaying && humanPlayer && humanPlayer.stamina !== undefined) {
     drawStaminaBar(humanPlayer);
   }
+
   
 }
 
@@ -298,6 +309,13 @@ function showHumanPlaying() {
   }
   else { //once done return to ai
     humanPlaying = false;
+    //different way to let the user know they died
+    /*
+    fill(255);
+    textAlign(CENTER, TOP); 
+    textSize(50);
+    text("You Died", 540, 450);
+  }*/
   }
 }
 //-----------------------------------------------------------------------------------
