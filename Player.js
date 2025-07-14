@@ -195,15 +195,9 @@ class Player {
   }
 
   update() {
-    if (this.dead) {
-      return;
-    }
+    if (this.dead) return;
 
-    if (millis() < this.isInvinUntil) {
-      this.isInvincible = true;
-    } else {
-      this.isInvincible = false;
-    }
+    this.isInvincible = millis() < this.isInvinUntil;
 
     if (humanPlaying) {
       if (keyIsDown(87)) {
@@ -225,38 +219,35 @@ class Player {
 
       this.isSprinting = keyIsDown(SHIFT) && this.stamina > 0;
 
-      if (this.isSprinting) {
-        this.speed = this.boostedSpeed;
-        this.stamina -= this.staminaDrainRate;
-        if (this.stamina < 0) {
-          this.stamina = 0;
-        }
-      } else {
-        this.speed = this.baseSpeed;
-        if (this.stamina < this.maxStamina) {
-          this.stamina += this.staminaRegenRate;
-          if (this.stamina > this.maxStamina) {
-            this.stamina = this.maxStamina;
-          }
-       }
+    }
+
+    //sprint logic
+    if (this.isSprinting && this.stamina > 0) {
+      this.speed = this.boostedSpeed;
+      this.stamina -= this.staminaDrainRate;
+      if (this.stamina < 0) this.stamina = 0;
+    } else {
+      this.speed = this.baseSpeed;
+      if (this.stamina < this.maxStamina) {
+        this.stamina += this.staminaRegenRate;
+      if (this.stamina > this.maxStamina) this.stamina = this.maxStamina;
       }
-
-      this.lifespan++;
     } 
-
+    
     // console.info("ID: ", this.id);
     // console.info("Fitness Penalty: ", this.fitnessPenalty);
     // console.info("Distance: ", this.distance);
     // console.info("X: ", this.x);
     // console.info("Y: ", this.y);
 
-    let timeSinceScore = millis() - this.lastScoreMillis;
-
+    const timeSinceScore = millis() - this.lastScoreMillis;
     if (timeSinceScore > 20000) {
-      // 20 seconds
       this.dead = true;
     }
-  }
+
+    this.lifespan++;
+}
+
 
   look() {
     this.vision = [];
@@ -394,7 +385,7 @@ class Player {
       }
     }
 
-    this.isSprinting = this.decision[4] >= 1 && this.stamina > 0;
+    this.isSprinting = this.decision[4] >= 0.7 && this.stamina > 0;
     // if (this.self == population[0] && !this.dead) {
     //     console.info("chosen direction: ", directions[maxIndex]);
     //   }
@@ -441,6 +432,8 @@ class Player {
     clone.brain.generateNetwork();
     clone.gen = this.gen;
     clone.bestScore = this.score;
+    clone.stamina = this.stamina;
+    clone.maxStamina = this.maxStamina;
     return clone;
   }
 
@@ -455,6 +448,8 @@ class Player {
     clone.brain.generateNetwork();
     clone.gen = this.gen;
     clone.bestScore = this.score;
+    clone.stamina = this.stamina;
+    clone.maxStamina = this.maxStamina;
 
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
     return clone;

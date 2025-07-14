@@ -144,14 +144,25 @@ function draw() {
   
   //placeholder text so player knows how to start playing
   if (!humanPlaying && !runBest && !showBestEachGen) {
+    noStroke();
     fill(255);
     textAlign(RIGHT, BOTTOM); 
     textSize(24);
     text("Press P to play as human", width - 10, height - 4);
   }
 
+  
+  if (!showBestEachGen) {
+    noStroke();
+    fill(255);
+    textAlign(LEFT, BOTTOM); 
+    textSize(24);
+    text("Press G to see best AI each gen", 400, height - 4);
+  }
+
   //placeholder text for debugging
   if (showBest) {
+    noStroke();
     fill(255);
     textAlign(LEFT, BOTTOM); 
     textSize(24);
@@ -160,6 +171,7 @@ function draw() {
 
   //lets player know if AI is playing
   if (!humanPlaying) {
+    noStroke();
     fill(255);
     textAlign(CENTER, TOP); 
     textSize(32);
@@ -194,6 +206,13 @@ function draw() {
 
   if (humanPlaying && humanPlayer && humanPlayer.stamina !== undefined) {
     drawStaminaBar(humanPlayer);
+  }
+  else if(showBestEachGen && genPlayerTemp && genPlayerTemp.stamina !== undefined) {
+    drawStaminaBar(genPlayerTemp);
+  }
+  else if(!humanPlaying && showBest && !showBestEachGen && population.players[0] && population.players[0].stamina !== undefined) {
+    //default what viewer first sees
+    drawStaminaBar(population.players[0]);
   }
 
   
@@ -417,9 +436,11 @@ function keyPressed() {
       runBest = !runBest;
       break;
     case 'G': //show generations
-      showBestEachGen = !showBestEachGen;
-      upToGen = 0;
-      genPlayerTemp = population.genPlayers[upToGen].clone();
+      if (population.genPlayers.length > 0) {
+        showBestEachGen = true;
+        upToGen = 0;
+        genPlayerTemp = population.genPlayers[upToGen].clone();
+      }
       break;
     case 'N': //show absolutely nothing in order to speed up computation
       showNothing = !showNothing;
