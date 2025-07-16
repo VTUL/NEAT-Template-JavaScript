@@ -458,6 +458,7 @@ class Player {
   calculateFitness() {
     // this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier)  - this.fitnessPenalty;
     this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distance * this.distanceModifier) - (this.fitnessPenalty * this.penaltyModifier);
+    
   }
 
   crossover(parent2) {

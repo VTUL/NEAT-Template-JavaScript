@@ -202,7 +202,7 @@ function draw() {
       resetGame(); //reset the game state for the next generation
     }
   }
-  //drawGrid(); 
+  drawGrid(); 
 
   if (humanPlaying && humanPlayer && humanPlayer.stamina !== undefined) {
     drawStaminaBar(humanPlayer);
@@ -248,7 +248,7 @@ function handleRespawns() {
   }
 
   //respawn treats if it was collected and 3 seconds passed
- if (treats.length <= 15 && millis() > treatRespawnTime) {
+ if (treats.length <= 25 && millis() > treatRespawnTime) {
       treats.push(new Treat());
     treatRespawnTime = millis() + 1000; 
   }
@@ -577,7 +577,7 @@ function resetGame() {
   treatRespawnTime = millis() + 1000;       //treats every 1 second
   enemyRespawnTime = millis() + 5000;       //enemies every 5 seconds
 
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 25; i++) {
     treats.push(new Treat());
   }
 
