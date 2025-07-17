@@ -17,7 +17,7 @@ class Player {
     this.penaltyModifier = 100;
     this.distanceModifier = 500;
 
-    this.genomeInputs = 10; // 4 for walls, 5 for pickups 1 for enemies
+    this.genomeInputs = 22; // 4 for walls, 5 for pickups 1 for enemies
     this.genomeOutputs = 5; // Up, Right, Down, Left, Sprint
     this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
 
@@ -34,9 +34,19 @@ class Player {
     this.dir = "d"; //the direction the player is facing
     this.isInvincible = false;
     this.lastScoreMillis = millis();
-    this.sprite = new Sprite(dog, 64, 32, 4);
-    this.spriteUp = new Sprite(dogUp, 28, 72, 4);
-    this.spriteDown = new Sprite(dogDown, 28, 72, 4);
+    this.derek = new Sprite(derek, 64, 32, 4);
+    this.derekUp = new Sprite(derekUp, 28, 72, 4);
+    this.derekDown = new Sprite(derekDown, 28, 72, 4);
+    this.epcot = new Sprite(epcot, 64, 32, 4);
+    this.epcotUp = new Sprite(epcotUp, 28, 72, 4);
+    this.epcotDown = new Sprite(epcotDown, 28, 72, 4);
+    //this.josie = new Sprite(josie, 64, 32, 4);
+    //this.josieUp = new Sprite(josieUp, 28, 72, 4);
+    //this.josieDown = new Sprite(josieDown, 28, 72, 4);
+    this.sprite = [this.derek, this.epcot];
+    this.spriteUp = [this.derekUp, this.epcotUp];
+    this.spriteDown = [this.derekDown, this.epcotDown];
+    this.i = 0;
     this.previousX = this.x;
     this.previousY = this.y;
 
@@ -89,11 +99,11 @@ class Player {
 
   //different sprites for different directions
     if (this.facing === "w") {
-      this.spriteUp.draw();
+      this.spriteUp[this.i].draw();
     } else if (this.facing === "s") {
-      this.spriteDown.draw();
+      this.spriteDown[this.i].draw();
     } else {
-      this.sprite.draw();
+      this.sprite[this.i].draw();
     }
 
     imageMode(CORNER);
@@ -250,32 +260,73 @@ class Player {
 
 
   look() {
-    this.vision = [];
-    const centerX = this.x + this.w / 2;
-    const centerY = this.y + this.h / 2;
+  this.vision = [];
+  const centerX = this.x + this.w / 2;
+  const centerY = this.y + this.h / 2;
 
-    // Push distances to vision array
-    this.vision.push(map(this.getWallDistances(this.checkUp), 1, 30, 0, 1));
-    this.vision.push(map(this.getWallDistances(this.checkRight), 1, 30, 0, 1));
-    this.vision.push(map(this.getWallDistances(this.checkDown), 1, 30, 0, 1));
-    this.vision.push(map(this.getWallDistances(this.checkLeft), 1, 30, 0, 1));
+  //push distances to vision array
+  this.vision.push(map(this.getWallDistances(this.checkUp), 1, 30, 0, 1));
+  this.vision.push(map(this.getWallDistances(this.checkRight), 1, 30, 0, 1));
+  this.vision.push(map(this.getWallDistances(this.checkDown), 1, 30, 0, 1));
+  this.vision.push(map(this.getWallDistances(this.checkLeft), 1, 30, 0, 1));
 
-    // console.info("Vision Raw - Up: ", this.getWallDistances(this.checkUp))
-    // console.info("Vision Raw - Right: ", this.getWallDistances(this.checkRight))
-    // console.info("Vision Raw - Down: ", this.getWallDistances(this.checkDown))
-    // console.info("Vision Raw - Left: ", this.getWallDistances(this.checkLeft))
+  // console.info("Vision Raw - Up: ", this.getWallDistances(this.checkUp))
+  // console.info("Vision Raw - Right: ", this.getWallDistances(this.checkRight))
+  // console.info("Vision Raw - Down: ", this.getWallDistances(this.checkDown))
+  // console.info("Vision Raw - Left: ", this.getWallDistances(this.checkLeft))
 
-    this.vision.push(map(this.getDistance(enemies, centerX, centerY), 0, 1500, 0, 1));
-    this.vision.push(map(this.getDistance(treats, centerX, centerY), 0, 1500, 0, 1));
-    this.vision.push(map(this.getDistance(anti, centerX, centerY), 0, 1500, 0, 1));
-    this.vision.push(map(this.getDistance(bandanas, centerX, centerY), 0, 1500, 0, 1));
-    this.vision.push(map(this.getDistance(balls, centerX, centerY), 0, 1500, 0, 1));
-    this.vision.push(map(this.getDistance(pb, centerX, centerY), 0, 1500, 0, 1));
+  //add directional vector (dx/dy) and distance for each target type
+  const targets = [enemies, treats, anti, balls, beds, pb];
 
-    //  if (this.self == population[0] && !this.dead) {
+  for (let targetList of targets) {
+    const nearest = this.getNearest(targetList, centerX, centerY);
+    if (nearest) {
+      const dx = nearest.x - centerX;
+      const dy = nearest.y - centerY;
+      const maxRange = 1080;
+
+      //normalize and push to vision
+      this.vision.push(map(dx, -maxRange, maxRange, -1, 1));
+      this.vision.push(map(dy, -maxRange, maxRange, -1, 1));
+      const dist = Math.abs(dx) + Math.abs(dy);
+      this.vision.push(map(dist, 0, maxRange, 0, 1));
+    } else {
+      //no target found = neutral values
+      this.vision.push(0); // dx
+      this.vision.push(0); // dy
+      this.vision.push(1); // max distance
+    }
+  }
+
+   //  if (this.self == population[0] && !this.dead) {
       //   console.info("Vision: ", pbData.distance);
       // }
+
   }
+
+
+
+getNearest(targets, centerX, centerY) {
+  if (!targets || targets.length === 0) return null;
+
+  let nearest = null;
+  let minDist = Infinity;
+
+  for (let t of targets) {
+    if (t.idList?.includes(this.uuid)) continue;
+    const dx = t.x - centerX;
+    const dy = t.y - centerY;
+    const dist = Math.abs(dx) + Math.abs(dy);
+
+    if (dist < minDist) {
+      minDist = dist;
+      nearest = t;
+    }
+  }
+
+  return nearest;
+}
+
 
   //vision not wide enough?
   getWallDistances(direction) {
@@ -366,7 +417,7 @@ class Player {
     // console.info("Vision - Enemies: ", this.vision[4]);
     // console.info("Vision - Treats: ", this.vision[5]);
     // console.info("Vision - Anti: ", this.vision[6]);
-    // console.info("Vision - Bandanas: ", this.vision[7]);
+    // console.info("Vision - balls: ", this.vision[7]);
     // console.info("Vision - Ball: ", this.vision[8]);
     // console.info("Vision - PB: ", this.vision[9]);
 
@@ -374,7 +425,7 @@ class Player {
 
     //movement decision
     let directions = ["w", "d", "s", "a"];
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       // if (this.self == population[0] && !this.dead) {
       //   console.info(i + ": ", this.canMove(directions[i]));
       // }

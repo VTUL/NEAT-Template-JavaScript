@@ -25,19 +25,27 @@ var showNothing = false;
 let treats = [];
 let enemies = []; 
 let anti = [];
+let beds = [];
 let balls = [];
-let bandanas = [];
-let ballsRespawnTime = 0;
+let bedsRespawnTime = 0;
 let treatRespawnTime = 0;
 let PBRespawnTime = 0;
-let bandanaRespawnTime = 0;
+let ballRespawnTime = 0;
 let enemyRespawnTime = 0;
 let pb = [];
 
 //images
 var bg;
 var blockImg;
-var dog;
+var derek;
+var derekUp;
+var derekDown;
+var epcot;
+var epcotUp;
+var epcotDown;
+var josie;
+var josieUp;
+var josieDown;
 var acorn;
 var squirrel;
 var peanut;
@@ -53,16 +61,19 @@ let pendingReset = false;
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function preload(){
-  bg = loadImage("images/Library_Map.png");
+  bg = loadImage("images/library_map (1).png");
   blockImg = loadImage("images/square.png");
   acorn = loadImage("images/Acorn_Item.png");
   squirrel = loadImage("spriteSheets/Enemy_Side_Template.png");
   squirrelDown = loadImage("spriteSheets/Enemy_Vertical_1.png");
   yum = loadImage("images/Dog_Treat.png");
   peanut = loadImage("images/Peanut_Butter.png");
-  dog = loadImage("spriteSheets/Dog_walk.png");
-  dogUp = loadImage("spriteSheets/Dog_Overhead_Walk_2.png");
-  dogDown = loadImage("spriteSheets/dog-overhead.png");
+  derek = loadImage("spriteSheets/Derek_walk.png");
+  derekUp = loadImage("spriteSheets/Derek_Overhead_Walk_2.png");
+  derekDown = loadImage("spriteSheets/Derek_overhead_walk.png");
+  epcot = loadImage("spriteSheets/Epcot_walk.png");
+  epcotUp = loadImage("spriteSheets/Epcot_Overhead_Walk_2.png");
+  epcotDown = loadImage("spriteSheets/Epcot_overhead_walk.png");
   bed = loadImage("images/Dog_Bed-1.png.png");
   tennis = loadImage("images/Ball-1.png.png");
 }
@@ -112,12 +123,12 @@ function draw() {
     treats[i].show();
   }
 
-  if (balls?.length >= 1) {
-    balls[0].show();
+  if (beds?.length >= 1) {
+    beds[0].show();
   }
 
-  if (bandanas?.length >= 1) {
-    bandanas[0].show();
+  if (balls?.length >= 1) {
+    balls[0].show();
   }
 
   handleRespawns(); //handle respawning of items
@@ -229,16 +240,16 @@ function handleRespawns() {
     pb[0].show();
   }
 
-   //respawn balls if it was collected and 10 seconds passed
-  if (balls.length === 0 && millis() > ballsRespawnTime) {
-    balls.push(new TennisBall());
-    ballsRespawnTime = millis() + 10000;
+   //respawn beds if it was collected and 10 seconds passed
+  if (beds.length === 0 && millis() > bedsRespawnTime) {
+    beds.push(new DogBed());
+    bedsRespawnTime = millis() + 10000;
   }
 
-  //respawn bandana if it was collected and 60 seconds passed
-  if (bandanas.length === 0 && millis() > bandanaRespawnTime) {
-    bandanas.push(new Bandana());
-    bandanaRespawnTime = millis() + 60000;
+  //respawn TennisBall if it was collected and 60 seconds passed
+  if (balls.length === 0 && millis() > ballRespawnTime) {
+    balls.push(new TennisBall());
+    ballRespawnTime = millis() + 60000;
   }
 
    //respawn enemies if killed and 5 seconds passed
@@ -449,6 +460,25 @@ function keyPressed() {
       humanPlaying = !humanPlaying;
       humanPlayer = new Player();
       break;
+    case 'J':
+      //switch to next dog sprite
+      if (humanPlaying) {
+        humanPlayer.i = (humanPlayer.i + 1) % humanPlayer.sprite.length;
+      }
+      else if (showBestEachGen) {
+        genPlayerTemp.i = (genPlayerTemp.i + 1) % genPlayerTemp.sprite.length;
+      }
+      else if (showBest) {
+        population.players[0].i = (population.players[0].i + 1) % population.players[0].sprite.length;
+      }
+      else if (runBest) {
+        population.bestPlayer.i = (population.bestPlayer.i + 1) % population.bestPlayer.sprite.length;
+      }
+      else if (population && population.players) {
+        for (let player of population.players) {
+          player.i = (player.i + 1) % player.sprite.length;
+        }
+}
   }
   //any of the arrow keys
   switch (keyCode) {
@@ -486,29 +516,37 @@ function handleInteractions(player) {
     if (treats[i].checkCollision(player) && !treats[i].idList.includes(player.uuid)) {
       player.score += 1;
       treats[i].idList.push(player.uuid); //add player id to the treat
+      if(humanPlaying)
+        treats.splice(i, 1); //remove anti item if human player
       player.lastScoreMillis = millis();
     }
   }
 
-  //Tennis Ball
-  if (balls?.length >= 0 && balls[0]?.checkCollision(player) && !balls[0].idList.includes(player.uuid)) {
+  //Dog Beds
+  if (beds?.length >= 0 && beds[0]?.checkCollision(player) && !beds[0].idList.includes(player.uuid)) {
     player.stamina = player.maxStamina; //reset stamina
-    balls[0].idList.push(player.uuid); //add player id
-    ballRespawnTime = millis() + 10000;
+    beds[0].idList.push(player.uuid); //add player id
+    if(humanPlaying)
+      beds.splice(0, 1); //remove anti item if human player
+    bedsRespawnTime = millis() + 20000;
   }
 
-  //Bandana
-  if (bandanas?.length >= 0 && bandanas[0]?.checkCollision(player) && !bandanas[0].idList.includes(player.uuid)) {
+  //TennisBall
+  if (balls?.length >= 0 && balls[0]?.checkCollision(player) && !balls[0].idList.includes(player.uuid)) {
     player.isInvincible = true;
     player.isInvinUntil = millis() + 10000;
-    bandanas[0].idList.push(player.uuid); //add player id
-    bandanaRespawnTime = millis() + 60000;
+    balls[0].idList.push(player.uuid); //add player id
+    if(humanPlaying)
+      balls.splice(0, 1); //remove anti item if human player
+    ballRespawnTime = millis() + 60000;
   }
 
    //Peanut Butter
   if (pb?.length >= 0 && pb[0]?.checkCollision(player) && !pb[0].idList.includes(player.uuid)) {
     pb[0].idList.push(player.uuid); //add player id
     player.score += 10;
+    if(humanPlaying)
+      pb.splice(0, 1); //remove anti item if human player
     PBRespawnTime = millis() + 60000;
     player.lastScoreMillis = millis();
   }
@@ -518,6 +556,8 @@ function handleInteractions(player) {
     if (anti[i].checkCollision(player) && !player.isInvincible && !anti[i].idList.includes(player.uuid)) {
       anti[i].idList.push(player.uuid); //add player id
       player.score -= 5;
+      if(humanPlaying)
+        anti.splice(i, 1); //remove anti item if human player
     }
 
     //get rid of anti penalty
@@ -552,8 +592,8 @@ function handleInteractions(player) {
 function resetGame() {
   treats = [];
   enemies = [];
+  beds = [];
   balls = [];
-  bandanas = [];
   pb = [];
 
   treats.length = 0;
@@ -562,17 +602,17 @@ function resetGame() {
 
   Treat.resetSpawns();
   Enemy.resetSpawns();
+  DogBed.resetSpawns();
   TennisBall.resetSpawns();
-  Bandana.resetSpawns();
   PeanutButter.resetSpawns();
 
+  beds.push(new DogBed());
   balls.push(new TennisBall());
-  bandanas.push(new Bandana());
   pb.push(new PeanutButter());
 
   //reset timers for collectible respawns
-  ballRespawnTime = millis() + 10000;       //tennis ball in 10 seconds
-  bandanaRespawnTime = millis() + 60000;    //bandana in 60 seconds
+  bedsRespawnTime = millis() + 20000;       //dog bed in 20 seconds
+  ballRespawnTime = millis() + 60000;    //TennisBall in 60 seconds
   PBRespawnTime = millis() + 60000;         //peanut butter in 60 seconds
   treatRespawnTime = millis() + 1000;       //treats every 1 second
   enemyRespawnTime = millis() + 5000;       //enemies every 5 seconds

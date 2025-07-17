@@ -1,33 +1,32 @@
-class Bandana {
-  // Originally named/planned to be a "Bandana" item, but is now sunglasses.
+class DogBed {
   static originalSpawnPoints = [
-    { x: 180, y: 400 },
-    { x: 920, y: 600 },
-    { x: 600, y: 640 },
-    { x: 800, y: 240 }
+    { x: 200, y: 215 },
+    { x: 750, y: 80 },
+    { x: 800, y: 570 },
+    { x: 102, y: 830 }
   ];
 
-  static spawnPoints = [...Bandana.originalSpawnPoints];
+   static spawnPoints = [...DogBed.originalSpawnPoints];
 
   constructor() {
-    let spawn = random(Bandana.spawnPoints);
+    let spawn = random(DogBed.spawnPoints); 
     this.x = spawn.x;
     this.y = spawn.y;
-    this.r = 7.5;
+    this.r = 20;
 
-    this.life = millis() + 30000;
+    this.life = millis() + 15000;
     this.idList = [];
-    
   }
 
   show() {
-    fill(120, 40, 255);
-    noStroke();
-    image(tennis, this.x, this.y, this.r*2, this.r*2);
-  }
+  imageMode(CENTER);
+  image(bed, this.x, this.y, this.r * 2, this.r * 2);
+  imageMode(CORNER);  
+}
+
 
   static resetSpawns() {
-    Bandana.spawnPoints = [...Bandana.originalSpawnPoints];
+    DogBed.spawnPoints = [...DogBed.originalSpawnPoints];
   }
 
 checkCollision(player) {
@@ -49,6 +48,5 @@ checkCollision(player) {
   }
   return false;
 }
-
-
+A
 }

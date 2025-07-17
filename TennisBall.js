@@ -1,27 +1,29 @@
 class TennisBall {
+  // Originally named/planned to be a "TennisBall" item, but is now sunglasses.
   static originalSpawnPoints = [
-    { x: 200, y: 215 },
-    { x: 750, y: 80 },
-    { x: 800, y: 570 },
-    { x: 102, y: 830 }
+    { x: 180, y: 400 },
+    { x: 920, y: 600 },
+    { x: 600, y: 640 },
+    { x: 800, y: 240 }
   ];
 
-   static spawnPoints = [...TennisBall.originalSpawnPoints];
+  static spawnPoints = [...TennisBall.originalSpawnPoints];
 
   constructor() {
-    let spawn = random(TennisBall.spawnPoints); 
+    let spawn = random(TennisBall.spawnPoints);
     this.x = spawn.x;
     this.y = spawn.y;
     this.r = 7.5;
 
-    this.life = millis() + 30000;
+    this.life = millis() + 15000;
     this.idList = [];
+    
   }
 
   show() {
-    fill(123, 245, 60);
+    fill(120, 40, 255);
     noStroke();
-    image(bed, this.x, this.y, this.r*5, this.r*5);
+    image(tennis, this.x, this.y, this.r*2, this.r*2);
   }
 
   static resetSpawns() {

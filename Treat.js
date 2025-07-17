@@ -78,7 +78,7 @@ class Treat {
     this.y = this.spawn.y;
     this.w = 20;
     this.h = 20;
-    this.life = millis() + 30000;
+    this.life = millis() + 10000;
     this.idList = [];
   }
 

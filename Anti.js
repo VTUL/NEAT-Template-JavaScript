@@ -4,7 +4,7 @@ class Anti {
     this.y = y;
     this.r = 7.5;
 
-    this.life = millis() + 10000;
+    this.life = millis() + 8000;
     this.idList = [];
 
     this.playInvin = false;
