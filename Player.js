@@ -34,19 +34,22 @@ class Player {
     this.dir = "d"; //the direction the player is facing
     this.isInvincible = false;
     this.lastScoreMillis = millis();
+    
+    //sprite variables
     this.derek = new Sprite(derek, 64, 32, 4);
     this.derekUp = new Sprite(derekUp, 28, 72, 4);
     this.derekDown = new Sprite(derekDown, 28, 72, 4);
     this.epcot = new Sprite(epcot, 64, 32, 4);
     this.epcotUp = new Sprite(epcotUp, 28, 72, 4);
     this.epcotDown = new Sprite(epcotDown, 28, 72, 4);
-    //this.josie = new Sprite(josie, 64, 32, 4);
-    //this.josieUp = new Sprite(josieUp, 28, 72, 4);
-    //this.josieDown = new Sprite(josieDown, 28, 72, 4);
-    this.sprite = [this.derek, this.epcot];
-    this.spriteUp = [this.derekUp, this.epcotUp];
-    this.spriteDown = [this.derekDown, this.epcotDown];
+    this.josie = new Sprite(josie, 64, 32, 4);
+    this.josieUp = new Sprite(josieUp, 28, 72, 4);
+    this.josieDown = new Sprite(josieDown, 28, 72, 4);
+    this.sprite = [this.derek, this.epcot, this.josie];
+    this.spriteUp = [this.derekUp, this.epcotUp, this.josieUp];
+    this.spriteDown = [this.derekDown, this.epcotDown, this.josieDown];
     this.i = 0;
+
     this.previousX = this.x;
     this.previousY = this.y;
 

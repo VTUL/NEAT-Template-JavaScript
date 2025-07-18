@@ -1,4 +1,3 @@
-
 //this is a template to add a NEAT ai to any game
 //note //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
 //this means that there is some information specific to the game to input here
@@ -74,6 +73,9 @@ function preload(){
   epcot = loadImage("spriteSheets/Epcot_walk.png");
   epcotUp = loadImage("spriteSheets/Epcot_Overhead_Walk_2.png");
   epcotDown = loadImage("spriteSheets/Epcot_overhead_walk.png");
+  josie = loadImage("spriteSheets/Josie_walk.png");
+  josieUp = loadImage("spriteSheets/Josie_Overhead_Walk_2.png");
+  josieDown = loadImage("spriteSheets/Josie_overhead_walk.png");
   bed = loadImage("images/Dog_Bed-1.png.png");
   tennis = loadImage("images/Ball-1.png.png");
 }
@@ -120,7 +122,8 @@ function draw() {
   }
 
   for (let i = treats.length - 1; i >= 0; i--) {
-    treats[i].show();
+    if (treats?.length >= 1) 
+      treats[i].show();
   }
 
   if (beds?.length >= 1) {
@@ -183,7 +186,7 @@ function draw() {
   //lets player know if AI is playing
   if (!humanPlaying) {
     noStroke();
-    fill(255);
+    fill(0);
     textAlign(CENTER, TOP); 
     textSize(32);
     text("AI Playing", 540, 15);
@@ -246,10 +249,10 @@ function handleRespawns() {
     bedsRespawnTime = millis() + 10000;
   }
 
-  //respawn TennisBall if it was collected and 60 seconds passed
+  //respawn TennisBall if it was collected and 30 seconds passed
   if (balls.length === 0 && millis() > ballRespawnTime) {
     balls.push(new TennisBall());
-    ballRespawnTime = millis() + 60000;
+    ballRespawnTime = millis() + 30000;
   }
 
    //respawn enemies if killed and 5 seconds passed
@@ -259,8 +262,8 @@ function handleRespawns() {
   }
 
   //respawn treats if it was collected and 3 seconds passed
- if (treats.length <= 25 && millis() > treatRespawnTime) {
-      treats.push(new Treat());
+ if (treats.length < 25 && millis() > treatRespawnTime) {
+    treats.push(new Treat());
     treatRespawnTime = millis() + 1000; 
   }
 
@@ -270,6 +273,33 @@ function handleRespawns() {
       anti.splice(i, 1);
     }
   }
+  //remove expired treats causes game to crash
+  //for (let i = treats.length - 1; i >= 0; i--) {
+   // if (treats?.length >= 1 && treats[i].life < millis()) {
+    //  treats.splice(i, 1);
+    //}
+ // }
+  //remove expired peanut butter
+for (let i = pb.length - 1; i >= 0; i--) {
+  if (pb[i].life < millis()) {
+    pb.splice(i, 1);
+  }
+}
+
+//remove expired beds
+for (let i = beds.length - 1; i >= 0; i--) {
+  if (beds[i].life < millis()) {
+    beds.splice(i, 1);
+  }
+}
+
+//remove expired tennis balls
+for (let i = balls.length - 1; i >= 0; i--) {
+  if (balls[i].life < millis()) {
+    balls.splice(i, 1);
+  }
+}
+
 }
 
 function drawStaminaBar(player) {
@@ -513,7 +543,7 @@ function handleInteractions(player) {
 
   //Treats
   for (let i = treats.length - 1; i >= 0; i--) {
-    if (treats[i].checkCollision(player) && !treats[i].idList.includes(player.uuid)) {
+    if (treats?.length >= 0 && treats[i].checkCollision(player) && !treats[i].idList.includes(player.uuid)) {
       player.score += 1;
       treats[i].idList.push(player.uuid); //add player id to the treat
       if(humanPlaying)
@@ -628,5 +658,4 @@ function resetGame() {
                           
 
 }
-
 
