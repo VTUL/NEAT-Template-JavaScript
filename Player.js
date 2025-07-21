@@ -11,7 +11,7 @@ class Player {
     this.gen = 0;
     this.distanceInterval = 20;
     this.distanceReward = 100;
-    this.pickupRewardModifier = 1000;
+    this.pickupRewardModifier = 2000;
     this.distance = 0;
     this.fitnessPenalty = 0;
     this.penaltyModifier = 100;
@@ -34,6 +34,8 @@ class Player {
     this.dir = "d"; //the direction the player is facing
     this.isInvincible = false;
     this.lastScoreMillis = millis();
+  
+
     
     //sprite variables
     this.derek = new Sprite(derek, 64, 32, 4);
@@ -49,9 +51,6 @@ class Player {
     this.spriteUp = [this.derekUp, this.epcotUp, this.josieUp];
     this.spriteDown = [this.derekDown, this.epcotDown, this.josieDown];
     this.i = 0;
-
-    this.previousX = this.x;
-    this.previousY = this.y;
 
     this.distanceTrackerX = this.x;
     this.distanceTrackerY = this.y;
@@ -203,8 +202,7 @@ class Player {
         break;
     }
 
-    this.previousX = this.x;
-    this.previousY = this.y;
+
   }
 
   update() {
@@ -257,6 +255,7 @@ class Player {
     if (timeSinceScore > 20000) {
       this.dead = true;
     }
+
 
     this.lifespan++;
 }
@@ -512,7 +511,6 @@ getNearest(targets, centerX, centerY) {
   calculateFitness() {
     // this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier)  - this.fitnessPenalty;
     this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distance * this.distanceModifier) - (this.fitnessPenalty * this.penaltyModifier);
-    
   }
 
   crossover(parent2) {

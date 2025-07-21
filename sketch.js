@@ -261,10 +261,10 @@ function handleRespawns() {
     enemyRespawnTime = millis() + 5000; 
   }
 
-  //respawn treats if it was collected and 3 seconds passed
+  //respawn treats 
  if (treats.length < 25 && millis() > treatRespawnTime) {
     treats.push(new Treat());
-    treatRespawnTime = millis() + 1000; 
+    //treatRespawnTime = millis() + 1000; 
   }
 
   //remove expired anti items
@@ -603,6 +603,7 @@ function handleInteractions(player) {
   //Enemies
   for (let i = enemies.length - 1; i >= 0; i--) {
   if (enemies[i].checkCollision(player) && !player.isInvincible) {
+    player.fitnessPenalty += 10; //increase penalty for dying
     player.dead = true;
   }
 
