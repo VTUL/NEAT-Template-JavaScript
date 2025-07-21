@@ -78,7 +78,7 @@ class Treat {
     this.y = this.spawn.y;
     this.w = 20;
     this.h = 20;
-    this.life = millis() + 10000;
+    this.life = millis() + random(10000, 20000); //treats last between 10 and 20 seconds
     this.idList = [];
   }
 

@@ -27,8 +27,7 @@ let anti = [];
 let beds = [];
 let balls = [];
 let bedsRespawnTime = 0;
-let treatRespawnTime = 0;
-let PBRespawnTime = 0;
+let treatRemoveTime = 0; 
 let ballRespawnTime = 0;
 let enemyRespawnTime = 0;
 let pb = [];
@@ -262,9 +261,9 @@ function handleRespawns() {
   }
 
   //respawn treats 
- if (treats.length < 25 && millis() > treatRespawnTime) {
+ if (treats.length < 25) {
     treats.push(new Treat());
-    //treatRespawnTime = millis() + 1000; 
+    
   }
 
   //remove expired anti items
@@ -274,11 +273,13 @@ function handleRespawns() {
     }
   }
   //remove expired treats causes game to crash
-  //for (let i = treats.length - 1; i >= 0; i--) {
-   // if (treats?.length >= 1 && treats[i].life < millis()) {
-    //  treats.splice(i, 1);
-    //}
- // }
+for (let i = treats.length - 1; i >= 0; i--) {
+  if (treats[i].life < millis()) {
+    treats[i].eaten(); //call eaten to reset spawn point
+    treats.splice(i, 1);
+  }
+}
+
   //remove expired peanut butter
 for (let i = pb.length - 1; i >= 0; i--) {
   if (pb[i].life < millis()) {
@@ -543,11 +544,13 @@ function handleInteractions(player) {
 
   //Treats
   for (let i = treats.length - 1; i >= 0; i--) {
-    if (treats?.length >= 0 && treats[i].checkCollision(player) && !treats[i].idList.includes(player.uuid)) {
+    if (treats[i] && treats[i].checkCollision(player) && !treats[i].idList.includes(player.uuid)) {
       player.score += 1;
       treats[i].idList.push(player.uuid); //add player id to the treat
-      if(humanPlaying)
+      if(humanPlaying){
+        treats[i].eaten(); 
         treats.splice(i, 1); //remove anti item if human player
+      }
       player.lastScoreMillis = millis();
     }
   }
@@ -621,21 +624,22 @@ function handleInteractions(player) {
 
 //function to reset the game state
 function resetGame() {
-  treats = [];
-  enemies = [];
-  beds = [];
-  balls = [];
-  pb = [];
-
-  treats.length = 0;
-  enemies.length = 0;
-  anti.length = 0;
-
   Treat.resetSpawns();
   Enemy.resetSpawns();
   DogBed.resetSpawns();
   TennisBall.resetSpawns();
   PeanutButter.resetSpawns();
+
+  treats = [];
+  enemies = [];
+  beds = [];
+  balls = [];
+  pb = [];
+  anti = [];
+
+  treats.length = 0;
+  enemies.length = 0;
+  anti.length = 0;
 
   beds.push(new DogBed());
   balls.push(new TennisBall());
@@ -645,8 +649,9 @@ function resetGame() {
   bedsRespawnTime = millis() + 20000;       //dog bed in 20 seconds
   ballRespawnTime = millis() + 60000;    //TennisBall in 60 seconds
   PBRespawnTime = millis() + 60000;         //peanut butter in 60 seconds
-  treatRespawnTime = millis() + 1000;       //treats every 1 second
+
   enemyRespawnTime = millis() + 5000;       //enemies every 5 seconds
+  treatRemoveTime = millis() + 1000;        //treats removed after 1 second
 
   for (let i = 0; i < 25; i++) {
     treats.push(new Treat());
