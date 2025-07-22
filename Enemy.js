@@ -15,7 +15,7 @@ class Enemy {
     { spawn: { x: 1090, y: 380 },  patrol: [{ x: 1020, y: 380 }, { x: 560, y: 380 }] },
     { spawn: { x: -10, y: 380 },  patrol: [{ x: 100, y: 380 }, { x: 500, y: 380 }] },
     { spawn: { x: 550, y: -10}, patrol: [{ x: 550, y: 100 }, { x: 550, y: 500 }] },
-    { spawn: { x: 490, y: -10}, patrol: [{ x: 490, y: 100 }, { x: 490, y: 500 }] },
+    { spawn: { x: 500, y: -10}, patrol: [{ x: 500, y: 100 }, { x: 500, y: 500 }] },
     { spawn: {x: 60, y: -10}, patrol: [{ x: 60, y: 100 }, { x: 60, y: 400 }] },
     { spawn: { x: 1020, y: -10}, patrol: [{ x: 1020, y: 100 }, { x: 1020, y: 440 }] },
     { spawn: { x: 1000, y: -10}, patrol: [{ x: 1000, y: 100 }, { x: 1000, y: 440 }] },
@@ -147,10 +147,16 @@ class Enemy {
     if (this.facing === "w") {
       scale(-1, -1);
       this.spriteDown.draw();
+      this.w = 18;
+      this.h = 36;
     } else if (this.facing === "s") {
       this.spriteDown.draw();
+      this.w = 18;
+      this.h = 36;
     } else {
       this.sprite.draw();
+      this.w = 36;
+      this.h = 18;
     }
 
     imageMode(CORNER);

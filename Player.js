@@ -33,7 +33,12 @@ class Player {
     this.h = 24;
     this.dir = "d"; //the direction the player is facing
     this.isInvincible = false;
+
     this.lastScoreMillis = millis();
+    this.previousX = this.x;
+    this.previousY = this.y;
+    this.lastMeaningfulMoveTime = millis();
+    this.minMeaningfulDistance = 40; // tune this!
   
 
     
@@ -102,10 +107,16 @@ class Player {
   //different sprites for different directions
     if (this.facing === "w") {
       this.spriteUp[this.i].draw();
+      this.w = 24;
+      this.h = 40;
     } else if (this.facing === "s") {
       this.spriteDown[this.i].draw();
+      this.w = 24;
+      this.h = 40;
     } else {
       this.sprite[this.i].draw();
+      this.w = 40;
+      this.h = 24;
     }
 
     imageMode(CORNER);
@@ -251,8 +262,21 @@ class Player {
     // console.info("X: ", this.x);
     // console.info("Y: ", this.y);
 
-    const timeSinceScore = millis() - this.lastScoreMillis;
-    if (timeSinceScore > 20000) {
+    const dx = this.x - this.previousX;
+    const dy = this.y - this.previousY;
+    const movedEnough = Math.abs(dx) + Math.abs(dy) >= this.minMeaningfulDistance;
+
+    if (movedEnough) {
+      this.lastMeaningfulMoveTime = millis();
+      this.previousX = this.x;
+      this.previousY = this.y;
+    }
+
+    const now = millis();
+    const timeSinceScore = now - this.lastScoreMillis;
+    const timeSinceMovement = now - this.lastMeaningfulMoveTime;
+
+    if (timeSinceScore > 20000 || timeSinceMovement > 20000) {
       this.dead = true;
     }
 
@@ -277,7 +301,7 @@ class Player {
   // console.info("Vision Raw - Down: ", this.getWallDistances(this.checkDown))
   // console.info("Vision Raw - Left: ", this.getWallDistances(this.checkLeft))
 
-  //add directional vector (dx/dy) and distance for each target type
+ //add directional vector (dx/dy) and distance for each target type
   const targets = [enemies, treats, anti, balls, beds, pb];
 
   for (let targetList of targets) {
@@ -300,13 +324,18 @@ class Player {
     }
   }
 
+    /*this.vision.push(map(this.getDistance(enemies, centerX, centerY), 0, 1500, 0, 1));
+    this.vision.push(map(this.getDistance(treats, centerX, centerY), 0, 1500, 0, 1));
+    this.vision.push(map(this.getDistance(anti, centerX, centerY), 0, 1500, 0, 1));
+    this.vision.push(map(this.getDistance(balls, centerX, centerY), 0, 1500, 0, 1));
+    this.vision.push(map(this.getDistance(beds, centerX, centerY), 0, 1500, 0, 1));
+    this.vision.push(map(this.getDistance(pb, centerX, centerY), 0, 1500, 0, 1));*/
+
    //  if (this.self == population[0] && !this.dead) {
       //   console.info("Vision: ", pbData.distance);
       // }
 
   }
-
-
 
 getNearest(targets, centerX, centerY) {
   if (!targets || targets.length === 0) return null;

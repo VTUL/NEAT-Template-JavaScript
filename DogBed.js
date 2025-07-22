@@ -1,7 +1,7 @@
 class DogBed {
   static originalSpawnPoints = [
-    { x: 200, y: 215 },
-    { x: 750, y: 80 },
+    { x: 200, y: 240 },
+    { x: 750, y: 100 },
     { x: 800, y: 570 },
     { x: 102, y: 830 }
   ];

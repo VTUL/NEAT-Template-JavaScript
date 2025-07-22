@@ -30,6 +30,7 @@ let bedsRespawnTime = 0;
 let treatRemoveTime = 0; 
 let ballRespawnTime = 0;
 let enemyRespawnTime = 0;
+let introTime = 0;
 let pb = [];
 
 //images
@@ -50,6 +51,7 @@ var peanut;
 var yum;
 var bed;
 var tennis;
+var arrow;
 
 let wall;
 let blocks = [];
@@ -77,6 +79,7 @@ function preload(){
   josieDown = loadImage("spriteSheets/Josie_overhead_walk.png");
   bed = loadImage("images/Dog_Bed-1.png.png");
   tennis = loadImage("images/Ball-1.png.png");
+  arrow = loadImage("images/red-pixel-arrow.png"); //stand in
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -103,6 +106,7 @@ function setup() {
   }
   
   resetGame();
+  introTime = millis() + 3000; 
 
 }
 
@@ -228,7 +232,9 @@ function draw() {
     drawStaminaBar(population.players[0]);
   }
 
-  
+  if(millis() < introTime)
+    drawArrow(); 
+
 }
 
 function handleRespawns() {
@@ -317,6 +323,21 @@ function drawStaminaBar(player) {
   stroke(255);
   noFill();
   rect(20, 20, barWidth, barHeight);
+}
+
+function drawArrow() {
+  let tempSprite = new Sprite(derek, 64, 32, 4);
+  imageMode(CENTER);
+  image(arrow, 480, 430, 30, 30);
+  imageMode(CORNER);
+
+  noStroke();
+  fill(0);
+  textAlign(LEFT, TOP); 
+  textSize(20);
+  text("This is the player", 470, 390);
+  translate(510, 420); 
+  tempSprite.draw();
 }
 
 
@@ -606,7 +627,6 @@ function handleInteractions(player) {
   //Enemies
   for (let i = enemies.length - 1; i >= 0; i--) {
   if (enemies[i].checkCollision(player) && !player.isInvincible) {
-    player.fitnessPenalty += 10; //increase penalty for dying
     player.dead = true;
   }
 
