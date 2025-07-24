@@ -38,9 +38,10 @@ class Player {
     this.previousX = this.x;
     this.previousY = this.y;
     this.lastMeaningfulMoveTime = millis();
-    this.minMeaningfulDistance = 40; // tune this!
+    this.minMeaningfulDistance = 40; //mess with
   
-
+    this.lastDec;
+    this.decisionCount = 15;
     
     //sprite variables
     this.derek = new Sprite(derek, 64, 32, 4);
@@ -452,22 +453,29 @@ getNearest(targets, centerX, centerY) {
     // console.info("Vision - Ball: ", this.vision[8]);
     // console.info("Vision - PB: ", this.vision[9]);
 
-    this.decision = this.brain.feedForward(this.vision);
-
     //movement decision
     let directions = ["w", "d", "s", "a"];
-    for (let i = 0; i < 5; i++) {
+    if(this.decisionCount > 0) {
+      this.move(directions[this.lastDec]);
+      this.decisionCount--;
+    } else {
+      this.decision = this.brain.feedForward(this.vision);
+      
+      for (let i = 0; i < 4; i++) {
       // if (this.self == population[0] && !this.dead) {
       //   console.info(i + ": ", this.canMove(directions[i]));
       // }
       // if (this.decision[i] > max && this.canMove(directions[i])) {
-      if (this.decision[i] > max) {
-        max = this.decision[i];
-        maxIndex = i;
+      
+        if (this.decision[i] > max && this.canMove(directions[i])) {
+          max = this.decision[i];
+          maxIndex = i;
+        }
       }
-    }
-
+    
+    this.lastDec = maxIndex;
     this.isSprinting = this.decision[4] >= 0.7 && this.stamina > 0;
+    this.decisionCount = 60;
     // if (this.self == population[0] && !this.dead) {
     //     console.info("chosen direction: ", directions[maxIndex]);
     //   }
@@ -477,7 +485,10 @@ getNearest(targets, centerX, centerY) {
       // this.move(directions[Math.floor(Math.random() * directions.length)]);
     // } else {
       // console.info("Decision: ", directions[maxIndex]);
-      this.move(directions[maxIndex]);
+      
+      this.move(directions[this.lastDec]);
+    }
+      
     // }
   }
 
