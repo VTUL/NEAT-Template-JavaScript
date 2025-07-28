@@ -163,9 +163,9 @@ class Enemy {
     pop();
     
     pop();
-    noFill();
-    stroke(255, 0, 0);
-    rect(this.x, this.y, this.w, this.h);
+    //noFill();
+    //stroke(255, 0, 0);
+    //rect(this.x, this.y, this.w, this.h);
   }
 
   checkCollision(player) {

@@ -120,9 +120,9 @@ function draw() {
     image(bg, 0, 0, width, height); 
   }
 
-  for(var i = 0; i < blocks.length; i++){
+  /*for(var i = 0; i < blocks.length; i++){
     blocks[i].show();
-  }
+  }*/
 
   for (let i = treats.length - 1; i >= 0; i--) {
     if (treats?.length >= 1) 
@@ -176,6 +176,12 @@ function draw() {
     textSize(24);
     text("Press G to see best AI each gen", 400, height - 4);
   }
+
+    noStroke();
+    fill(0);
+    textAlign(CENTER, TOP); 
+    textSize(24);
+    text("Press J to play as another dog!", 540, 65);
 
   //placeholder text for debugging
   if (showBest) {

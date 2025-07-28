@@ -71,6 +71,9 @@ class Player {
     this.checkRight = this.checkRight.bind(this);
     this.checkDown = this.checkDown.bind(this);
     this.checkLeft = this.checkLeft.bind(this);
+
+    this.recentPositions = [];
+
   }
 
   show() {
@@ -124,9 +127,9 @@ class Player {
     pop();
 
     //collision box
-    noFill();
-    stroke(255, 0, 0);
-    rect(this.x, this.y, this.w, this.h);
+    //noFill();
+    //stroke(255, 0, 0);
+    //rect(this.x, this.y, this.w, this.h);
     
   }
 
@@ -214,6 +217,17 @@ class Player {
         break;
     }
 
+    //track and analyze recent positions for loop detection
+    this.recentPositions.push({ x: this.x, y: this.y });
+    if (this.recentPositions.length > 10) this.recentPositions.shift();
+
+    const looped = this.recentPositions.filter(
+      pos => Math.abs(pos.x - this.x) < 10 && Math.abs(pos.y - this.y) < 10
+      ).length;
+
+    if (looped > 3) {
+      this.fitnessPenalty += 1; //discourage standing still or cycling
+    }
 
   }
 
@@ -455,7 +469,9 @@ getNearest(targets, centerX, centerY) {
 
     //movement decision
     let directions = ["w", "d", "s", "a"];
-    if(this.decisionCount > 0) {
+    const stillValid = this.canMove(directions[this.lastDec]);
+
+    if(this.decisionCount > 0 && stillValid) {
       this.move(directions[this.lastDec]);
       this.decisionCount--;
     } else {
@@ -475,7 +491,7 @@ getNearest(targets, centerX, centerY) {
     
     this.lastDec = maxIndex;
     this.isSprinting = this.decision[4] >= 0.7 && this.stamina > 0;
-    this.decisionCount = 60;
+    this.decisionCount = 15;
     // if (this.self == population[0] && !this.dead) {
     //     console.info("chosen direction: ", directions[maxIndex]);
     //   }
