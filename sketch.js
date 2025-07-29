@@ -181,7 +181,7 @@ function draw() {
     fill(0);
     textAlign(CENTER, TOP); 
     textSize(24);
-    text("Press J to play as another dog!", 540, 65);
+    text("Press J to play as another dog!", 540, 50);
 
   //placeholder text for debugging
   if (showBest) {
@@ -257,13 +257,13 @@ function handleRespawns() {
    //respawn beds if it was collected and 10 seconds passed
   if (beds.length === 0 && millis() > bedsRespawnTime) {
     beds.push(new DogBed());
-    bedsRespawnTime = millis() + 10000;
+    bedsRespawnTime = millis() + 20000;
   }
 
   //respawn TennisBall if it was collected and 30 seconds passed
   if (balls.length === 0 && millis() > ballRespawnTime) {
     balls.push(new TennisBall());
-    ballRespawnTime = millis() + 30000;
+    ballRespawnTime = millis() + 40000;
   }
 
    //respawn enemies if killed and 5 seconds passed
@@ -598,7 +598,7 @@ function handleInteractions(player) {
     balls[0].idList.push(player.uuid); //add player id
     if(humanPlaying)
       balls.splice(0, 1); //remove anti item if human player
-    ballRespawnTime = millis() + 60000;
+    ballRespawnTime = millis() + 40000;
   }
 
    //Peanut Butter
@@ -673,7 +673,7 @@ function resetGame() {
 
   //reset timers for collectible respawns
   bedsRespawnTime = millis() + 20000;       //dog bed in 20 seconds
-  ballRespawnTime = millis() + 60000;    //TennisBall in 60 seconds
+  ballRespawnTime = millis() + 40000;    //TennisBall in 40 seconds
   PBRespawnTime = millis() + 60000;         //peanut butter in 60 seconds
 
   enemyRespawnTime = millis() + 5000;       //enemies every 5 seconds

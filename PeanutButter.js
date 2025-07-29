@@ -15,7 +15,7 @@ class PeanutButter {
     this.w = 25;
     this.h = 25;
 
-    this.life = millis() + 15000;
+    this.life = millis() + 20000;
     this.idList = [];
   }
   show() {
