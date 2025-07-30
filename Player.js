@@ -291,7 +291,9 @@ class Player {
     const timeSinceScore = now - this.lastScoreMillis;
     const timeSinceMovement = now - this.lastMeaningfulMoveTime;
 
-    if (timeSinceScore > 20000 || timeSinceMovement > 20000) {
+    //taking out meaniful movement check for now
+    // if (timeSinceMovement > 10000) {
+    if (timeSinceScore > 20000) {
       this.dead = true;
     }
 
