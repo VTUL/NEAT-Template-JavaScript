@@ -1,50 +1,88 @@
 class Enemy {
   // Full, unchanging original list
-  static originalSpawnOptions = [
-    //top
+  static topLeftSpawn = [
+    //top left
     { spawn: {x: -10, y: 100 }, patrol: [{ x: 60, y: 100 }, { x: 500, y: 100 }] },
-    { spawn: {x: 1090, y: 100 }, patrol: [{ x: 1020, y: 100 }, { x: 560, y: 100 }] },
     { spawn: {x: 500, y: -10 }, patrol: [{ x: 500, y: 70 }, { x: 60, y: 70 }] },
-    { spawn: {x: 560, y: -10 }, patrol: [{ x: 560, y: 70 }, { x: 1020, y: 70 }] },
     { spawn: { x: -10, y: 235 }, patrol: [{ x: 60, y: 235 }, { x: 500, y: 235 }] },
-    { spawn: { x: 1090, y: 235 }, patrol: [{ x: 1020, y: 235 }, { x: 560, y: 235 }] },
-    { spawn: { x: 1090, y: 490 },  patrol: [{ x: 1020, y: 490 }, { x: 560, y: 490 }] },
     { spawn: { x: -10, y: 490 },  patrol: [{ x: 100, y: 490 }, { x: 500, y: 490 }] },
-    { spawn: { x: 1090, y: 440 },  patrol: [{ x: 1020, y: 440 }, { x: 560, y: 440 }] },
     { spawn: { x: -10, y: 440 },  patrol: [{ x: 100, y: 440 }, { x: 500, y: 440 }] },
-    { spawn: { x: 1090, y: 380 },  patrol: [{ x: 1020, y: 380 }, { x: 560, y: 380 }] },
     { spawn: { x: -10, y: 380 },  patrol: [{ x: 100, y: 380 }, { x: 500, y: 380 }] },
-    { spawn: { x: 550, y: -10}, patrol: [{ x: 550, y: 100 }, { x: 550, y: 500 }] },
     { spawn: { x: 500, y: -10}, patrol: [{ x: 500, y: 100 }, { x: 500, y: 500 }] },
     { spawn: {x: 60, y: -10}, patrol: [{ x: 60, y: 100 }, { x: 60, y: 400 }] },
+
+  ];
+  static topRightSpawn = [
+    //top right
+    { spawn: {x: 1090, y: 100 }, patrol: [{ x: 1020, y: 100 }, { x: 560, y: 100 }] }, 
+    { spawn: {x: 560, y: -10 }, patrol: [{ x: 560, y: 70 }, { x: 1020, y: 70 }] },
+    { spawn: { x: 1090, y: 235 }, patrol: [{ x: 1020, y: 235 }, { x: 560, y: 235 }] },
+    { spawn: { x: 1090, y: 490 },  patrol: [{ x: 1020, y: 490 }, { x: 560, y: 490 }] },
+    { spawn: { x: 1090, y: 440 },  patrol: [{ x: 1020, y: 440 }, { x: 560, y: 440 }] },
+    { spawn: { x: 1090, y: 380 },  patrol: [{ x: 1020, y: 380 }, { x: 560, y: 380 }] },
+    { spawn: { x: 550, y: -10}, patrol: [{ x: 550, y: 100 }, { x: 550, y: 500 }] },
     { spawn: { x: 1020, y: -10}, patrol: [{ x: 1020, y: 100 }, { x: 1020, y: 440 }] },
     { spawn: { x: 1000, y: -10}, patrol: [{ x: 1000, y: 100 }, { x: 1000, y: 440 }] },
-
-    //bottom
-    { spawn: { x: 1020, y: 910}, patrol: [{ x: 1020, y: 830 }, { x: 1020, y: 500 }] },
+  ];
+  static bottomLeftSpawn = [
+    //bottom left
     { spawn: { x: 90, y: 910}, patrol: [{ x: 90, y: 830 }, { x: 90, y: 500 }] },
     { spawn: { x: 220, y: 910}, patrol: [{ x: 220, y: 830 }, { x: 220, y: 500 }] },
     { spawn: {x: 350, y: 910}, patrol: [{ x: 350, y: 830 }, { x: 350, y: 500 }] },
     { spawn: {x: -10, y: 600}, patrol: [{ x: 90, y: 600 }, { x: 500, y: 600 }] },
-    { spawn: {x: 1090, y: 600}, patrol: [{ x: 1020, y: 600 }, { x: 560, y: 600 }] },
     { spawn: {x: -10, y: 830}, patrol: [{ x: 90, y: 830 }, { x: 350, y: 830 }] },
     { spawn: {x: 350, y: 910}, patrol: [{ x: 350, y: 770 }, { x: 720, y: 770 }] },
+  ];
+  static bottomRightSpawn = [
+    //bottom right
+    { spawn: { x: 1020, y: 910}, patrol: [{ x: 1020, y: 830 }, { x: 1020, y: 500 }] },
+    { spawn: {x: 1090, y: 600}, patrol: [{ x: 1020, y: 600 }, { x: 560, y: 600 }] },
     { spawn: {x: 730, y: 910}, patrol: [{ x: 730, y: 830 }, { x: 730, y: 500 }] },
     { spawn: {x: 855, y: 910}, patrol: [{ x: 855, y: 830 }, { x: 855, y: 500 }] },
-    { spawn: {x: 980, y: 910}, patrol: [{ x: 980, y: 830 }, { x: 980, y: 500 }] }
+    { spawn: {x: 980, y: 910}, patrol: [{ x: 980, y: 830 }, { x: 980, y: 500 }] },
   ];
 
   
-  static spawnOptions = [...Enemy.originalSpawnOptions];
+  static topLeftSpawnOptions = [...Enemy.topLeftSpawn];
+  static topRightSpawnOptions = [...Enemy.topRightSpawn];
+  static bottomLeftSpawnOptions = [...Enemy.bottomLeftSpawn];
+  static bottomRightSpawnOptions = [...Enemy.bottomRightSpawn];
 
   static resetSpawns() {
-    Enemy.spawnOptions = [...Enemy.originalSpawnOptions];
+    Enemy.topLeftSpawnOptions = [...Enemy.topLeftSpawn];
+    Enemy.topRightSpawnOptions = [...Enemy.topRightSpawn]; 
+    Enemy.bottomLeftSpawnOptions = [...Enemy.bottomLeftSpawn];
+    Enemy.bottomRightSpawnOptions = [...Enemy.bottomRightSpawn];
   }
+ static enemyCount = 0; // static counter shared by all enemies
 
   constructor() {
-    let randomIndex = floor(random(Enemy.spawnOptions.length));
-    this.spawn = Enemy.spawnOptions.splice(randomIndex, 1)[0];
-    this.patrolPoints = this.spawn.patrol;
+    let randomIndex;
+    Enemy.enemyCount++;  // increment count on each new enemy
+    this.i = (Enemy.enemyCount % 4) + 1;
+    this.spawnIndex = 0;
+
+    switch (this.i) {
+      case 1:
+        randomIndex = floor(random(Enemy.topLeftSpawnOptions.length));
+        this.spawn = Enemy.topLeftSpawnOptions.splice(randomIndex, 1)[0];
+        break;
+      case 2:
+        randomIndex = floor(random(Enemy.topRightSpawnOptions.length));
+        this.spawn = Enemy.topRightSpawnOptions.splice(randomIndex, 1)[0];
+        break;
+      case 3:
+        randomIndex = floor(random(Enemy.bottomLeftSpawnOptions.length));
+        this.spawn = Enemy.bottomLeftSpawnOptions.splice(randomIndex, 1)[0];
+        break;
+      case 4:
+        randomIndex = floor(random(Enemy.bottomRightSpawnOptions.length));
+        this.spawn = Enemy.bottomRightSpawnOptions.splice(randomIndex, 1)[0];
+        break;
+  }
+
+  this.patrolPoints = this.spawn.patrol;
+  
 
     //random spawn position along patrol line
     //let t = random(0, 1);
@@ -92,8 +130,17 @@ class Enemy {
   move() {
     // .01% chance per frame to disappear
     if (random(1) < 0.001) {
-      if (this.spawn) {
-        Enemy.spawnOptions.push(this.spawn);
+      if (this.spawn && this.i == 1) {
+        Enemy.topLeftSpawnOptions.push(this.spawn);
+      }
+      else if (this.spawn && this.i == 2) {
+        Enemy.topRightSpawnOptions.push(this.spawn);
+      }
+      else if (this.spawn && this.i == 3) {
+        Enemy.bottomLeftSpawnOptions.push(this.spawn);
+      }
+      else if (this.spawn && this.i == 4) {
+        Enemy.bottomRightSpawnOptions.push(this.spawn);
       }
       this.isActive = false;
       return;
@@ -160,8 +207,6 @@ class Enemy {
     }
 
     imageMode(CORNER);
-    pop();
-    
     pop();
     //noFill();
     //stroke(255, 0, 0);

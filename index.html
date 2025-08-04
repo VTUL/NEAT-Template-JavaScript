@@ -55,6 +55,7 @@
 
     canvas {
       display: block;
+      margin: 5px auto;
     }
 
     #gameInfo {
@@ -117,9 +118,9 @@
       <div id="neatInfo">
         <p>How does this whole training thing work? Well, this AI uses a Neuroevolution of augmenting topologies algorithm, or NEAT for short. It sounds complicated, but it is really just an algorithm for mimicking the real-world process of Natural Selection. We give the AI a brain in the form of a matrix, which you might remember from algebra as a grid of numbers. A very simplified example might look like this:  </p> 
           <pre>
-              4 | 8 | 0
-              5 | 3 | 8
-              7 | 3 | 2
+                                              4 | 8 | 0
+                                              5 | 3 | 8
+                                              7 | 3 | 2
           </pre>
         <p>At first the matrix is random, and each version of the AI gets a different brain.
         <p>The AI also gets access to inputs and outputs. Inputs are things it knows about the world. Our AI knows how far away a treat is, how far away an enemy is, and whether they are about to run into a wall. Outputs are things it can do. For a game, these are essentially the buttons it can press on a controller. Our AI can move up, down, left, right, and hold down a "sprint" button to temporarily run faster.</p>

@@ -319,7 +319,7 @@ class Player {
   // console.info("Vision Raw - Left: ", this.getWallDistances(this.checkLeft))
 
  //add directional vector (dx/dy) and distance for each target type
-  const targets = [enemies, treats, anti, balls, beds, pb];
+  /*const targets = [enemies, treats, anti, balls, beds, pb];
 
   for (let targetList of targets) {
     const nearest = this.getNearest(targetList, centerX, centerY);
@@ -339,14 +339,14 @@ class Player {
       this.vision.push(0); // dy
       this.vision.push(1); // max distance
     }
-  }
+  }*/
 
-    /*this.vision.push(map(this.getDistance(enemies, centerX, centerY), 0, 1500, 0, 1));
+    this.vision.push(map(this.getDistance(enemies, centerX, centerY), 0, 1500, 0, 1));
     this.vision.push(map(this.getDistance(treats, centerX, centerY), 0, 1500, 0, 1));
     this.vision.push(map(this.getDistance(anti, centerX, centerY), 0, 1500, 0, 1));
     this.vision.push(map(this.getDistance(balls, centerX, centerY), 0, 1500, 0, 1));
     this.vision.push(map(this.getDistance(beds, centerX, centerY), 0, 1500, 0, 1));
-    this.vision.push(map(this.getDistance(pb, centerX, centerY), 0, 1500, 0, 1));*/
+    this.vision.push(map(this.getDistance(pb, centerX, centerY), 0, 1500, 0, 1));
 
    //  if (this.self == population[0] && !this.dead) {
       //   console.info("Vision: ", pbData.distance);
@@ -493,7 +493,7 @@ getNearest(targets, centerX, centerY) {
     
     this.lastDec = maxIndex;
     this.isSprinting = this.decision[4] >= 0.7 && this.stamina > 0;
-    this.decisionCount = 15;
+    this.decisionCount = 30;
     // if (this.self == population[0] && !this.dead) {
     //     console.info("chosen direction: ", directions[maxIndex]);
     //   }
