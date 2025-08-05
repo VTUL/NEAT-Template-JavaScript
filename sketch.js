@@ -238,8 +238,8 @@ function draw() {
     drawStaminaBar(population.players[0]);
   }
 
-  if(millis() < introTime)
-    drawArrow(); 
+  /*if(millis() < introTime)
+    drawArrow();*/
 
 }
 

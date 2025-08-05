@@ -77,6 +77,7 @@ class Player {
   }
 
   show() {
+
      /*if (this.x + this.w < 0 && this.y + this.h > 400 && this.y + this.h < 600) {
        this.x = width;
        this.y = 460;
@@ -226,7 +227,7 @@ class Player {
       ).length;
 
     if (looped > 3) {
-      this.fitnessPenalty += 1; //discourage standing still or cycling
+      this.fitnessPenalty += 10; //discourage standing still or cycling
     }
 
   }
