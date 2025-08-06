@@ -83,6 +83,7 @@ class Treat {
   }
 
   show() {
+    //tint(112, 65, 20); //brown tint for treat
     image(yum, this.x, this.y, this.w, this.h);
   }
 
