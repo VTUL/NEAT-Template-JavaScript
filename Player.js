@@ -72,8 +72,6 @@ class Player {
     this.checkDown = this.checkDown.bind(this);
     this.checkLeft = this.checkLeft.bind(this);
 
-    this.recentPositions = [];
-
   }
 
   show() {
@@ -133,6 +131,13 @@ class Player {
     //rect(this.x, this.y, this.w, this.h);
     
   }
+
+  isWalkable(x, y) {
+    if (y < 0 || y >= MAP_DATA.length) return false;
+    if (x < 0 || x >= MAP_DATA[0].length) return false;
+    return MAP_DATA[y][x] === '-';
+  }
+
 
   move(direction) {
     this.facing = direction;
@@ -218,17 +223,7 @@ class Player {
         break;
     }
 
-    //track and analyze recent positions for loop detection
-    this.recentPositions.push({ x: this.x, y: this.y });
-    if (this.recentPositions.length > 10) this.recentPositions.shift();
-
-    const looped = this.recentPositions.filter(
-      pos => Math.abs(pos.x - this.x) < 10 && Math.abs(pos.y - this.y) < 10
-      ).length;
-
-    if (looped > 3) {
-      this.fitnessPenalty += 10; //discourage standing still or cycling
-    }
+  
 
   }
 
@@ -278,22 +273,10 @@ class Player {
     // console.info("X: ", this.x);
     // console.info("Y: ", this.y);
 
-    const dx = this.x - this.previousX;
-    const dy = this.y - this.previousY;
-    const movedEnough = Math.abs(dx) + Math.abs(dy) >= this.minMeaningfulDistance;
-
-    if (movedEnough) {
-      this.lastMeaningfulMoveTime = millis();
-      this.previousX = this.x;
-      this.previousY = this.y;
-    }
 
     const now = millis();
     const timeSinceScore = now - this.lastScoreMillis;
-    const timeSinceMovement = now - this.lastMeaningfulMoveTime;
-
-    //taking out meaniful movement check for now
-    // if (timeSinceMovement > 10000) {
+   
     if (timeSinceScore > 20000) {
       this.dead = true;
     }
@@ -510,6 +493,7 @@ getNearest(targets, centerX, centerY) {
       
     // }
   }
+
 
   //helper method to check if a move is possible (not blocked by wall)
   canMove(direction) {

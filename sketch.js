@@ -57,6 +57,11 @@ let wall;
 let blocks = [];
 let pendingReset = false;
 
+let blockWidth = 50;
+let blockHeight = 35;
+let offsetX;
+let offsetY;
+
 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -91,16 +96,15 @@ function setup() {
 
   wall = new Wall(MAP_DATA); //map for collisions
 
-  let blockSize = 10;
-  let wallWidth = wall.getColumns() * blockSize;
-  let wallHeight = wall.getRows() * blockSize;
+  let wallWidth = wall.getColumns() * blockWidth;
+  let wallHeight = wall.getRows() * blockHeight;
   let offsetX = (width - wallWidth) / 2;
   let offsetY = (height - wallHeight) / 2;
 
   for (let i = 0; i < wall.getRows(); i++) {
     for (let j = 0; j < wall.getColumns(); j++) {
       if (wall.getElement(i, j) === '*') {
-        blocks.push(new Block(j * blockSize + offsetX, i * blockSize + offsetY));
+        blocks.push(new Block(j * blockWidth + offsetX, i * blockHeight + offsetY));
       }
     }
   }
@@ -120,9 +124,9 @@ function draw() {
     image(bg, 0, 0, width, height); 
   }
 
-  /*for(var i = 0; i < blocks.length; i++){
+  for(var i = 0; i < blocks.length; i++){
     blocks[i].show();
-  }*/
+  }
 
   for (let i = treats.length - 1; i >= 0; i--) {
     if (treats?.length >= 1) 
