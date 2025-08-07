@@ -1,17 +1,10 @@
 class DogBed {
-  static originalSpawnPoints = [
-    { x: 200, y: 240 },
-    { x: 750, y: 100 },
-    { x: 800, y: 570 },
-    { x: 102, y: 830 }
-  ];
-
-   static spawnPoints = [...DogBed.originalSpawnPoints];
-
   constructor() {
-    let spawn = random(DogBed.spawnPoints); 
-    this.x = spawn.x;
-    this.y = spawn.y;
+    let index = floor(random(goodSpawns.length));
+    let spawn = goodSpawns.splice(index, 1)[0]; // removes and returns the spawn
+    this.spawn = spawn;
+    this.x = spawn.x * blockWidth + offsetX + blockWidth / 2;
+    this.y = spawn.y * blockHeight + offsetY + blockHeight / 2;
     this.r = 20;
 
     this.life = millis() + 15000;
@@ -19,14 +12,13 @@ class DogBed {
   }
 
   show() {
-  imageMode(CENTER);
-  image(bed, this.x, this.y, this.r * 2, this.r * 2);
-  imageMode(CORNER);  
-}
+    imageMode(CENTER);
+    image(bed, this.x, this.y, this.r * 2, this.r * 2);
+    imageMode(CORNER);  
+  }
 
-
-  static resetSpawns() {
-    DogBed.spawnPoints = [...DogBed.originalSpawnPoints];
+  eaten() {
+    goodSpawns.push(this.spawn);
   }
 
 checkCollision(player) {

@@ -1,81 +1,58 @@
 class Treat {
-  static originalSpawnPoints = [
-    //top
-    { x: 500, y: 70 },
-    { x: 90, y: 90 },
-    { x: 290, y: 90 },
-    { x: 720, y: 90 },
-     { x: 905, y: 90 },
-    { x: 1010, y: 90 },
-    { x: 190, y: 100 },
-    { x: 400, y: 100 },
-    { x: 540, y: 100 },
-    { x: 800, y: 100 },
-    { x: 60, y: 160 },
-    { x: 490, y: 160 },
-    { x: 550, y: 160 },
-    { x: 1020, y: 160 },
-    //upper mid
-    { x: 90, y: 230 },
-    { x: 290, y: 230 },
-    { x: 390, y: 230 },
-    { x: 540, y: 200 },
-    { x: 690, y: 230 },
-    { x: 850, y: 230 },
-    { x: 720, y: 235 },
-    { x: 290, y: 235 },
-    { x: 550, y: 300 },
-    //mid
-    { x: 550, y: 370 },
-    { x: 490, y: 370 },
-    { x: 720, y: 380 },
-    { x: 290, y: 380 },
-    { x: 90, y: 390 },
-    { x: 200, y: 400 },
-    { x: 800, y: 400 },
-    { x: 1010, y: 400 },
-    { x: 900, y: 420 },
-    { x: 720, y: 440 },
-    { x: 290, y: 440 },
-    { x: 550, y: 450 },
-    { x: 650, y: 450 },
-    { x: 1020, y: 465 },
-    { x: 290, y: 500 },   
-    //lower mid
-    { x: 290, y: 570 }, 
-    { x: 90, y: 570 },
-    { x: 220, y: 570 },
-    { x: 1010, y: 600 },
-    { x: 500, y: 630 },
-    { x: 90, y: 665 },
-    { x: 220, y: 665 },
-    { x: 350, y: 665 },
-    { x: 730, y: 700 },
-    { x: 855, y: 700 },
-    { x: 980, y: 700 },
-    { x: 850, y: 700 },
-    { x: 90, y: 730 },
-    { x: 1000, y: 730 },
-    { x: 450, y: 750 },
-    { x: 600, y: 750 },
-    //bottom
-    { x: 1010, y: 800 },
-    { x: 100, y: 830 },
-    { x: 200, y: 830 },
-    { x: 250, y: 830 },
-    { x: 790, y: 830 },
-    { x: 950, y: 830 },
-
-  ];
-
-  static spawnPoints = [...Treat.originalSpawnPoints];
-
   constructor() {
-    let index = Math.floor(Math.random() * Treat.spawnPoints.length);
-    this.spawn = Treat.spawnPoints.splice(index, 1)[0];
+    //I wanted to m akre sure treats were evenly spread out but 
+    //it might not be too different from just taking available random spawns
+    let randomX;
+    let randomY;
+    let foundIndex;
+    Treat.treatCount++;  // increment count on each new enemy
+    this.i = (Treat.treatCount % 4) + 1;
 
-    this.x = this.spawn.x;
-    this.y = this.spawn.y;
+    switch (this.i) {
+      case 1:
+        randomX = floor(random(10));
+        randomY = floor(random(12));
+        foundIndex = goodSpawns.findIndex(spawn => spawn.x === randomX && spawn.y === randomY);
+        if (foundIndex !== -1) {
+          this.spawn = goodSpawns.splice(foundIndex, 1)[0];
+        }
+        break;
+      case 2:
+        randomX = random(11, 22);
+        randomY = floor(random(12));
+        foundIndex = goodSpawns.findIndex(spawn => spawn.x === randomX && spawn.y === randomY);
+        if (foundIndex !== -1) {
+          this.spawn = goodSpawns.splice(foundIndex, 1)[0];
+        }
+        break;
+      case 3:
+        randomX = floor(random(10));
+        randomY = random(13, 26);
+        foundIndex = goodSpawns.findIndex(spawn => spawn.x === randomX && spawn.y === randomY);
+        if (foundIndex !== -1) {
+          this.spawn = goodSpawns.splice(foundIndex, 1)[0];
+        }
+        break;
+      case 4:
+        randomX = random(11, 22);
+        randomY = random(13, 26);
+        foundIndex = goodSpawns.findIndex(spawn => spawn.x === randomX && spawn.y === randomY);
+        if (foundIndex !== -1) {
+          this.spawn = goodSpawns.splice(foundIndex, 1)[0];
+        }
+        break;
+      default:
+        let randomIndex = floor(random(goodSpawns.length));
+        this.spawn = goodSpawns.splice(randomIndex, 1)[0];
+        break;
+
+  }
+
+    //let index = floor(random(goodSpawns.length));
+    //let spawn = goodSpawns.splice(index, 1)[0]; // removes and returns the spawn
+    //this.spawn = spawn;
+    this.x = this.spawn.x * blockWidth + offsetX + blockWidth / 2;
+    this.y = this.spawn.y * blockHeight + offsetY + blockHeight / 2;
     this.w = 20;
     this.h = 20;
     this.life = millis() + random(10000, 20000); //treats last between 10 and 20 seconds
@@ -83,16 +60,14 @@ class Treat {
   }
 
   show() {
-    //tint(112, 65, 20); //brown tint for treat
+    imageMode(CENTER); 
     image(yum, this.x, this.y, this.w, this.h);
+    noTint(); 
+    imageMode(CORNER);
   }
 
   eaten() {
-    Treat.spawnPoints.push(this.spawn);
-  }
-
-  static resetSpawns() {
-    Treat.spawnPoints = [...Treat.originalSpawnPoints];
+    goodSpawns.push(this.spawn);
   }
 
   checkCollision(player) {

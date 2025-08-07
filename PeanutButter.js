@@ -1,17 +1,10 @@
 class PeanutButter {
-  static originalSpawnPoints = [
-    { x: 400, y: 90 },
-    { x: 730, y: 800 },
-    { x: 200, y: 600 },
-    { x: 985, y: 700 }
-  ];
-
-  static spawnPoints = [...PeanutButter.originalSpawnPoints];
-
   constructor() {
-    let spawn = random(PeanutButter.spawnPoints); 
-    this.x = spawn.x;
-    this.y = spawn.y;
+    let index = floor(random(goodSpawns.length));
+    let spawn = goodSpawns.splice(index, 1)[0]; // removes and returns the spawn
+    this.spawn = spawn;
+    this.x = spawn.x * blockWidth + offsetX + blockWidth / 2;
+    this.y = spawn.y * blockHeight + offsetY + blockHeight / 2;
     this.w = 25;
     this.h = 25;
 
@@ -19,11 +12,13 @@ class PeanutButter {
     this.idList = [];
   }
   show() {
+    imageMode(CENTER);
     image(peanut, this.x, this.y, this.w, this.h);
+    imageMode(CORNER);
   }
 
-  static resetSpawns() {
-    PeanutButter.spawnPoints = [...PeanutButter.originalSpawnPoints];
+  eaten() {
+    goodSpawns.push(this.spawn);
   }
 
 checkCollision(player) {

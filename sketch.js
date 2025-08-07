@@ -62,6 +62,8 @@ let blockHeight = 35;
 let offsetX;
 let offsetY;
 
+let goodSpawns = [];
+
 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -98,13 +100,16 @@ function setup() {
 
   let wallWidth = wall.getColumns() * blockWidth;
   let wallHeight = wall.getRows() * blockHeight;
-  let offsetX = (width - wallWidth) / 2;
-  let offsetY = (height - wallHeight) / 2;
+  offsetX = (width - wallWidth) / 2;
+  offsetY = (height - wallHeight) / 2;
 
   for (let i = 0; i < wall.getRows(); i++) {
     for (let j = 0; j < wall.getColumns(); j++) {
       if (wall.getElement(i, j) === '*') {
         blocks.push(new Block(j * blockWidth + offsetX, i * blockHeight + offsetY));
+      }
+      else if (wall.getElement(i, j) === '-') {
+        goodSpawns.push({ x: j, y: i }); 
       }
     }
   }
@@ -247,6 +252,12 @@ function draw() {
 
 }
 
+function validSpawns(){
+    
+}
+    
+
+
 function handleRespawns() {
   //respawn Peanut Butter if missing and timer passed
   if (pb?.length < 1 && millis() > PBRespawnTime) {
@@ -299,6 +310,7 @@ for (let i = treats.length - 1; i >= 0; i--) {
   //remove expired peanut butter
 for (let i = pb.length - 1; i >= 0; i--) {
   if (pb[i].life < millis()) {
+    pb[i].eaten();
     pb.splice(i, 1);
   }
 }
@@ -306,6 +318,7 @@ for (let i = pb.length - 1; i >= 0; i--) {
 //remove expired beds
 for (let i = beds.length - 1; i >= 0; i--) {
   if (beds[i].life < millis()) {
+    beds[i].eaten();
     beds.splice(i, 1);
   }
 }
@@ -313,6 +326,7 @@ for (let i = beds.length - 1; i >= 0; i--) {
 //remove expired tennis balls
 for (let i = balls.length - 1; i >= 0; i--) {
   if (balls[i].life < millis()) {
+    balls[i].eaten(); 
     balls.splice(i, 1);
   }
 }
@@ -591,6 +605,7 @@ function handleInteractions(player) {
     player.stamina = player.maxStamina; //reset stamina
     beds[0].idList.push(player.uuid); //add player id
     if(humanPlaying)
+      beds[0].eaten(); 
       beds.splice(0, 1); //remove anti item if human player
     bedsRespawnTime = millis() + 20000;
   }
@@ -601,6 +616,7 @@ function handleInteractions(player) {
     player.isInvinUntil = millis() + 10000;
     balls[0].idList.push(player.uuid); //add player id
     if(humanPlaying)
+      balls[0].eaten(); 
       balls.splice(0, 1); //remove anti item if human player
     ballRespawnTime = millis() + 40000;
   }
@@ -610,6 +626,7 @@ function handleInteractions(player) {
     pb[0].idList.push(player.uuid); //add player id
     player.score += 10;
     if(humanPlaying)
+      pb[0].eaten(); 
       pb.splice(0, 1); //remove anti item if human player
     PBRespawnTime = millis() + 60000;
     player.lastScoreMillis = millis();
@@ -621,6 +638,7 @@ function handleInteractions(player) {
       anti[i].idList.push(player.uuid); //add player id
       player.score -= 5;
       if(humanPlaying)
+        anti[i].eaten(); 
         anti.splice(i, 1); //remove anti item if human player
     }
 
@@ -654,11 +672,7 @@ function handleInteractions(player) {
 
 //function to reset the game state
 function resetGame() {
-  Treat.resetSpawns();
   Enemy.resetSpawns();
-  DogBed.resetSpawns();
-  TennisBall.resetSpawns();
-  PeanutButter.resetSpawns();
 
   treats = [];
   enemies = [];

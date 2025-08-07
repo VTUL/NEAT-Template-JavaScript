@@ -7,28 +7,48 @@ class TennisBall {
     { x: 800, y: 240 }
   ];
 
-  static spawnPoints = [...TennisBall.originalSpawnPoints];
+  static originalGridSpawn = [
+    { x: 4, y: 4 },
+    //{ x: 19, y: 18 },
+    //{ x: 10, y: 19 },
+    //{ x: 17, y: 8 }
+  ];
+
+  //static spawnPoints = [...TennisBall.originalSpawnPoints];
+  static gridSpawn = [...TennisBall.originalGridSpawn];
 
   constructor() {
-    let spawn = random(TennisBall.spawnPoints);
-    this.x = spawn.x;
-    this.y = spawn.y;
-    this.r = 7.5;
+  // let spawn = random(TennisBall.gridSpawn);
+  //this.x = spawn.x * blockWidth + offsetX + blockWidth / 2;
+  //this.y = spawn.y * blockHeight + offsetY + blockHeight / 2;
 
+    this.r = 7.5;
     this.life = millis() + 15000;
     this.idList = [];
-    
-  }
+
+    let index = floor(random(goodSpawns.length));
+    let spawn = goodSpawns.splice(index, 1)[0]; // removes and returns the spawn
+    this.spawn = spawn;
+    this.x = spawn.x * blockWidth + offsetX + blockWidth / 2;
+    this.y = spawn.y * blockHeight + offsetY + blockHeight / 2;
+
+}
+
 
   show() {
     fill(120, 40, 255);
     noStroke();
-    image(tennis, this.x, this.y, this.r*2, this.r*2);
+    image(tennis, this.x - this.r, this.y - this.r, this.r*2, this.r*2);
   }
 
   static resetSpawns() {
-    TennisBall.spawnPoints = [...TennisBall.originalSpawnPoints];
+    //goodSpawns.push(this.spawn)
   }
+
+  eaten() {
+    goodSpawns.push(this.spawn);
+  }
+    
 
 checkCollision(player) {
   let playerLeft = player.x;

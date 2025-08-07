@@ -574,4 +574,14 @@ getNearest(targets, centerX, centerY) {
     }
     return false;
   }
+
+  //when grid stuff is finished for player
+  //in this case x = grid x, y = grid y
+  checkCollision(x, y) {
+    return this.x === x && this.y === y;
+}
+
+
+
+
 }
