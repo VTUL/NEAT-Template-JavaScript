@@ -2,44 +2,48 @@ class Enemy {
   // Full, unchanging original list
   static topLeftSpawn = [
     //top left
-    { spawn: {x: -10, y: 100 }, patrol: [{ x: 60, y: 100 }, { x: 500, y: 100 }] },
-    { spawn: {x: 500, y: -10 }, patrol: [{ x: 500, y: 70 }, { x: 60, y: 70 }] },
-    { spawn: { x: -10, y: 235 }, patrol: [{ x: 60, y: 235 }, { x: 500, y: 235 }] },
-    { spawn: { x: -10, y: 490 },  patrol: [{ x: 100, y: 490 }, { x: 500, y: 490 }] },
-    { spawn: { x: -10, y: 440 },  patrol: [{ x: 100, y: 440 }, { x: 500, y: 440 }] },
-    { spawn: { x: -10, y: 380 },  patrol: [{ x: 100, y: 380 }, { x: 500, y: 380 }] },
-    { spawn: { x: 500, y: -10}, patrol: [{ x: 500, y: 100 }, { x: 500, y: 500 }] },
-    { spawn: {x: 60, y: -10}, patrol: [{ x: 60, y: 100 }, { x: 60, y: 400 }] },
+
+    { spawn: {x: -1, y: 3 }, patrol: [{ x: 1, y: 3 }, { x: 10, y: 3 }] },
+    { spawn: {x: 10, y: -1 }, patrol: [{ x: 10, y: 2 }, { x: 1, y: 2 }] },
+    { spawn: { x: -1, y: 7 }, patrol: [{ x: 1, y: 7 }, { x: 10, y: 7 }] },
+    { spawn: { x: -1, y: 14 },  patrol: [{ x: 1, y: 14 }, { x: 10, y: 14 }] },
+    { spawn: { x: -1, y: 12 },  patrol: [{ x: 1, y: 12 }, { x: 10, y: 12 }] },
+    { spawn: { x: -1, y: 10 },  patrol: [{ x: 1, y: 10 }, { x: 10, y: 10 }] },
+    { spawn: { x: 10, y: -1}, patrol: [{ x: 10, y: 2}, { x: 10, y: 10 }] },
+    { spawn: {x: 1, y: -1}, patrol: [{ x: 1, y: 2 }, { x: 1, y: 11 }] },
 
   ];
   static topRightSpawn = [
     //top right
-    { spawn: {x: 1090, y: 100 }, patrol: [{ x: 1020, y: 100 }, { x: 560, y: 100 }] }, 
-    { spawn: {x: 560, y: -10 }, patrol: [{ x: 560, y: 70 }, { x: 1020, y: 70 }] },
-    { spawn: { x: 1090, y: 235 }, patrol: [{ x: 1020, y: 235 }, { x: 560, y: 235 }] },
-    { spawn: { x: 1090, y: 490 },  patrol: [{ x: 1020, y: 490 }, { x: 560, y: 490 }] },
-    { spawn: { x: 1090, y: 440 },  patrol: [{ x: 1020, y: 440 }, { x: 560, y: 440 }] },
-    { spawn: { x: 1090, y: 380 },  patrol: [{ x: 1020, y: 380 }, { x: 560, y: 380 }] },
-    { spawn: { x: 550, y: -10}, patrol: [{ x: 550, y: 100 }, { x: 550, y: 500 }] },
-    { spawn: { x: 1020, y: -10}, patrol: [{ x: 1020, y: 100 }, { x: 1020, y: 440 }] },
-    { spawn: { x: 1000, y: -10}, patrol: [{ x: 1000, y: 100 }, { x: 1000, y: 440 }] },
+  
+    { spawn: {x: 22, y: 2 }, patrol: [{ x: 20, y: 2 }, { x: 11, y: 2 }] }, 
+    { spawn: {x: 11, y: -1 }, patrol: [{ x: 11, y: 2 }, { x: 20, y: 2 }] },
+    { spawn: { x: 22, y: 7 }, patrol: [{ x: 20, y: 7 }, { x: 11, y: 7 }] },
+    { spawn: { x: 22, y: 14 },  patrol: [{ x: 20, y: 14 }, { x: 11, y: 14 }] },
+    { spawn: { x: 22, y: 12 },  patrol: [{ x: 20, y: 12 }, { x: 11, y: 12 }] },
+    { spawn: { x: 22, y: 10 },  patrol: [{ x: 20, y: 10 }, { x: 11, y: 10 }] },
+    { spawn: { x: 11, y: -1}, patrol: [{ x: 11, y: 2 }, { x: 11, y: 10 }] },
+    { spawn: { x: 20, y: -1}, patrol: [{ x: 20, y: 2 }, { x: 20, y: 9 }] },
+
   ];
   static bottomLeftSpawn = [
     //bottom left
-    { spawn: { x: 90, y: 910}, patrol: [{ x: 90, y: 830 }, { x: 90, y: 500 }] },
-    { spawn: { x: 220, y: 910}, patrol: [{ x: 220, y: 830 }, { x: 220, y: 500 }] },
-    { spawn: {x: 350, y: 910}, patrol: [{ x: 350, y: 830 }, { x: 350, y: 500 }] },
-    { spawn: {x: -10, y: 600}, patrol: [{ x: 90, y: 600 }, { x: 500, y: 600 }] },
-    { spawn: {x: -10, y: 830}, patrol: [{ x: 90, y: 830 }, { x: 350, y: 830 }] },
-    { spawn: {x: 350, y: 910}, patrol: [{ x: 350, y: 770 }, { x: 720, y: 770 }] },
+
+    { spawn: { x: 1, y: 26}, patrol: [{ x: 1, y: 24 }, { x: 1, y: 10 }] },
+    { spawn: { x: 4, y: 26}, patrol: [{ x: 4, y: 24 }, { x: 4, y: 10 }] },
+    { spawn: {x: 7, y: 26}, patrol: [{ x: 7, y: 24 }, { x: 7, y: 10 }] },
+    { spawn: {x: -1, y: 17}, patrol: [{ x: 1, y: 17 }, { x: 10, y: 17 }] },
+    { spawn: {x: -1, y: 23}, patrol: [{ x: 1, y: 23 }, { x: 7, y: 23 }] },
+    { spawn: {x: 7, y: 26}, patrol: [{ x: 7, y: 22 }, { x: 14, y: 22 }] },
   ];
   static bottomRightSpawn = [
     //bottom right
-    { spawn: { x: 1020, y: 910}, patrol: [{ x: 1020, y: 830 }, { x: 1020, y: 500 }] },
-    { spawn: {x: 1090, y: 600}, patrol: [{ x: 1020, y: 600 }, { x: 560, y: 600 }] },
-    { spawn: {x: 730, y: 910}, patrol: [{ x: 730, y: 830 }, { x: 730, y: 500 }] },
-    { spawn: {x: 855, y: 910}, patrol: [{ x: 855, y: 830 }, { x: 855, y: 500 }] },
-    { spawn: {x: 980, y: 910}, patrol: [{ x: 980, y: 830 }, { x: 980, y: 500 }] },
+
+    { spawn: { x: 20, y: 26}, patrol: [{ x: 20, y: 24 }, { x: 20, y: 10 }] },
+    { spawn: {x: 22, y: 17}, patrol: [{ x: 20, y: 17 }, { x: 11, y: 17 }] },
+    { spawn: {x: 14, y: 26}, patrol: [{ x: 14, y: 23 }, { x: 14, y: 10 }] },
+    { spawn: {x: 17, y: 26}, patrol: [{ x: 17, y: 23 }, { x: 17, y: 10 }] },
+    { spawn: {x: 20, y: 26}, patrol: [{ x: 20, y: 23 }, { x: 20, y: 10 }] },
   ];
 
   
@@ -54,11 +58,11 @@ class Enemy {
     Enemy.bottomLeftSpawnOptions = [...Enemy.bottomLeftSpawn];
     Enemy.bottomRightSpawnOptions = [...Enemy.bottomRightSpawn];
   }
- static enemyCount = 0; // static counter shared by all enemies
+  static enemyCount = 0; //static counter shared by all enemies
 
   constructor() {
     let randomIndex;
-    Enemy.enemyCount++;  // increment count on each new enemy
+    Enemy.enemyCount++;  //increment count on each new enemy
     this.i = (Enemy.enemyCount % 4) + 1;
     this.spawnIndex = 0;
 
@@ -79,18 +83,12 @@ class Enemy {
         randomIndex = floor(random(Enemy.bottomRightSpawnOptions.length));
         this.spawn = Enemy.bottomRightSpawnOptions.splice(randomIndex, 1)[0];
         break;
-  }
+    }
 
-  this.patrolPoints = this.spawn.patrol;
+    this.patrolPoints = this.spawn.patrol;
   
-
-    //random spawn position along patrol line
-    //let t = random(0, 1);
-   //let p0 = this.patrolPoints[0];
-    //let p1 = this.patrolPoints[1];
-
-    this.x = this.spawn.spawn.x;
-    this.y = this.spawn.spawn.y;
+    this.x = this.spawn.spawn.x * blockWidth + offsetX + blockWidth / 2;
+    this.y = this.spawn.spawn.y * blockHeight + offsetY + blockHeight / 2;
 
     this.h = 18;
     this.speed = 3;
@@ -115,10 +113,8 @@ class Enemy {
     let newX = this.x + this.speed * cos(angle);
     let newY = this.y + this.speed * sin(angle);
 
-    
     this.x = newX;
-    this.y = newY;
-    
+    this.y = newY  
 
     if (abs(targetX - this.x) > abs(targetY - this.y)) {
       this.facing = targetX < this.x ? "a" : "d";
@@ -128,7 +124,7 @@ class Enemy {
   }
 
   move() {
-    // .01% chance per frame to disappear
+    //.01% chance per frame to disappear
     if (random(1) < 0.001) {
       if (this.spawn && this.i == 1) {
         Enemy.topLeftSpawnOptions.push(this.spawn);
@@ -163,86 +159,63 @@ class Enemy {
   }
 
   patrol() {
-  let target = this.patrolPoints[this.currentPatrolIndex];
-  let d = dist(this.x, this.y, target.x, target.y);
+    let targetGrid = this.patrolPoints[this.currentPatrolIndex];
+    let targetX = targetGrid.x * blockWidth + offsetX + blockWidth / 2;
+    let targetY = targetGrid.y * blockHeight + offsetY + blockHeight / 2;
+    let d = dist(this.x, this.y, targetX, targetY);
 
-  if (d < 5) {
-    this.x = target.x;
-    this.y = target.y;
-  
-    this.currentPatrolIndex = (this.currentPatrolIndex + 1) % this.patrolPoints.length;
-  } else {
-    this.moveTo(target.x, target.y);
-  }
+    if (d < 5) {
+      this.x = targetX;
+      this.y = targetY;
+      this.currentPatrolIndex = (this.currentPatrolIndex + 1) % this.patrolPoints.length;
+    } else {
+      this.moveTo(targetX, targetY);
+    }
 }
 
+show() {
+  push();
 
-  show() {
-    push();
-    const cx = this.x + this.w / 2;
-    const cy = this.y + this.h / 2;
+  translate(this.x, this.y);
 
-    translate(cx, cy);
+  if (this.facing === "a") {
+    scale(-1, 1);
+  }
 
-    if (this.facing === "a") {
-      scale(-1, 1);
-   }
-
-    imageMode(CENTER);
+  imageMode(CENTER);
 
   //different sprites for different directions
-    if (this.facing === "w") {
-      scale(-1, -1);
-      this.spriteDown.draw();
-      this.w = 18;
-      this.h = 36;
-    } else if (this.facing === "s") {
-      this.spriteDown.draw();
-      this.w = 18;
-      this.h = 36;
-    } else {
-      this.sprite.draw();
-      this.w = 36;
-      this.h = 18;
-    }
-
-    imageMode(CORNER);
-    pop();
-    //noFill();
-    //stroke(255, 0, 0);
-    //rect(this.x, this.y, this.w, this.h);
+  if (this.facing === "w") {
+    scale(-1, -1);
+    this.spriteDown.draw();
+    this.w = 18;
+    this.h = 36;
+  } else if (this.facing === "s") {
+    this.spriteDown.draw();
+    this.w = 18;
+    this.h = 36;
+  } else {
+    this.sprite.draw();
+    this.w = 36;
+    this.h = 18;
   }
 
-  checkCollision(player) {
-  let thisLeft = this.x;
-  let thisRight = this.x + this.w;
-  let thisTop = this.y;
-  let thisBottom = this.y + this.h;
-
-  let playerLeft = player.x;
-  let playerRight = player.x + player.w;
-  let playerTop = player.y;
-  let playerBottom = player.y + player.h;
-
-  let overlapX = thisRight > playerLeft && thisLeft < playerRight;
-  let overlapY = thisBottom > playerTop && thisTop < playerBottom;
-
-  return overlapX && overlapY;
+  imageMode(CORNER);
+  pop();
+  //noFill();
+  //stroke(255, 0, 0);
+  //rect(this.x, this.y, this.w, this.h);
 }
 
-  /*collidesWithBlocks(x, y) {
-    let tempEnemy = {
-      x: x - this.size / 2,
-      y: y - this.size / 2,
-      w: this.size,
-      h: this.size
-    };
+checkCollision(player) {
+  const enemyGridX = Math.floor((this.x - offsetX) / blockWidth);
+  const enemyGridY = Math.floor((this.y - offsetY) / blockHeight);
 
-    for (let block of blocks) {
-      if (block.intersects(tempEnemy)) {
-        return true;
-      }
-    }
-    return false;
-  }*/
+  const playerGridX = Math.floor((player.x - offsetX) / blockWidth);
+  const playerGridY = Math.floor((player.y - offsetY) / blockHeight);
+
+  //check if both are in the same grid space
+  return enemyGridX === playerGridX && enemyGridY === playerGridY;
+}
+
 }

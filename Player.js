@@ -27,16 +27,20 @@ class Player {
     this.boostedSpeed = 10;
     this.speed = this.baseSpeed;
     this.isInvinUntil = 0;
-    this.x = 516;
-    this.y = 375;
+    this.gridX = 11;
+    this.gridY = 11;
+    this.x = this.gridX * blockWidth + offsetX + blockWidth / 2;
+    this.y = this.gridY * blockHeight + offsetY + blockHeight / 2;
     this.w = 40;
     this.h = 24;
+    this.targetX = this.x;
+    this.targetY = this.y;
+    this.isMoving = false;
+
     this.dir = "d"; //the direction the player is facing
     this.isInvincible = false;
 
     this.lastScoreMillis = millis();
-    this.previousX = this.x;
-    this.previousY = this.y;
     this.lastMeaningfulMoveTime = millis();
     this.minMeaningfulDistance = 40; //mess with
   
@@ -89,15 +93,12 @@ class Player {
      }*/
 
      //draw the player sprite
-     push();
-    const cx = this.x + this.w / 2;
-    const cy = this.y + this.h / 2;
-
-    translate(cx, cy);
+    push();
+    translate(this.x, this.y);
 
     if (this.facing === "a") {
       scale(-1, 1);
-   }
+    }
 
     imageMode(CENTER);
 
@@ -105,7 +106,7 @@ class Player {
       tint(0, 255, 0);
     } else {
       noTint();
-   }
+    }
 
   //different sprites for different directions
     if (this.facing === "w") {
@@ -140,97 +141,55 @@ class Player {
 
 
   move(direction) {
-    this.facing = direction;
-    let dx = 0;
-    let dy = 0;
+    this.facing = direction; //update facing direction
+    if (this.isMoving) return; //already sliding to a tile
+
+    let newGridX = this.gridX;
+    let newGridY = this.gridY;
 
     switch (direction) {
-      case "a":
-        if (
-          !this.collidesWithBlocks(
-            this.x - this.speed - 2,
-            this.y,
-            this.w,
-            this.h
-          )
-        ) {
-          this.x = this.x - this.speed;
-          if((Math.abs(this.distanceTrackerX - this.x) > this.distanceInterval || Math.abs(this.distanceTrackerY - this.y) > this.distanceInterval)) {
-            this.distanceTrackerX = this.x;
-            this.distanceTrackerY = this.y;
-            this.distance += this.distanceReward;
-          }
-        } else {
-          this.fitnessPenalty += 1;
-        }
-        break;
-      case "d":
-        if (
-          !this.collidesWithBlocks(
-            this.x + this.speed + 2,
-            this.y,
-            this.w,
-            this.h
-          )
-        ) {
-          this.x = this.x + this.speed;
-          if((Math.abs(this.distanceTrackerX - this.x) > this.distanceInterval || Math.abs(this.distanceTrackerY - this.y) > this.distanceInterval)) {
-            this.distanceTrackerX = this.x;
-            this.distanceTrackerY = this.y;
-            this.distance += this.distanceReward;
-          }
-        } else {
-          this.fitnessPenalty += 1;
-        }
-        break;
-      case "w":
-        if (
-          !this.collidesWithBlocks(
-            this.x,
-            this.y - this.speed - 5,
-            this.w,
-            this.h
-          )
-        ) {
-          this.y = this.y - this.speed;
-          if((Math.abs(this.distanceTrackerX - this.x) > this.distanceInterval || Math.abs(this.distanceTrackerY - this.y) > this.distanceInterval)) {
-            this.distanceTrackerX = this.x;
-            this.distanceTrackerY = this.y;
-            this.distance += this.distanceReward;
-          }
-        } else {
-          this.fitnessPenalty += 1;
-        }
-        break;
-      case "s":
-        if (
-          !this.collidesWithBlocks(
-            this.x,
-            this.y + this.speed + 5,
-            this.w,
-            this.h
-          )
-        ) {
-          this.y = this.y + this.speed;
-          if((Math.abs(this.distanceTrackerX - this.x) > this.distanceInterval || Math.abs(this.distanceTrackerY - this.y) > this.distanceInterval)) {
-            this.distanceTrackerX = this.x;
-            this.distanceTrackerY = this.y;
-            this.distance += this.distanceReward;
-          }
-        } else {
-          this.fitnessPenalty += 1;
-        }
-        break;
+      case "a": newGridX -= 1; break;
+      case "d": newGridX += 1; break;
+      case "w": newGridY -= 1; break;
+      case "s": newGridY += 1; break;
+   }
+
+    //check if that grid space is walkable
+    if (this.isWalkable(newGridX, newGridY)) {
+      this.gridX = newGridX;
+      this.gridY = newGridY;
+
+      //set target pixel position (center of grid cell)
+      this.targetX = this.gridX * blockWidth + offsetX + blockWidth / 2;
+      this.targetY = this.gridY * blockHeight + offsetY + blockHeight / 2;
+
+      this.isMoving = true; // start sliding
     }
+}
 
-  
-
-  }
 
   update() {
     if (this.dead) return;
 
     this.isInvincible = millis() < this.isInvinUntil;
+
+    if (this.isMoving) {
+    const dx = this.targetX - this.x;
+    const dy = this.targetY - this.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+
+    if (dist <= this.speed) {
+      // Snap to center
+      this.x = this.targetX;
+      this.y = this.targetY;
+      this.isMoving = false; // done moving
+    } else {
+      // Move toward target
+      const angle = Math.atan2(dy, dx);
+      this.x += Math.cos(angle) * this.speed;
+      this.y += Math.sin(angle) * this.speed;
+    }
+  }
 
     if (humanPlaying) {
       if (keyIsDown(87)) {
@@ -376,27 +335,19 @@ getNearest(targets, centerX, centerY) {
   }
 
   checkUp(i) {
-    return (
-      this.collidesWithBlocks(this.x, this.y - i - 10, this.w, this.h)
-    );
+    return this.isWalkable(this.gridX, this.gridY - i);
   }
 
   checkRight(i) {
-    return (
-      this.collidesWithBlocks(this.x + this.w + i, this.y, this.w, this.h)
-    );
+    return this.isWalkable(this.gridX + i, this.gridY);
   }
 
   checkDown(i) {
-    return (
-      this.collidesWithBlocks(this.x, this.y + this.h + i, this.w, this.h)
-    );
+    return this.isWalkable(this.gridX, this.gridY + i);
   }
 
   checkLeft(i) {
-    return (
-      this.collidesWithBlocks(this.x - i - 5, this.y, this.w, this.h)
-    );
+    return this.isWalkable(this.gridX - i, this.gridY);
   }
 
   getDistance(targets, centerX, centerY) {
@@ -413,31 +364,6 @@ getNearest(targets, centerX, centerY) {
       return accumulator;
     }, 1500);
   }
-
-  // getNearestDirection(target, centerX, centerY) {
-  //   // console.log(target);
-  //   const y = target.y - centerY;
-  //   const x = target.x - centerX;
-  //   const angle = (Math.atan2(y, x) * 180) / Math.PI;
-
-  //   if (angle < 22.5 || angle > 337.5) {
-  //     return 4;
-  //   } else if (angle < 67.5) {
-  //     return 3;
-  //   } else if (angle < 112.5) {
-  //     return 2;
-  //   } else if (angle < 157.5) {
-  //     return 1;
-  //   } else if (angle < 202.5) {
-  //     return 8;
-  //   } else if (angle < 247.5) {
-  //     return 7;
-  //   } else if (angle < 292.5) {
-  //     return 6;
-  //   } else {
-  //     return 5;
-  //   }
-  // }
 
   think() {
     let max = 0;
@@ -497,26 +423,16 @@ getNearest(targets, centerX, centerY) {
 
   //helper method to check if a move is possible (not blocked by wall)
   canMove(direction) {
-    // console.log(direction);
-    let dx = 0,
-      dy = 0;
+    // Use grid coordinates and isWalkable for grid-based movement
+    let newGridX = this.gridX;
+    let newGridY = this.gridY;
     switch (direction) {
-      case "a":
-        dx -= this.speed;
-        break;
-      case "d":
-        dx += this.speed;
-        break;
-      case "w":
-        dy -= this.speed;
-        break;
-      case "s":
-        dy += this.speed;
-        break;
+      case "a": newGridX -= 1; break;
+      case "d": newGridX += 1; break;
+      case "w": newGridY -= 1; break;
+      case "s": newGridY += 1; break;
     }
-
-    //check if path is blocked at full step (not pixel by pixel here)
-    return !this.collidesWithBlocks(this.x + dx, this.y + dy, this.w, this.h);
+    return this.isWalkable(newGridX, newGridY);
   }
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -561,18 +477,6 @@ getNearest(targets, centerX, centerY) {
     child.brain = this.brain.crossover(parent2.brain);
     child.brain.generateNetwork();
     return child;
-  }
-
-  collidesWithBlocks(x, y, w, h) {
-    //creates a temporary object with x,y,w,h to mimic player position
-    let tempPlayer = { x: x, y: y, w: w, h: h };
-
-    for (let block of blocks) {
-      if (block.intersects(tempPlayer)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   //when grid stuff is finished for player

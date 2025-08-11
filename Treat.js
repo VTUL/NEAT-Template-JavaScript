@@ -60,7 +60,7 @@ class Treat {
   }
 
   show() {
-    imageMode(CENTER); 
+    imageMode(CENTER);  
     image(yum, this.x, this.y, this.w, this.h);
     noTint(); 
     imageMode(CORNER);
