@@ -21,22 +21,16 @@ class PeanutButter {
     goodSpawns.push(this.spawn);
   }
 
-checkCollision(player) {
-  let thisLeft = this.x;
-  let thisRight = this.x + this.w;
-  let thisTop = this.y;
-  let thisBottom = this.y + this.h;
+   checkCollision(player) {
+    const objGridX = Math.floor((this.x - offsetX) / blockWidth);
+    const objGridY = Math.floor((this.y - offsetY) / blockHeight);
 
-  let playerLeft = player.x;
-  let playerRight = player.x + player.w;
-  let playerTop = player.y;
-  let playerBottom = player.y + player.h;
+    const playerGridX = Math.floor((player.x - offsetX) / blockWidth);
+    const playerGridY = Math.floor((player.y - offsetY) / blockHeight);
 
-  let overlapX = thisRight > playerLeft && thisLeft < playerRight;
-  let overlapY = thisBottom > playerTop && thisTop < playerBottom;
-
-  return overlapX && overlapY;
-}
+    //check if both are in the same grid space
+    return objGridX === playerGridX && objGridY === playerGridY;
+  }
 
 
 }

@@ -59,10 +59,13 @@ let pendingReset = false;
 
 let blockWidth = 50;
 let blockHeight = 35;
-let offsetX;
-let offsetY;
+let wallWidth = 1100;
+let wallHeight = 910;
+let offsetX = -10;
+let offsetY = 0;
 
 let goodSpawns = [];
+let fullSpawns = [];
 
 
 
@@ -98,10 +101,10 @@ function setup() {
 
   wall = new Wall(MAP_DATA); //map for collisions
 
-  let wallWidth = wall.getColumns() * blockWidth;
-  let wallHeight = wall.getRows() * blockHeight;
-  offsetX = (width - wallWidth) / 2;
-  offsetY = (height - wallHeight) / 2;
+  //wallWidth = wall.getColumns() * blockWidth;
+ // wallHeight = wall.getRows() * blockHeight;
+  //offsetX = (width - wallWidth) / 2;
+  //offsetY = (height - wallHeight) / 2;
 
   for (let i = 0; i < wall.getRows(); i++) {
     for (let j = 0; j < wall.getColumns(); j++) {
@@ -113,6 +116,8 @@ function setup() {
       }
     }
   }
+
+  fullSpawns = [...goodSpawns]; //keep a copy of all good spawns
   
   resetGame();
   introTime = millis() + 3000; 
@@ -672,6 +677,7 @@ function handleInteractions(player) {
 
 //function to reset the game state
 function resetGame() {
+  goodSpawns = [...fullSpawns]; //reset good spawns to full list
   Enemy.resetSpawns();
 
   treats = [];

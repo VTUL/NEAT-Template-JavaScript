@@ -163,7 +163,7 @@ class Player {
       this.targetX = this.gridX * blockWidth + offsetX + blockWidth / 2;
       this.targetY = this.gridY * blockHeight + offsetY + blockHeight / 2;
 
-      this.isMoving = true; // start sliding
+      this.isMoving = true; //start sliding
     }
 }
 
@@ -318,8 +318,6 @@ getNearest(targets, centerX, centerY) {
   return nearest;
 }
 
-
-  //vision not wide enough?
   getWallDistances(direction) {
     const visionInterval = 4;
     const visionDistance = 25;
@@ -403,7 +401,7 @@ getNearest(targets, centerX, centerY) {
     
     this.lastDec = maxIndex;
     this.isSprinting = this.decision[4] >= 0.7 && this.stamina > 0;
-    this.decisionCount = 30;
+    this.decisionCount = 1000;
     // if (this.self == population[0] && !this.dead) {
     //     console.info("chosen direction: ", directions[maxIndex]);
     //   }
@@ -478,14 +476,5 @@ getNearest(targets, centerX, centerY) {
     child.brain.generateNetwork();
     return child;
   }
-
-  //when grid stuff is finished for player
-  //in this case x = grid x, y = grid y
-  checkCollision(x, y) {
-    return this.x === x && this.y === y;
-}
-
-
-
 
 }

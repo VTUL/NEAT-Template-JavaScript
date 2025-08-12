@@ -5,7 +5,7 @@ class Treat {
     let randomX;
     let randomY;
     let foundIndex;
-    Treat.treatCount++;  // increment count on each new enemy
+    Treat.treatCount++;  // increment count on each new obj
     this.i = (Treat.treatCount % 4) + 1;
 
     switch (this.i) {
@@ -70,7 +70,7 @@ class Treat {
     goodSpawns.push(this.spawn);
   }
 
-  checkCollision(player) {
+  /*checkCollision(player) {
     let thisLeft = this.x;
     let thisRight = this.x + this.w;
     let thisTop = this.y;
@@ -85,5 +85,15 @@ class Treat {
     let overlapY = thisBottom > playerTop && thisTop < playerBottom;
 
     return overlapX && overlapY;
+  }*/
+  checkCollision(player) {
+    const objGridX = Math.floor((this.x - offsetX) / blockWidth);
+    const objGridY = Math.floor((this.y - offsetY) / blockHeight);
+
+    const playerGridX = Math.floor((player.x - offsetX) / blockWidth);
+    const playerGridY = Math.floor((player.y - offsetY) / blockHeight);
+
+    //check if both are in the same grid space
+    return objGridX === playerGridX && objGridY === playerGridY;
   }
 }

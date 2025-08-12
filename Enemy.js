@@ -35,15 +35,17 @@ class Enemy {
     { spawn: {x: -1, y: 17}, patrol: [{ x: 1, y: 17 }, { x: 10, y: 17 }] },
     { spawn: {x: -1, y: 23}, patrol: [{ x: 1, y: 23 }, { x: 7, y: 23 }] },
     { spawn: {x: 7, y: 26}, patrol: [{ x: 7, y: 22 }, { x: 14, y: 22 }] },
+    { spawn: {x: -1, y: 24}, patrol: [{ x: 1, y: 24 }, { x: 10, y: 24 }] },
   ];
   static bottomRightSpawn = [
     //bottom right
 
     { spawn: { x: 20, y: 26}, patrol: [{ x: 20, y: 24 }, { x: 20, y: 10 }] },
     { spawn: {x: 22, y: 17}, patrol: [{ x: 20, y: 17 }, { x: 11, y: 17 }] },
-    { spawn: {x: 14, y: 26}, patrol: [{ x: 14, y: 23 }, { x: 14, y: 10 }] },
-    { spawn: {x: 17, y: 26}, patrol: [{ x: 17, y: 23 }, { x: 17, y: 10 }] },
-    { spawn: {x: 20, y: 26}, patrol: [{ x: 20, y: 23 }, { x: 20, y: 10 }] },
+    { spawn: {x: 14, y: 26}, patrol: [{ x: 14, y: 24 }, { x: 14, y: 10 }] },
+    { spawn: {x: 17, y: 26}, patrol: [{ x: 17, y: 24 }, { x: 17, y: 10 }] },
+    { spawn: {x: 20, y: 26}, patrol: [{ x: 20, y: 24 }, { x: 20, y: 10 }] },
+    { spawn: {x: 22, y: 24}, patrol: [{ x: 21, y: 24 }, { x: 11, y: 24 }] },
   ];
 
   
@@ -147,15 +149,19 @@ class Enemy {
     if (this.dropCooldown > 0) {
       this.dropCooldown--;
     } else {
-      if (random(1) < 0.0001) {
+      if (random(1) < 0.001) { //0.0001
         this.dropAnti();
-        this.dropCooldown = 60000;
+        this.dropCooldown = 30000;
       }
     }
   }
 
   dropAnti() {
-    anti.push(new Anti(this.x, this.y));
+    const gridX = Math.floor((this.x - offsetX) / blockWidth);
+    const gridY = Math.floor((this.y - offsetY) / blockHeight);
+    const centerX = gridX * blockWidth + offsetX + blockWidth / 2;
+    const centerY = gridY * blockHeight + offsetY + blockHeight / 2;
+    anti.push(new Anti(centerX, centerY));
   }
 
   patrol() {

@@ -50,25 +50,16 @@ class TennisBall {
   }
     
 
-checkCollision(player) {
-  let playerLeft = player.x;
-  let playerRight = player.x + player.w;
-  let playerTop = player.y;
-  let playerBottom = player.y + player.h;
+ checkCollision(player) {
+    const objGridX = Math.floor((this.x - offsetX) / blockWidth);
+    const objGridY = Math.floor((this.y - offsetY) / blockHeight);
 
-  let closestX = constrain(this.x, playerLeft, playerRight);
-  let closestY = constrain(this.y, playerTop, playerBottom);
+    const playerGridX = Math.floor((player.x - offsetX) / blockWidth);
+    const playerGridY = Math.floor((player.y - offsetY) / blockHeight);
 
-  let dx = this.x - closestX;
-  let dy = this.y - closestY;
-  let distanceSq = dx * dx + dy * dy;
-
-  if (distanceSq < this.r * this.r) {
-    this.collected = true;
-    return true;
+    //check if both are in the same grid space
+    return objGridX === playerGridX && objGridY === playerGridY;
   }
-  return false;
-}
 
 
 }
