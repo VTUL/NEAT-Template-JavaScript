@@ -111,11 +111,11 @@ class Player {
     }
 
   //different sprites for different directions
-    if (this.facing === "w") {
+    if (this.facing === "w" ) {
       this.spriteUp[this.i].draw();
       this.w = 24;
       this.h = 40;
-    } else if (this.facing === "s") {
+    } else if (this.facing === "s" ) {
       this.spriteDown[this.i].draw();
       this.w = 24;
       this.h = 40;
@@ -144,7 +144,7 @@ class Player {
 
   move(direction) {
     this.facing = direction; //update facing direction
-    if (this.isMoving) return; //already sliding to a tile
+    if (this.isMoving) return; //already sliding to a tile, sprite turns/flips too early
 
     let newGridX = this.gridX;
     let newGridY = this.gridY;
@@ -181,12 +181,12 @@ class Player {
     const dist = Math.sqrt(dx*dx + dy*dy);
 
     if (dist <= this.speed) {
-      // Snap to center
+      //snap to center
       this.x = this.targetX;
       this.y = this.targetY;
       this.isMoving = false; // done moving
     } else {
-      // Move toward target
+      //move toward target
       const angle = Math.atan2(dy, dx);
       this.x += Math.cos(angle) * this.speed;
       this.y += Math.sin(angle) * this.speed;
