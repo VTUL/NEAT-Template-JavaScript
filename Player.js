@@ -13,7 +13,7 @@ class Player {
     this.distanceReward = 100;
     this.pickupRewardModifier = 2000;
     this.distance = 0;
-    this.fitnessPenalty = 0;
+    this.fitnessPenalty = 1;
     this.penaltyModifier = 100;
     this.distanceModifier = 500;
 
@@ -29,6 +29,8 @@ class Player {
     this.isInvinUntil = 0;
     this.gridX = 11;
     this.gridY = 11;
+    this.visitedTiles = new Set();
+    this.recentTiles = [];
     this.x = this.gridX * blockWidth + offsetX + blockWidth / 2;
     this.y = this.gridY * blockHeight + offsetY + blockHeight / 2;
     this.w = 40;
@@ -242,13 +244,23 @@ class Player {
 
 
     this.lifespan++;
+
+    const tileKey = `${this.gridX},${this.gridY}`; //trying to stop looping
+    this.visitedTiles.add(tileKey);
+    this.recentTiles.push(tileKey);
+    if (this.recentTiles.length > 40) this.recentTiles.shift();
+
+    if (this.recentTiles.slice(0, -1).includes(tileKey)) {
+      this.fitnessPenalty += 5; 
+    }
 }
 
 
   look() {
   this.vision = [];
-  const centerX = this.x + this.w / 2;
-  const centerY = this.y + this.h / 2;
+  //use grid coordinates for distance calculations
+  const gridX = this.gridX;
+  const gridY = this.gridY;
 
   //push distances to vision array
   this.vision.push(map(this.getWallDistances(this.checkUp), 1, 30, 0, 1));
@@ -265,17 +277,17 @@ class Player {
   /*const targets = [enemies, treats, anti, balls, beds, pb];
 
   for (let targetList of targets) {
-    const nearest = this.getNearest(targetList, centerX, centerY);
+    const nearest = this.getNearestGrid(targetList, gridX, gridY);
     if (nearest) {
-      const dx = nearest.x - centerX;
-      const dy = nearest.y - centerY;
-      const maxRange = 1080;
+      const dx = nearest.gridX - gridX;
+      const dy = nearest.gridY - gridY;
+      const maxGridRange = 30; // adjust as needed for your map size
 
       //normalize and push to vision
-      this.vision.push(map(dx, -maxRange, maxRange, -1, 1));
-      this.vision.push(map(dy, -maxRange, maxRange, -1, 1));
-      const dist = Math.abs(dx) + Math.abs(dy);
-      this.vision.push(map(dist, 0, maxRange, 0, 1));
+      this.vision.push(map(dx, -maxGridRange, maxGridRange, -1, 1));
+      this.vision.push(map(dy, -maxGridRange, maxGridRange, -1, 1));
+      const gridDist = Math.abs(dx) + Math.abs(dy);
+      this.vision.push(map(gridDist, 0, maxGridRange, 0, 1));
     } else {
       //no target found = neutral values
       this.vision.push(0); // dx
@@ -284,12 +296,12 @@ class Player {
     }
   }*/
 
-    this.vision.push(map(this.getDistance(enemies, centerX, centerY), 0, 1500, 0, 1));
-    this.vision.push(map(this.getDistance(treats, centerX, centerY), 0, 1500, 0, 1));
-    this.vision.push(map(this.getDistance(anti, centerX, centerY), 0, 1500, 0, 1));
-    this.vision.push(map(this.getDistance(balls, centerX, centerY), 0, 1500, 0, 1));
-    this.vision.push(map(this.getDistance(beds, centerX, centerY), 0, 1500, 0, 1));
-    this.vision.push(map(this.getDistance(pb, centerX, centerY), 0, 1500, 0, 1));
+    this.vision.push(map(this.getDistance(enemies, gridX, gridY), 0, 1500, 0, 1));
+    this.vision.push(map(this.getDistance(treats, gridX, gridY), 0, 1500, 0, 1));
+    this.vision.push(map(this.getDistance(anti, gridX, gridY), 0, 1500, 0, 1));
+    this.vision.push(map(this.getDistance(balls, gridX, gridY), 0, 1500, 0, 1));
+    this.vision.push(map(this.getDistance(beds, gridX, gridY), 0, 1500, 0, 1));
+    this.vision.push(map(this.getDistance(pb, gridX, gridY), 0, 1500, 0, 1));
 
    //  if (this.self == population[0] && !this.dead) {
       //   console.info("Vision: ", pbData.distance);
@@ -297,26 +309,27 @@ class Player {
 
   }
 
-getNearest(targets, centerX, centerY) {
-  if (!targets || targets.length === 0) return null;
+  getNearestGrid(targets, gridX, gridY) {
+    if (!targets || targets.length === 0) return null;
 
-  let nearest = null;
-  let minDist = Infinity;
+    let nearest = null;
+    let minDist = Infinity;
 
-  for (let t of targets) {
-    if (t.idList?.includes(this.uuid)) continue;
-    const dx = t.x - centerX;
-    const dy = t.y - centerY;
-    const dist = Math.abs(dx) + Math.abs(dy);
+    for (let t of targets) {
+      if (t.idList?.includes(this.uuid)) continue;
+      //each target has gridX and gridY properties (except anti)
+      const dx = t.gridX - gridX;
+      const dy = t.gridY - gridY;
+      const dist = Math.abs(dx) + Math.abs(dy);
 
-    if (dist < minDist) {
-      minDist = dist;
-      nearest = t;
+      if (dist < minDist) {
+        minDist = dist;
+        nearest = t;
+      }
     }
-  }
 
-  return nearest;
-}
+    return nearest;
+  }
 
   getWallDistances(direction) {
     const visionInterval = 4;
@@ -348,14 +361,14 @@ getNearest(targets, centerX, centerY) {
     return this.isWalkable(this.gridX - i, this.gridY);
   }
 
-  getDistance(targets, centerX, centerY) {
+  getDistance(targets, gridX, gridY) {
     if (!targets || targets.length === 0) {
       return 1500;
     }
     return targets?.reduce((accumulator, currentValue) => {
       if(currentValue.idList?.includes(this.uuid)) {return accumulator};
       const temp =
-        Math.abs(centerX - currentValue.x) + Math.abs(centerY - currentValue.y);
+        Math.abs(gridX - currentValue.x) + Math.abs(gridY - currentValue.y);
       if (temp < accumulator) {
         return temp;
       }
@@ -466,8 +479,9 @@ getNearest(targets, centerX, centerY) {
   }
 
   calculateFitness() {
-    // this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier)  - this.fitnessPenalty;
-    this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distance * this.distanceModifier) - (this.fitnessPenalty * this.penaltyModifier);
+    const exploreReward = this.visitedTiles.size * 100; //100 points per unique tile
+    //this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier)  - this.fitnessPenalty;
+    this.fitness = (this.score * this.score * this.pickupRewardModifier) + exploreReward - (this.fitnessPenalty * this.penaltyModifier);
   }
 
   crossover(parent2) {

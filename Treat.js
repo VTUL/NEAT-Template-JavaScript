@@ -1,6 +1,6 @@
 class Treat {
   constructor() {
-    //I wanted to m akre sure treats were evenly spread out but 
+    //I wanted to make sure treats were evenly spread out but 
     //it might not be too different from just taking available random spawns
     let randomX;
     let randomY;
@@ -53,6 +53,8 @@ class Treat {
     //this.spawn = spawn;
     this.x = this.spawn.x * blockWidth + offsetX + blockWidth / 2;
     this.y = this.spawn.y * blockHeight + offsetY + blockHeight / 2;
+    this.gridX = this.spawn.x;
+    this.gridY = this.spawn.y;
     this.w = 20;
     this.h = 20;
     this.life = millis() + random(10000, 20000); //treats last between 10 and 20 seconds
@@ -87,13 +89,9 @@ class Treat {
     return overlapX && overlapY;
   }*/
   checkCollision(player) {
-    const objGridX = Math.floor((this.x - offsetX) / blockWidth);
-    const objGridY = Math.floor((this.y - offsetY) / blockHeight);
-
     const playerGridX = Math.floor((player.x - offsetX) / blockWidth);
     const playerGridY = Math.floor((player.y - offsetY) / blockHeight);
-
     //check if both are in the same grid space
-    return objGridX === playerGridX && objGridY === playerGridY;
+    return this.gridX === playerGridX && this.gridY === playerGridY;
   }
 }

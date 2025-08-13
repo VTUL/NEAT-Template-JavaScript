@@ -31,6 +31,8 @@ class TennisBall {
     this.spawn = spawn;
     this.x = spawn.x * blockWidth + offsetX + blockWidth / 2;
     this.y = spawn.y * blockHeight + offsetY + blockHeight / 2;
+    this.gridX = spawn.x;
+    this.gridY = spawn.y;
 
 }
 
@@ -50,15 +52,11 @@ class TennisBall {
   }
     
 
- checkCollision(player) {
-    const objGridX = Math.floor((this.x - offsetX) / blockWidth);
-    const objGridY = Math.floor((this.y - offsetY) / blockHeight);
-
+  checkCollision(player) {
     const playerGridX = Math.floor((player.x - offsetX) / blockWidth);
     const playerGridY = Math.floor((player.y - offsetY) / blockHeight);
-
     //check if both are in the same grid space
-    return objGridX === playerGridX && objGridY === playerGridY;
+    return this.gridX === playerGridX && this.gridY === playerGridY;
   }
 
 

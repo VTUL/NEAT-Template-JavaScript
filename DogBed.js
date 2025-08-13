@@ -6,6 +6,8 @@ class DogBed {
     this.x = spawn.x * blockWidth + offsetX + blockWidth / 2;
     this.y = spawn.y * blockHeight + offsetY + blockHeight / 2;
     this.r = 20;
+    this.gridX = spawn.x;
+    this.gridY = spawn.y;
 
     this.life = millis() + 15000;
     this.idList = [];
@@ -21,14 +23,11 @@ class DogBed {
     goodSpawns.push(this.spawn);
   }
 
-   checkCollision(player) {
-    const objGridX = Math.floor((this.x - offsetX) / blockWidth);
-    const objGridY = Math.floor((this.y - offsetY) / blockHeight);
-
-    const playerGridX = Math.floor((player.x - offsetX) / blockWidth);
-    const playerGridY = Math.floor((player.y - offsetY) / blockHeight);
-
-    //check if both are in the same grid space
-    return objGridX === playerGridX && objGridY === playerGridY;
+  checkCollision(player) {
+  const playerGridX = Math.floor((player.x - offsetX) / blockWidth);
+  const playerGridY = Math.floor((player.y - offsetY) / blockHeight);
+  //check if both are in the same grid space
+  return this.gridX === playerGridX && this.gridY === playerGridY;
   }
+
 }

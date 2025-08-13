@@ -1,14 +1,14 @@
 class Enemy {
-  // Full, unchanging original list
+  //commented out spawns that arent on the outer edges
   static topLeftSpawn = [
     //top left
 
     { spawn: {x: -1, y: 3 }, patrol: [{ x: 1, y: 3 }, { x: 10, y: 3 }] },
     { spawn: {x: 10, y: -1 }, patrol: [{ x: 10, y: 2 }, { x: 1, y: 2 }] },
-    { spawn: { x: -1, y: 7 }, patrol: [{ x: 1, y: 7 }, { x: 10, y: 7 }] },
-    { spawn: { x: -1, y: 14 },  patrol: [{ x: 1, y: 14 }, { x: 10, y: 14 }] },
-    { spawn: { x: -1, y: 12 },  patrol: [{ x: 1, y: 12 }, { x: 10, y: 12 }] },
-    { spawn: { x: -1, y: 10 },  patrol: [{ x: 1, y: 10 }, { x: 10, y: 10 }] },
+    //{ spawn: { x: -1, y: 7 }, patrol: [{ x: 1, y: 7 }, { x: 10, y: 7 }] },
+    //{ spawn: { x: -1, y: 14 },  patrol: [{ x: 1, y: 14 }, { x: 10, y: 14 }] },
+    //{ spawn: { x: -1, y: 12 },  patrol: [{ x: 1, y: 12 }, { x: 10, y: 12 }] },
+    //{ spawn: { x: -1, y: 10 },  patrol: [{ x: 1, y: 10 }, { x: 10, y: 10 }] },
     { spawn: { x: 10, y: -1}, patrol: [{ x: 10, y: 2}, { x: 10, y: 10 }] },
     { spawn: {x: 1, y: -1}, patrol: [{ x: 1, y: 2 }, { x: 1, y: 11 }] },
 
@@ -17,11 +17,11 @@ class Enemy {
     //top right
   
     { spawn: {x: 22, y: 2 }, patrol: [{ x: 20, y: 2 }, { x: 11, y: 2 }] }, 
-    { spawn: {x: 11, y: -1 }, patrol: [{ x: 11, y: 2 }, { x: 20, y: 2 }] },
-    { spawn: { x: 22, y: 7 }, patrol: [{ x: 20, y: 7 }, { x: 11, y: 7 }] },
-    { spawn: { x: 22, y: 14 },  patrol: [{ x: 20, y: 14 }, { x: 11, y: 14 }] },
-    { spawn: { x: 22, y: 12 },  patrol: [{ x: 20, y: 12 }, { x: 11, y: 12 }] },
-    { spawn: { x: 22, y: 10 },  patrol: [{ x: 20, y: 10 }, { x: 11, y: 10 }] },
+    { spawn: {x: 11, y: -1 }, patrol: [{ x: 11, y: 3 }, { x: 20, y: 3 }] },
+    //{ spawn: { x: 22, y: 7 }, patrol: [{ x: 20, y: 7 }, { x: 11, y: 7 }] },
+    //{ spawn: { x: 22, y: 14 },  patrol: [{ x: 20, y: 14 }, { x: 11, y: 14 }] },
+    //{ spawn: { x: 22, y: 12 },  patrol: [{ x: 20, y: 12 }, { x: 11, y: 12 }] },
+    //{ spawn: { x: 22, y: 10 },  patrol: [{ x: 20, y: 10 }, { x: 11, y: 10 }] },
     { spawn: { x: 11, y: -1}, patrol: [{ x: 11, y: 2 }, { x: 11, y: 10 }] },
     { spawn: { x: 20, y: -1}, patrol: [{ x: 20, y: 2 }, { x: 20, y: 9 }] },
 
@@ -30,21 +30,22 @@ class Enemy {
     //bottom left
 
     { spawn: { x: 1, y: 26}, patrol: [{ x: 1, y: 24 }, { x: 1, y: 10 }] },
-    { spawn: { x: 4, y: 26}, patrol: [{ x: 4, y: 24 }, { x: 4, y: 10 }] },
-    { spawn: {x: 7, y: 26}, patrol: [{ x: 7, y: 24 }, { x: 7, y: 10 }] },
+    //{ spawn: { x: 4, y: 26}, patrol: [{ x: 4, y: 24 }, { x: 4, y: 10 }] },
+    //{ spawn: {x: 7, y: 26}, patrol: [{ x: 7, y: 24 }, { x: 7, y: 10 }] },
     { spawn: {x: -1, y: 17}, patrol: [{ x: 1, y: 17 }, { x: 10, y: 17 }] },
     { spawn: {x: -1, y: 23}, patrol: [{ x: 1, y: 23 }, { x: 7, y: 23 }] },
-    { spawn: {x: 7, y: 26}, patrol: [{ x: 7, y: 22 }, { x: 14, y: 22 }] },
+    //{ spawn: {x: 7, y: 26}, patrol: [{ x: 7, y: 22 }, { x: 14, y: 22 }] },
     { spawn: {x: -1, y: 24}, patrol: [{ x: 1, y: 24 }, { x: 10, y: 24 }] },
+    
   ];
   static bottomRightSpawn = [
     //bottom right
 
     { spawn: { x: 20, y: 26}, patrol: [{ x: 20, y: 24 }, { x: 20, y: 10 }] },
     { spawn: {x: 22, y: 17}, patrol: [{ x: 20, y: 17 }, { x: 11, y: 17 }] },
-    { spawn: {x: 14, y: 26}, patrol: [{ x: 14, y: 24 }, { x: 14, y: 10 }] },
-    { spawn: {x: 17, y: 26}, patrol: [{ x: 17, y: 24 }, { x: 17, y: 10 }] },
-    { spawn: {x: 20, y: 26}, patrol: [{ x: 20, y: 24 }, { x: 20, y: 10 }] },
+    //{ spawn: {x: 14, y: 26}, patrol: [{ x: 14, y: 24 }, { x: 14, y: 10 }] },
+    //{ spawn: {x: 17, y: 26}, patrol: [{ x: 17, y: 24 }, { x: 17, y: 10 }] },
+    //{ spawn: {x: 20, y: 26}, patrol: [{ x: 20, y: 24 }, { x: 20, y: 10 }] },
     { spawn: {x: 22, y: 24}, patrol: [{ x: 21, y: 24 }, { x: 11, y: 24 }] },
   ];
 
@@ -91,6 +92,8 @@ class Enemy {
   
     this.x = this.spawn.spawn.x * blockWidth + offsetX + blockWidth / 2;
     this.y = this.spawn.spawn.y * blockHeight + offsetY + blockHeight / 2;
+    this.gridX = this.spawn.spawn.x;
+    this.gridY = this.spawn.spawn.y;
 
     this.h = 18;
     this.speed = 3;
@@ -154,13 +157,13 @@ class Enemy {
         this.dropCooldown = 30000;
       }
     }
+    this.gridX = Math.floor((this.x - offsetX) / blockWidth);
+    this.gridY = Math.floor((this.y - offsetY) / blockHeight);
   }
 
   dropAnti() {
-    const gridX = Math.floor((this.x - offsetX) / blockWidth);
-    const gridY = Math.floor((this.y - offsetY) / blockHeight);
-    const centerX = gridX * blockWidth + offsetX + blockWidth / 2;
-    const centerY = gridY * blockHeight + offsetY + blockHeight / 2;
+    const centerX = this.gridX * blockWidth + offsetX + blockWidth / 2;
+    const centerY = this.gridY * blockHeight + offsetY + blockHeight / 2;
     anti.push(new Anti(centerX, centerY));
   }
 
@@ -214,14 +217,10 @@ show() {
 }
 
 checkCollision(player) {
-  const enemyGridX = Math.floor((this.x - offsetX) / blockWidth);
-  const enemyGridY = Math.floor((this.y - offsetY) / blockHeight);
-
   const playerGridX = Math.floor((player.x - offsetX) / blockWidth);
   const playerGridY = Math.floor((player.y - offsetY) / blockHeight);
-
   //check if both are in the same grid space
-  return enemyGridX === playerGridX && enemyGridY === playerGridY;
+  return this.gridX === playerGridX && this.gridY === playerGridY;
 }
 
 }
