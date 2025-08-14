@@ -17,10 +17,10 @@ class Player {
     this.penaltyModifier = 100;
     this.distanceModifier = 500;
 
-    this.genomeInputs = 22; // 4 for walls, 5 for pickups 1 for enemies
+    this.genomeInputs = 22; // 4 for walls, 5 for pickups 1 for enemies 22
     this.genomeOutputs = 5; // Up, Right, Down, Left, Sprint
     this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
-
+    
     this.uuid = crypto.randomUUID();
 
     this.baseSpeed = 5;
@@ -47,7 +47,7 @@ class Player {
     this.minMeaningfulDistance = 40; //mess with
   
     this.lastDec;
-    this.decisionCount = 15;
+    this.decisionCount = 60;
     
     //sprite variables
     this.derek = new Sprite(derek, 64, 32, 4);
@@ -70,7 +70,7 @@ class Player {
     this.stamina = 100; 
     this.maxStamina = 100;
     this.staminaDrainRate = 0.8; //per frame when sprinting
-    this.staminaRegenRate = this.maxStamina / (30 * 60); //regen over 30 seconds at 60 fps
+    this.staminaRegenRate = this.maxStamina / (15 * 30); //regen over 15 seconds at 30 fps
     this.isSprinting = false;
 
     this.checkUp = this.checkUp.bind(this);
@@ -184,7 +184,7 @@ class Player {
       //snap to center
       this.x = this.targetX;
       this.y = this.targetY;
-      this.isMoving = false; // done moving
+      this.isMoving = false; //done moving
     } else {
       //move toward target
       const angle = Math.atan2(dy, dx);
@@ -253,6 +253,7 @@ class Player {
     if (this.recentTiles.slice(0, -1).includes(tileKey)) {
       this.fitnessPenalty += 5; 
     }
+    
 }
 
 
@@ -274,14 +275,14 @@ class Player {
   // console.info("Vision Raw - Left: ", this.getWallDistances(this.checkLeft))
 
  //add directional vector (dx/dy) and distance for each target type
-  /*const targets = [enemies, treats, anti, balls, beds, pb];
+  const targets = [enemies, treats, anti, balls, beds, pb];
 
   for (let targetList of targets) {
     const nearest = this.getNearestGrid(targetList, gridX, gridY);
     if (nearest) {
       const dx = nearest.gridX - gridX;
       const dy = nearest.gridY - gridY;
-      const maxGridRange = 30; // adjust as needed for your map size
+      const maxGridRange = 40; // adjust as needed for your map size
 
       //normalize and push to vision
       this.vision.push(map(dx, -maxGridRange, maxGridRange, -1, 1));
@@ -294,14 +295,14 @@ class Player {
       this.vision.push(0); // dy
       this.vision.push(1); // max distance
     }
-  }*/
+  }
 
-    this.vision.push(map(this.getDistance(enemies, gridX, gridY), 0, 1500, 0, 1));
+    /*this.vision.push(map(this.getDistance(enemies, gridX, gridY), 0, 1500, 0, 1));
     this.vision.push(map(this.getDistance(treats, gridX, gridY), 0, 1500, 0, 1));
     this.vision.push(map(this.getDistance(anti, gridX, gridY), 0, 1500, 0, 1));
     this.vision.push(map(this.getDistance(balls, gridX, gridY), 0, 1500, 0, 1));
     this.vision.push(map(this.getDistance(beds, gridX, gridY), 0, 1500, 0, 1));
-    this.vision.push(map(this.getDistance(pb, gridX, gridY), 0, 1500, 0, 1));
+    this.vision.push(map(this.getDistance(pb, gridX, gridY), 0, 1500, 0, 1));*/
 
    //  if (this.self == population[0] && !this.dead) {
       //   console.info("Vision: ", pbData.distance);
@@ -379,16 +380,16 @@ class Player {
   think() {
     let max = 0;
     let maxIndex = 0;
-    // console.info("Vision - Up: ", this.vision[0]);
-    // console.info("Vision - Right: ", this.vision[1]);
-    // console.info("Vision - Down: ", this.vision[2]);
-    // console.info("Vision - Left: ", this.vision[3]);
-    // console.info("Vision - Enemies: ", this.vision[4]);
-    // console.info("Vision - Treats: ", this.vision[5]);
-    // console.info("Vision - Anti: ", this.vision[6]);
-    // console.info("Vision - balls: ", this.vision[7]);
-    // console.info("Vision - Ball: ", this.vision[8]);
-    // console.info("Vision - PB: ", this.vision[9]);
+     //console.info("Vision - Up: ", this.vision[0]);
+     //console.info("Vision - Right: ", this.vision[1]);
+     //console.info("Vision - Down: ", this.vision[2]);
+     //console.info("Vision - Left: ", this.vision[3]);
+     //console.info("Vision - Enemies: ", this.vision[4]);
+     //console.info("Vision - Treats: ", this.vision[5]);
+     //console.info("Vision - Anti: ", this.vision[6]);
+     //console.info("Vision - balls: ", this.vision[7]);
+     //console.info("Vision - Ball: ", this.vision[8]);
+     //console.info("Vision - PB: ", this.vision[9]);
 
     //movement decision
     let directions = ["w", "d", "s", "a"];
@@ -397,12 +398,15 @@ class Player {
     if(this.decisionCount > 0 && stillValid) {
       this.move(directions[this.lastDec]);
       this.decisionCount--;
+    //} else if (stillValid) {
+      this.move(directions[this.lastDec]);
     } else {
       this.decision = this.brain.feedForward(this.vision);
       
       for (let i = 0; i < 4; i++) {
       // if (this.self == population[0] && !this.dead) {
-      //   console.info(i + ": ", this.canMove(directions[i]));
+          //console.info(i + ": ", this.canMove(directions[i]));
+          //console.info(i + ": ", this.decision[i]);
       // }
       // if (this.decision[i] > max && this.canMove(directions[i])) {
       
@@ -414,16 +418,16 @@ class Player {
     
     this.lastDec = maxIndex;
     this.isSprinting = this.decision[4] >= 0.7 && this.stamina > 0;
-    this.decisionCount = 1000;
+    this.decisionCount = 60;
     // if (this.self == population[0] && !this.dead) {
-    //     console.info("chosen direction: ", directions[maxIndex]);
+         //console.info("chosen direction: ", directions[this.lastDec]);
     //   }
 
     // if (typeof(maxIndex) === "undefined") {
       // console.log("random movement")
       // this.move(directions[Math.floor(Math.random() * directions.length)]);
     // } else {
-      // console.info("Decision: ", directions[maxIndex]);
+       //console.info("Decision: ", directions[this.lastDec]);
       
       this.move(directions[this.lastDec]);
     }
@@ -434,7 +438,7 @@ class Player {
 
   //helper method to check if a move is possible (not blocked by wall)
   canMove(direction) {
-    // Use grid coordinates and isWalkable for grid-based movement
+    //use grid coordinates and isWalkable for grid-based movement
     let newGridX = this.gridX;
     let newGridY = this.gridY;
     switch (direction) {
@@ -481,7 +485,7 @@ class Player {
   calculateFitness() {
     const exploreReward = this.visitedTiles.size * 100; //100 points per unique tile
     //this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier)  - this.fitnessPenalty;
-    this.fitness = (this.score * this.score * this.pickupRewardModifier) + exploreReward - (this.fitnessPenalty * this.penaltyModifier);
+    this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier) + exploreReward  - this.fitnessPenalty;
   }
 
   crossover(parent2) {

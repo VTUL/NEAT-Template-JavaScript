@@ -287,7 +287,7 @@ function handleRespawns() {
   }
 
    //respawn enemies if killed and 5 seconds passed
- if (millis() > enemyRespawnTime && enemies.length < 10) {
+ if (millis() > enemyRespawnTime && enemies.length < 15) {
     enemies.push(new Enemy());
     enemyRespawnTime = millis() + 5000; 
   }
@@ -493,7 +493,7 @@ function writeInfo() {
       //when all runs visible 
       info += "Gen: " + population.gen + "<br>";
       info += "Species: " + population.species.length + "<br>";
-      info += "Global Best Score: " + population.bestScore + "<br>";
+      info += "Global Best Score: " + population.globalBestScore + "<br>"; //originally population.bestScore
     }
   }
 

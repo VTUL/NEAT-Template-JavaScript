@@ -5,10 +5,10 @@ class Enemy {
 
     { spawn: {x: -1, y: 3 }, patrol: [{ x: 1, y: 3 }, { x: 10, y: 3 }] },
     { spawn: {x: 10, y: -1 }, patrol: [{ x: 10, y: 2 }, { x: 1, y: 2 }] },
-    //{ spawn: { x: -1, y: 7 }, patrol: [{ x: 1, y: 7 }, { x: 10, y: 7 }] },
-    //{ spawn: { x: -1, y: 14 },  patrol: [{ x: 1, y: 14 }, { x: 10, y: 14 }] },
-    //{ spawn: { x: -1, y: 12 },  patrol: [{ x: 1, y: 12 }, { x: 10, y: 12 }] },
-    //{ spawn: { x: -1, y: 10 },  patrol: [{ x: 1, y: 10 }, { x: 10, y: 10 }] },
+    { spawn: { x: -1, y: 7 }, patrol: [{ x: 1, y: 7 }, { x: 10, y: 7 }] },
+    { spawn: { x: -1, y: 14 },  patrol: [{ x: 1, y: 14 }, { x: 10, y: 14 }] },
+    { spawn: { x: -1, y: 12 },  patrol: [{ x: 1, y: 12 }, { x: 10, y: 12 }] },
+    { spawn: { x: -1, y: 10 },  patrol: [{ x: 1, y: 10 }, { x: 10, y: 10 }] },
     { spawn: { x: 10, y: -1}, patrol: [{ x: 10, y: 2}, { x: 10, y: 10 }] },
     { spawn: {x: 1, y: -1}, patrol: [{ x: 1, y: 2 }, { x: 1, y: 11 }] },
 
@@ -18,10 +18,10 @@ class Enemy {
   
     { spawn: {x: 22, y: 2 }, patrol: [{ x: 20, y: 2 }, { x: 11, y: 2 }] }, 
     { spawn: {x: 11, y: -1 }, patrol: [{ x: 11, y: 3 }, { x: 20, y: 3 }] },
-    //{ spawn: { x: 22, y: 7 }, patrol: [{ x: 20, y: 7 }, { x: 11, y: 7 }] },
-    //{ spawn: { x: 22, y: 14 },  patrol: [{ x: 20, y: 14 }, { x: 11, y: 14 }] },
-    //{ spawn: { x: 22, y: 12 },  patrol: [{ x: 20, y: 12 }, { x: 11, y: 12 }] },
-    //{ spawn: { x: 22, y: 10 },  patrol: [{ x: 20, y: 10 }, { x: 11, y: 10 }] },
+    { spawn: { x: 22, y: 7 }, patrol: [{ x: 20, y: 7 }, { x: 11, y: 7 }] },
+    { spawn: { x: 22, y: 14 },  patrol: [{ x: 20, y: 14 }, { x: 11, y: 14 }] },
+    { spawn: { x: 22, y: 12 },  patrol: [{ x: 20, y: 12 }, { x: 11, y: 12 }] },
+    { spawn: { x: 22, y: 10 },  patrol: [{ x: 20, y: 10 }, { x: 11, y: 10 }] },
     { spawn: { x: 11, y: -1}, patrol: [{ x: 11, y: 2 }, { x: 11, y: 10 }] },
     { spawn: { x: 20, y: -1}, patrol: [{ x: 20, y: 2 }, { x: 20, y: 9 }] },
 
@@ -30,11 +30,12 @@ class Enemy {
     //bottom left
 
     { spawn: { x: 1, y: 26}, patrol: [{ x: 1, y: 24 }, { x: 1, y: 10 }] },
-    //{ spawn: { x: 4, y: 26}, patrol: [{ x: 4, y: 24 }, { x: 4, y: 10 }] },
-    //{ spawn: {x: 7, y: 26}, patrol: [{ x: 7, y: 24 }, { x: 7, y: 10 }] },
+    { spawn: { x: 2, y: 26}, patrol: [{ x: 2, y: 24 }, { x: 2, y: 10 }] },
+    { spawn: { x: 4, y: 26}, patrol: [{ x: 4, y: 24 }, { x: 4, y: 10 }] },
+    { spawn: {x: 7, y: 26}, patrol: [{ x: 7, y: 24 }, { x: 7, y: 10 }] },
     { spawn: {x: -1, y: 17}, patrol: [{ x: 1, y: 17 }, { x: 10, y: 17 }] },
     { spawn: {x: -1, y: 23}, patrol: [{ x: 1, y: 23 }, { x: 7, y: 23 }] },
-    //{ spawn: {x: 7, y: 26}, patrol: [{ x: 7, y: 22 }, { x: 14, y: 22 }] },
+    { spawn: {x: 7, y: 26}, patrol: [{ x: 7, y: 22 }, { x: 14, y: 22 }] },
     { spawn: {x: -1, y: 24}, patrol: [{ x: 1, y: 24 }, { x: 10, y: 24 }] },
     
   ];
@@ -42,11 +43,14 @@ class Enemy {
     //bottom right
 
     { spawn: { x: 20, y: 26}, patrol: [{ x: 20, y: 24 }, { x: 20, y: 10 }] },
+    { spawn: { x: 19, y: 26}, patrol: [{ x: 19, y: 24 }, { x: 19, y: 10 }] },
     { spawn: {x: 22, y: 17}, patrol: [{ x: 20, y: 17 }, { x: 11, y: 17 }] },
-    //{ spawn: {x: 14, y: 26}, patrol: [{ x: 14, y: 24 }, { x: 14, y: 10 }] },
-    //{ spawn: {x: 17, y: 26}, patrol: [{ x: 17, y: 24 }, { x: 17, y: 10 }] },
-    //{ spawn: {x: 20, y: 26}, patrol: [{ x: 20, y: 24 }, { x: 20, y: 10 }] },
+    { spawn: {x: 14, y: 26}, patrol: [{ x: 14, y: 24 }, { x: 14, y: 10 }] },
+    { spawn: {x: 17, y: 26}, patrol: [{ x: 17, y: 24 }, { x: 17, y: 10 }] },
     { spawn: {x: 22, y: 24}, patrol: [{ x: 21, y: 24 }, { x: 11, y: 24 }] },
+    { spawn: {x: 14, y: 26}, patrol: [{ x: 14, y: 21 }, { x: 7, y: 21 }] },
+    { spawn: {x: 22, y: 23}, patrol: [{ x: 21, y: 23 }, { x: 14, y: 23 }] },
+    
   ];
 
   
@@ -68,6 +72,10 @@ class Enemy {
     Enemy.enemyCount++;  //increment count on each new enemy
     this.i = (Enemy.enemyCount % 4) + 1;
     this.spawnIndex = 0;
+    this.topLef = 8;
+    this.topRig = 8;
+    this.botLef = 8;
+    this.botRig = 8;
 
     switch (this.i) {
       case 1:
@@ -96,7 +104,7 @@ class Enemy {
     this.gridY = this.spawn.spawn.y;
 
     this.h = 18;
-    this.speed = 3;
+    this.speed = 5;
     this.w = 36;
 
     this.playInvin = false;
