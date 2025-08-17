@@ -257,11 +257,6 @@ function draw() {
 
 }
 
-function validSpawns(){
-    
-}
-    
-
 
 function handleRespawns() {
   //respawn Peanut Butter if missing and timer passed
@@ -661,6 +656,7 @@ function handleInteractions(player) {
   for (let i = enemies.length - 1; i >= 0; i--) {
   if (enemies[i].checkCollision(player) && !player.isInvincible) {
     player.dead = true;
+    console.info("Player hit by enemy; Fitness: ", player.fitness, "Score: ", player.score);
   }
 
   //enemy invincibility handling

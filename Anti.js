@@ -12,7 +12,6 @@ class Anti {
     this.playInvin = false;
   }
 
-
   show() {
     imageMode(CENTER);
     image(acorn, this.x, this.y, this.r * 2, this.r * 2);

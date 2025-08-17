@@ -14,7 +14,7 @@ class Player {
     this.pickupRewardModifier = 2000;
     this.distance = 0;
     this.fitnessPenalty = 1;
-    this.penaltyModifier = 100;
+    this.penaltyModifier = 1;
     this.distanceModifier = 500;
 
     this.genomeInputs = 22; // 4 for walls, 5 for pickups 1 for enemies 22
@@ -47,7 +47,7 @@ class Player {
     this.minMeaningfulDistance = 40; //mess with
   
     this.lastDec;
-    this.decisionCount = 60;
+    this.decisionCount = 15;
     
     //sprite variables
     this.derek = new Sprite(derek, 64, 32, 4);
@@ -238,8 +238,9 @@ class Player {
     const now = millis();
     const timeSinceScore = now - this.lastScoreMillis;
    
-    if (timeSinceScore > 20000) {
+    if (timeSinceScore > 10000) {
       this.dead = true;
+      console.info("Player timed out; Fitness: ", this.fitness, "Score: ", this.score);
     }
 
 
@@ -269,13 +270,24 @@ class Player {
   this.vision.push(map(this.getWallDistances(this.checkDown), 1, 30, 0, 1));
   this.vision.push(map(this.getWallDistances(this.checkLeft), 1, 30, 0, 1));
 
+  // --- Nearest treat/enemy grid distances ---
+  // Treats: smaller is better (closer is attractive)
+  //const nearestTreat = this.getNearestGrid(treats, this.gridX, this.gridY);
+  //let treatDist = nearestTreat ? Math.abs(nearestTreat.gridX - this.gridX) + Math.abs(nearestTreat.gridY - this.gridY) : 40;
+  //this.vision.push(map(treatDist, 0, 40, 1, 0)); // 1=far, 0=close
+
+  // Enemies: smaller is dangerous, so invert
+  //const nearestEnemy = this.getNearestGrid(enemies, this.gridX, this.gridY);
+  //let enemyDist = nearestEnemy ? Math.abs(nearestEnemy.gridX - this.gridX) + Math.abs(nearestEnemy.gridY - this.gridY) : 40;
+  //this.vision.push(map(enemyDist, 0, 40, 0, 1)); // 0=close (danger), 1=far (safe)
+
   // console.info("Vision Raw - Up: ", this.getWallDistances(this.checkUp))
   // console.info("Vision Raw - Right: ", this.getWallDistances(this.checkRight))
   // console.info("Vision Raw - Down: ", this.getWallDistances(this.checkDown))
   // console.info("Vision Raw - Left: ", this.getWallDistances(this.checkLeft))
 
  //add directional vector (dx/dy) and distance for each target type
-  const targets = [enemies, treats, anti, balls, beds, pb];
+  const targets = [treats, enemies, anti, balls, beds, pb];
 
   for (let targetList of targets) {
     const nearest = this.getNearestGrid(targetList, gridX, gridY);
@@ -288,7 +300,7 @@ class Player {
       this.vision.push(map(dx, -maxGridRange, maxGridRange, -1, 1));
       this.vision.push(map(dy, -maxGridRange, maxGridRange, -1, 1));
       const gridDist = Math.abs(dx) + Math.abs(dy);
-      this.vision.push(map(gridDist, 0, maxGridRange, 0, 1));
+      this.vision.push(map(gridDist, 0, maxGridRange, 1, 0));
     } else {
       //no target found = neutral values
       this.vision.push(0); // dx
@@ -398,7 +410,8 @@ class Player {
     if(this.decisionCount > 0 && stillValid) {
       this.move(directions[this.lastDec]);
       this.decisionCount--;
-    //} else if (stillValid) {
+    } else if (stillValid && !directions[0]) {
+      this.decisionCount++;
       this.move(directions[this.lastDec]);
     } else {
       this.decision = this.brain.feedForward(this.vision);

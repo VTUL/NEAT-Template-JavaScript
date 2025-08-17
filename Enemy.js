@@ -170,8 +170,8 @@ class Enemy {
   }
 
   dropAnti() {
-    const centerX = this.gridX * blockWidth + offsetX + blockWidth / 2;
-    const centerY = this.gridY * blockHeight + offsetY + blockHeight / 2;
+    let centerX = this.gridX * blockWidth + offsetX + blockWidth / 2;
+    let centerY = this.gridY * blockHeight + offsetY + blockHeight / 2;
     anti.push(new Anti(centerX, centerY));
   }
 
