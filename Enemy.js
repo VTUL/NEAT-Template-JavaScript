@@ -47,9 +47,9 @@ class Enemy {
     { spawn: {x: 22, y: 17}, patrol: [{ x: 20, y: 17 }, { x: 11, y: 17 }] },
     { spawn: {x: 14, y: 26}, patrol: [{ x: 14, y: 24 }, { x: 14, y: 10 }] },
     { spawn: {x: 17, y: 26}, patrol: [{ x: 17, y: 24 }, { x: 17, y: 10 }] },
-    { spawn: {x: 22, y: 24}, patrol: [{ x: 21, y: 24 }, { x: 11, y: 24 }] },
+    { spawn: {x: 22, y: 24}, patrol: [{ x: 20, y: 24 }, { x: 11, y: 24 }] },
     { spawn: {x: 14, y: 26}, patrol: [{ x: 14, y: 21 }, { x: 7, y: 21 }] },
-    { spawn: {x: 22, y: 23}, patrol: [{ x: 21, y: 23 }, { x: 14, y: 23 }] },
+    { spawn: {x: 22, y: 23}, patrol: [{ x: 20, y: 23 }, { x: 14, y: 23 }] },
     
   ];
 

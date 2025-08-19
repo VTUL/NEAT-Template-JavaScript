@@ -480,7 +480,7 @@ function writeInfo() {
   } else {
     if (showBest) {
       info += "Score: " + population.players[0].score + "<br>";
-      info += "Gen: " + population.gen + "<br>";
+      info += "Gen: " + population.gen + "<br>"; 
       info += "Species: " + population.species.length + "<br>";
       info += "Global Best Score: " + population.bestScore + "<br>";
     }

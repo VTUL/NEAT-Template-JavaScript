@@ -13,7 +13,7 @@ class Player {
     this.distanceReward = 100;
     this.pickupRewardModifier = 2000;
     this.distance = 0;
-    this.fitnessPenalty = 1;
+    this.fitnessPenalty = 0;
     this.penaltyModifier = 1;
     this.distanceModifier = 500;
 
@@ -143,7 +143,6 @@ class Player {
 
 
   move(direction) {
-    this.facing = direction; //update facing direction
     if (this.isMoving) return; //already sliding to a tile, sprite turns/flips too early
 
     let newGridX = this.gridX;
@@ -166,6 +165,7 @@ class Player {
       this.targetY = this.gridY * blockHeight + offsetY + blockHeight / 2;
 
       this.isMoving = true; //start sliding
+      this.facing = direction; //update facing direction
     }
 }
 
@@ -238,7 +238,7 @@ class Player {
     const now = millis();
     const timeSinceScore = now - this.lastScoreMillis;
    
-    if (timeSinceScore > 10000) {
+    if (timeSinceScore > 20000) {
       this.dead = true;
       console.info("Player timed out; Fitness: ", this.fitness, "Score: ", this.score);
     }
@@ -248,12 +248,14 @@ class Player {
 
     const tileKey = `${this.gridX},${this.gridY}`; //trying to stop looping
     this.visitedTiles.add(tileKey);
+    console.info("Visited Tiles: ", this.visitedTiles.size);
     this.recentTiles.push(tileKey);
     if (this.recentTiles.length > 40) this.recentTiles.shift();
 
     if (this.recentTiles.slice(0, -1).includes(tileKey)) {
-      this.fitnessPenalty += 5; 
+      this.fitnessPenalty += 1; 
     }
+    console.info("Fitness Penalty: ", this.fitnessPenalty);
     
 }
 
@@ -300,7 +302,14 @@ class Player {
       this.vision.push(map(dx, -maxGridRange, maxGridRange, -1, 1));
       this.vision.push(map(dy, -maxGridRange, maxGridRange, -1, 1));
       const gridDist = Math.abs(dx) + Math.abs(dy);
-      this.vision.push(map(gridDist, 0, maxGridRange, 1, 0));
+      if( targetList === enemies) {
+        this.vision.push(map(gridDist, 0, maxGridRange, 0, 1));
+      }
+      else {
+        this.vision.push(map(gridDist, 0, maxGridRange, 1, 0));
+      }
+      //this.vision.push(map(gridDist, 0, maxGridRange, 1, 0));
+
     } else {
       //no target found = neutral values
       this.vision.push(0); // dx
@@ -498,7 +507,7 @@ class Player {
   calculateFitness() {
     const exploreReward = this.visitedTiles.size * 100; //100 points per unique tile
     //this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier)  - this.fitnessPenalty;
-    this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier) + exploreReward  - this.fitnessPenalty;
+    this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier) + exploreReward - this.fitnessPenalty;
   }
 
   crossover(parent2) {
