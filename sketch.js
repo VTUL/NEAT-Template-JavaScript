@@ -71,7 +71,7 @@ let fullSpawns = [];
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function preload(){
-  bg = loadImage("images/library_map (1).png");
+  bg = loadImage("images/library_map_fix.png");
   blockImg = loadImage("images/square.png");
   acorn = loadImage("images/Acorn_Item.png");
   squirrel = loadImage("spriteSheets/Enemy_Side_Template.png");

@@ -143,7 +143,7 @@ class Player {
 
 
   move(direction) {
-    if (this.isMoving) return; //already sliding to a tile, sprite turns/flips too early
+    if (this.isMoving) return; //already sliding to a tile
 
     let newGridX = this.gridX;
     let newGridY = this.gridY;
@@ -248,14 +248,14 @@ class Player {
 
     const tileKey = `${this.gridX},${this.gridY}`; //trying to stop looping
     this.visitedTiles.add(tileKey);
-    console.info("Visited Tiles: ", this.visitedTiles.size);
+    //console.info("Visited Tiles: ", this.visitedTiles.size);
     this.recentTiles.push(tileKey);
     if (this.recentTiles.length > 40) this.recentTiles.shift();
 
     if (this.recentTiles.slice(0, -1).includes(tileKey)) {
       this.fitnessPenalty += 1; 
     }
-    console.info("Fitness Penalty: ", this.fitnessPenalty);
+    //console.info("Fitness Penalty: ", this.fitnessPenalty);
     
 }
 
@@ -302,11 +302,11 @@ class Player {
       this.vision.push(map(dx, -maxGridRange, maxGridRange, -1, 1));
       this.vision.push(map(dy, -maxGridRange, maxGridRange, -1, 1));
       const gridDist = Math.abs(dx) + Math.abs(dy);
-      if( targetList === enemies) {
+      if( targetList === enemies || targetList === anti) {
         this.vision.push(map(gridDist, 0, maxGridRange, 0, 1));
       }
       else {
-        this.vision.push(map(gridDist, 0, maxGridRange, 1, 0));
+        this.vision.push(Math.exp(-gridDist / 5)); //pickups more valuable, so use exponential decay
       }
       //this.vision.push(map(gridDist, 0, maxGridRange, 1, 0));
 
@@ -427,12 +427,12 @@ class Player {
       
       for (let i = 0; i < 4; i++) {
       // if (this.self == population[0] && !this.dead) {
-          //console.info(i + ": ", this.canMove(directions[i]));
-          //console.info(i + ": ", this.decision[i]);
+          console.info(i + " can: ", this.canMove(directions[i]));
+          console.info(i + " dec: ", this.decision[i]);
       // }
       // if (this.decision[i] > max && this.canMove(directions[i])) {
       
-        if (this.decision[i] > max && this.canMove(directions[i])) {
+        if (this.decision[i] >=  max && this.canMove(directions[i])) { //tryign to prevent first decision from always being the best
           max = this.decision[i];
           maxIndex = i;
         }
@@ -449,7 +449,7 @@ class Player {
       // console.log("random movement")
       // this.move(directions[Math.floor(Math.random() * directions.length)]);
     // } else {
-       //console.info("Decision: ", directions[this.lastDec]);
+       console.info("Decision: ", directions[this.lastDec]);
       
       this.move(directions[this.lastDec]);
     }
