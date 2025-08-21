@@ -78,6 +78,8 @@ class Player {
     this.checkDown = this.checkDown.bind(this);
     this.checkLeft = this.checkLeft.bind(this);
 
+    this.prevDir = [];
+
   }
 
   show() {
@@ -247,10 +249,10 @@ class Player {
     this.lifespan++;
 
     const tileKey = `${this.gridX},${this.gridY}`; //trying to stop looping
-    this.visitedTiles.add(tileKey);
+    this.visitedTiles.add(tileKey); //reward for further exploration
     //console.info("Visited Tiles: ", this.visitedTiles.size);
     this.recentTiles.push(tileKey);
-    if (this.recentTiles.length > 40) this.recentTiles.shift();
+    if (this.recentTiles.length > 40) this.recentTiles.shift(); //penalty for revisiting tiles
 
     if (this.recentTiles.slice(0, -1).includes(tileKey)) {
       this.fitnessPenalty += 1; 
@@ -306,7 +308,7 @@ class Player {
         this.vision.push(map(gridDist, 0, maxGridRange, 0, 1));
       }
       else {
-        this.vision.push(Math.exp(-gridDist / 5)); //pickups more valuable, so use exponential decay
+        this.vision.push(1 / (gridDist + 1)); //pickups more valuable, so use exponential decay
       }
       //this.vision.push(map(gridDist, 0, maxGridRange, 1, 0));
 
@@ -419,7 +421,7 @@ class Player {
     if(this.decisionCount > 0 && stillValid) {
       this.move(directions[this.lastDec]);
       this.decisionCount--;
-    } else if (stillValid && !directions[0]) {
+    } else if (stillValid && !directions[0]) { //make open movement last longer to prevent consistent bouncing
       this.decisionCount++;
       this.move(directions[this.lastDec]);
     } else {
@@ -427,15 +429,18 @@ class Player {
       
       for (let i = 0; i < 4; i++) {
       // if (this.self == population[0] && !this.dead) {
-          console.info(i + " can: ", this.canMove(directions[i]));
-          console.info(i + " dec: ", this.decision[i]);
+          //console.info(i + " can: ", this.canMove(directions[i]));
+          //console.info(i + " dec: ", this.decision[i]);
       // }
       // if (this.decision[i] > max && this.canMove(directions[i])) {
       
-        if (this.decision[i] >=  max && this.canMove(directions[i])) { //tryign to prevent first decision from always being the best
-          max = this.decision[i];
-          maxIndex = i;
+        if (this.canMove(directions[i]) && !this.prevDir.includes(i)) { //preventy bouncing back and forth
+          if (this.decision[i] >= max) {
+            max = this.decision[i];
+            maxIndex = i;
+          }
         }
+        
       }
     
     this.lastDec = maxIndex;
@@ -450,7 +455,8 @@ class Player {
       // this.move(directions[Math.floor(Math.random() * directions.length)]);
     // } else {
        console.info("Decision: ", directions[this.lastDec]);
-      
+      this.prevDir.push(maxIndex);
+      if (this.prevDir.length > 2) this.prevDir.shift();
       this.move(directions[this.lastDec]);
     }
       
@@ -505,7 +511,7 @@ class Player {
   }
 
   calculateFitness() {
-    const exploreReward = this.visitedTiles.size * 100; //100 points per unique tile
+    const exploreReward = this.visitedTiles.size * 1000; //100 points per unique tile
     //this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier)  - this.fitnessPenalty;
     this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier) + exploreReward - this.fitnessPenalty;
   }

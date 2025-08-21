@@ -482,7 +482,7 @@ function writeInfo() {
       info += "Score: " + population.players[0].score + "<br>";
       info += "Gen: " + population.gen + "<br>"; 
       info += "Species: " + population.species.length + "<br>";
-      info += "Global Best Score: " + population.bestScore + "<br>";
+      info += "Global Best Score: " + population.globalBestScore + "<br>"; //originally population.bestScore, bestScore didnt seem to reflect the real best score over all pops
     }
     else{
       //when all runs visible 
