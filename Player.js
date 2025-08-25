@@ -434,7 +434,7 @@ class Player {
       // }
       // if (this.decision[i] > max && this.canMove(directions[i])) {
       
-        if (this.canMove(directions[i]) && !this.prevDir.includes(i)) { //preventy bouncing back and forth
+        if (this.canMove(directions[i]) && !this.prevDir.includes(i)) { //prevent bouncing back and forth
           if (this.decision[i] >= max) {
             max = this.decision[i];
             maxIndex = i;
@@ -445,7 +445,7 @@ class Player {
     
     this.lastDec = maxIndex;
     this.isSprinting = this.decision[4] >= 0.7 && this.stamina > 0;
-    this.decisionCount = 60;
+    this.decisionCount = 100;
     // if (this.self == population[0] && !this.dead) {
          //console.info("chosen direction: ", directions[this.lastDec]);
     //   }

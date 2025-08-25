@@ -76,7 +76,7 @@ function preload(){
   acorn = loadImage("images/Acorn_Item.png");
   squirrel = loadImage("spriteSheets/Enemy_Side_Template.png");
   squirrelDown = loadImage("spriteSheets/Enemy_Vertical_1.png");
-  yum = loadImage("images/Dog_Treat.png");
+  yum = loadImage("images/Treat_Dark_Outline.png");
   peanut = loadImage("images/Peanut_Butter.png");
   derek = loadImage("spriteSheets/Derek_walk.png");
   derekUp = loadImage("spriteSheets/Derek_Overhead_Walk_2.png");
