@@ -11,7 +11,7 @@ class Player {
     this.gen = 0;
     this.distanceInterval = 20;
     this.distanceReward = 100;
-    this.pickupRewardModifier = 2000;
+    this.pickupRewardModifier = 4000;
     this.distance = 0;
     this.fitnessPenalty = 0;
     this.penaltyModifier = 1;
@@ -242,7 +242,7 @@ class Player {
    
     if (timeSinceScore > 20000) {
       this.dead = true;
-      console.info("Player timed out; Fitness: ", this.fitness, "Score: ", this.score);
+      //console.info("Player timed out; Fitness: ", this.fitness, "Score: ", this.score);
     }
 
 
@@ -308,7 +308,7 @@ class Player {
         this.vision.push(map(gridDist, 0, maxGridRange, 0, 1));
       }
       else {
-        this.vision.push(1 / (gridDist + 1)); //pickups more valuable, so use exponential decay
+        this.vision.push(1 / (gridDist + 5)); //pickups more valuable
       }
       //this.vision.push(map(gridDist, 0, maxGridRange, 1, 0));
 
@@ -421,9 +421,9 @@ class Player {
     if(this.decisionCount > 0 && stillValid) {
       this.move(directions[this.lastDec]);
       this.decisionCount--;
-    } else if (stillValid && !directions[0]) { //make open movement last longer to prevent consistent bouncing
+    /*} else if (stillValid && !directions[0]) { //make open movement last longer to prevent consistent bouncing
       this.decisionCount++;
-      this.move(directions[this.lastDec]);
+      this.move(directions[this.lastDec]);*/
     } else {
       this.decision = this.brain.feedForward(this.vision);
       
@@ -445,7 +445,7 @@ class Player {
     
     this.lastDec = maxIndex;
     this.isSprinting = this.decision[4] >= 0.7 && this.stamina > 0;
-    this.decisionCount = 100;
+    this.decisionCount = 30;
     // if (this.self == population[0] && !this.dead) {
          //console.info("chosen direction: ", directions[this.lastDec]);
     //   }
@@ -454,7 +454,7 @@ class Player {
       // console.log("random movement")
       // this.move(directions[Math.floor(Math.random() * directions.length)]);
     // } else {
-       console.info("Decision: ", directions[this.lastDec]);
+      //console.info("Decision: ", directions[this.lastDec]);
       this.prevDir.push(maxIndex);
       if (this.prevDir.length > 2) this.prevDir.shift();
       this.move(directions[this.lastDec]);

@@ -5,10 +5,10 @@
 
 var nextConnectionNo = 1000;
 var population;
-var speed = 60;
+var speed = 30;
 
 
-var showBest = true; //true if only show the best of the previous generation
+var showBest = false; //true if only show the best of the previous generation (starts showing all dogs)
 var runBest = false; //true if replaying the best ever game
 var humanPlaying = false; //true if the user is playing
 
@@ -198,12 +198,12 @@ function draw() {
     text("Press J to play as another dog!", 540, 50);
 
   //placeholder text for debugging
-  if (showBest) {
+  if (!showBest) {
     noStroke();
     fill(255);
     textAlign(LEFT, BOTTOM); 
     textSize(24);
-    text("Press Space to see all AI runs", 10, height - 4);
+    text("Press Space to see best AI this gen", 10, height - 4);
   }
 
   //lets player know if AI is playing
@@ -296,6 +296,7 @@ function handleRespawns() {
   //remove expired anti items
   for (let i = anti.length - 1; i >= 0; i--) {
     if (anti[i].life < millis()) {
+      //anti[i].eaten(); //call eaten to reset spawn point
       anti.splice(i, 1);
     }
   }
@@ -656,7 +657,7 @@ function handleInteractions(player) {
   for (let i = enemies.length - 1; i >= 0; i--) {
   if (enemies[i].checkCollision(player) && !player.isInvincible) {
     player.dead = true;
-    console.info("Player hit by enemy; Fitness: ", player.fitness, "Score: ", player.score);
+    //console.info("Player hit by enemy; Fitness: ", player.fitness, "Score: ", player.score);
   }
 
   //enemy invincibility handling

@@ -66,8 +66,7 @@ class Population {
   //------------------------------------------------------------------------------------------------------------------------------------------------
   //this function is called when all the players in the this.players are dead and a newthis.generation needs to be made
   naturalSelection() {
-    this.species = []; //I added this to make generations faster
-    
+
     // this.batchNo = 0;
     var previousBest = this.players[0];
     this.speciate(); //seperate the this.players varo this.species

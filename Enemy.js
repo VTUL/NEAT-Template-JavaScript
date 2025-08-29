@@ -172,7 +172,10 @@ class Enemy {
   dropAnti() {
     let centerX = this.gridX * blockWidth + offsetX + blockWidth / 2;
     let centerY = this.gridY * blockHeight + offsetY + blockHeight / 2;
-    anti.push(new Anti(centerX, centerY));
+    let gridSpace = { x: this.gridX, y: this.gridY };
+    if(goodSpawns.some(s => s.x === gridSpace.x && s.y === gridSpace.y)){ 
+      anti.push(new Anti(centerX, centerY));
+    }
   }
 
   patrol() {

@@ -6,7 +6,7 @@ class Anti {
     this.gridY = Math.floor((this.y - offsetY) / blockHeight);
     this.r = 7.5;
 
-    this.life = millis() + 10000;
+    this.life = millis() + 15000;
     this.idList = [];
 
     this.playInvin = false;
