@@ -1,5 +1,5 @@
 class Population {
-
+//Best Player never updated from [0] in pop, bestscore never updated from 0 in pop
   constructor(size) {
     this.players = []; //new ArrayList<Player>();
     this.bestPlayer; //the best ever player

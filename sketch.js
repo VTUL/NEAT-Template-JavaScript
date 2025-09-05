@@ -30,6 +30,7 @@ let bedsRespawnTime = 0;
 let treatRemoveTime = 0; 
 let ballRespawnTime = 0;
 let enemyRespawnTime = 0;
+let deathMessageTime = 0;
 let introTime = 0;
 let pb = [];
 
@@ -134,9 +135,9 @@ function draw() {
     image(bg, 0, 0, width, height); 
   }
 
-  for(var i = 0; i < blocks.length; i++){
+  /*for(var i = 0; i < blocks.length; i++){
     blocks[i].show();
-  }
+  }*/
 
   for (let i = treats.length - 1; i >= 0; i--) {
     if (treats?.length >= 1) 
@@ -172,39 +173,6 @@ function draw() {
   for (let a of anti) {
     a.show();
   }
-  
-  //placeholder text so player knows how to start playing
-  if (!humanPlaying && !runBest && !showBestEachGen) {
-    noStroke();
-    fill(255);
-    textAlign(RIGHT, BOTTOM); 
-    textSize(24);
-    text("Press P to play as human", width - 10, height - 4);
-  }
-
-  
-  if (!showBestEachGen) {
-    noStroke();
-    fill(255);
-    textAlign(LEFT, BOTTOM); 
-    textSize(24);
-    text("Press G to see best AI each gen", 400, height - 4);
-  }
-
-    noStroke();
-    fill(0);
-    textAlign(CENTER, TOP); 
-    textSize(24);
-    text("Press J to play as another dog!", 540, 50);
-
-  //placeholder text for debugging
-  if (!showBest) {
-    noStroke();
-    fill(255);
-    textAlign(LEFT, BOTTOM); 
-    textSize(24);
-    text("Press Space to see best AI this gen", 10, height - 4);
-  }
 
   //lets player know if AI is playing
   if (!humanPlaying) {
@@ -214,9 +182,8 @@ function draw() {
     textSize(32);
     text("AI Playing", 540, 15);
   }
-
   
-
+  
   drawToScreen();
 
   if (showBestEachGen) { //show the best of each gen
@@ -239,7 +206,7 @@ function draw() {
       resetGame(); //reset the game state for the next generation
     }
   }
-  drawGrid(); 
+  //drawGrid(); 
 
   if (humanPlaying && humanPlayer && humanPlayer.stamina !== undefined) {
     drawStaminaBar(humanPlayer);
@@ -252,8 +219,12 @@ function draw() {
     drawStaminaBar(population.players[0]);
   }
 
-  /*if(millis() < introTime)
-    drawArrow();*/
+  if (millis() - deathMessageTime < 2000 && deathMessageTime !== 0) {
+    fill(255);
+    textAlign(CENTER, TOP); 
+    textSize(60);
+    text("You Got Distracted!", 540, 460);
+  }
 
 }
 
@@ -417,12 +388,7 @@ function showHumanPlaying() {
   else { //once done return to ai
     humanPlaying = false;
     //different way to let the user know they died
-    /*
-    fill(255);
-    textAlign(CENTER, TOP); 
-    textSize(50);
-    text("You Died", 540, 450);
-  }*/
+    deathMessageTime = millis(); //record the time of death
   }
 }
 //-----------------------------------------------------------------------------------

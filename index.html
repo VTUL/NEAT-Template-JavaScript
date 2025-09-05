@@ -61,12 +61,25 @@
       color: #8c7b6d;
       font-size: 25px;
       background-color: #f8f8f8;
-      padding: 10px;
       border-top: 2px solid #ffd58e;
-      margin: 5px auto;
-      width: fit-content;
+      padding-top: 30px;
+      padding-left: 30px;
+      height: 150;
+      width: 350;
       text-align: left;
       font-family: monospace; 
+    }
+
+     #controlsInfo {
+      color: #8c7b6d;
+      font-size: 20px;
+      background-color: #f8f8f8;
+      border-top: 2px solid #ffd58e;
+      height: 150;
+      width: 350;
+      text-align: left;
+      font-family: monospace; 
+      line-height: 5px;
     }
 
     h3 {
@@ -76,13 +89,22 @@
       color: #ff9a4d;
     }
 
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
     #textInfo {
       color: #8c7b6d;
       font-size: 20px;
       background-color: #f8f8f8;
       padding: 10px;
       border-top: 2px solid #ffd58e;
-      margin: 10px auto;
+      margin: 10px;
       width: fit-content;
       text-align: left;
       font-family: monospace; 
@@ -107,7 +129,16 @@
       <h2>Watch an AI learn to play a video game in real time!</h2>
     </div>
     <div id="canvasContainer"></div>
-    <div id="gameInfo"></div>
+    <div class="container">
+      <div id="gameInfo"></div>
+      <div id="controlsInfo">
+        <h3>Controls</h3>
+        <p><b>P:</b> Play the game!</p>
+        <p><b>G:</b> Best AI each gen</p>
+        <p><b>J:</b> Switch dogs!</p>
+        <p><b>Space:</b> Best AI this gen</p>
+      </div>
+    </div>
     <h3>Game Explanation</h3>
     <div id="textInfo">
         <p>Looks strange, doesn't it? Why are there so many dogs on screen? That's because there are actually 500 versions of the AI with slightly different brains playing the game at one time, each trying to get the highest score they can. The ones that do get to move on to the next round of training.</p>
