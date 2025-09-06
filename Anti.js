@@ -1,10 +1,12 @@
 class Anti {
   constructor(x,y) {; 
-    this.x = x;
-    this.y = y;
     this.gridX = Math.floor((this.x - offsetX) / blockWidth);
     this.gridY = Math.floor((this.y - offsetY) / blockHeight);
+    let index = goodSpawns.indexOf({ x: this.gridX, y: this.gridY });
+    this.x = x;
+    this.y = y;
     this.r = 7.5;
+    this.spawn = goodSpawns.splice(index, 1)[0];
 
     this.life = millis() + 15000;
     this.idList = [];
@@ -16,6 +18,10 @@ class Anti {
     imageMode(CENTER);
     image(acorn, this.x, this.y, this.r * 2, this.r * 2);
     imageMode(CORNER);
+  }
+
+  eaten() {
+    goodSpawns.push(this.spawn);
   }
 
   checkCollision(player) {

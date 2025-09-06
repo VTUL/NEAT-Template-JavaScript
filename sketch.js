@@ -267,7 +267,7 @@ function handleRespawns() {
   //remove expired anti items
   for (let i = anti.length - 1; i >= 0; i--) {
     if (anti[i].life < millis()) {
-      //anti[i].eaten(); //call eaten to reset spawn point
+      anti[i].eaten(); //call eaten to reset spawn point
       anti.splice(i, 1);
     }
   }
