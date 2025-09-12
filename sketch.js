@@ -561,7 +561,7 @@ function handleInteractions(player) {
       treats[i].idList.push(player.uuid); //add player id to the treat
       if(humanPlaying){
         treats[i].eaten(); 
-        treats.splice(i, 1); //remove anti item if human player
+        treats.splice(i, 1); //remove treat item if human player
       }
       player.lastScoreMillis = millis();
     }
@@ -573,7 +573,7 @@ function handleInteractions(player) {
     beds[0].idList.push(player.uuid); //add player id
     if(humanPlaying)
       beds[0].eaten(); 
-      beds.splice(0, 1); //remove anti item if human player
+      beds.splice(0, 1); //remove bed item if human player
     bedsRespawnTime = millis() + 20000;
   }
 
@@ -584,7 +584,7 @@ function handleInteractions(player) {
     balls[0].idList.push(player.uuid); //add player id
     if(humanPlaying)
       balls[0].eaten(); 
-      balls.splice(0, 1); //remove anti item if human player
+      balls.splice(0, 1); //remove ball item if human player
     ballRespawnTime = millis() + 40000;
   }
 
@@ -594,29 +594,30 @@ function handleInteractions(player) {
     player.score += 10;
     if(humanPlaying)
       pb[0].eaten(); 
-      pb.splice(0, 1); //remove anti item if human player
+      pb.splice(0, 1); //remove pb item if human player
     PBRespawnTime = millis() + 60000;
     player.lastScoreMillis = millis();
   }
 
   //Anti
   for (let i = anti.length - 1; i >= 0; i--) {
-    if (anti[i].checkCollision(player) && !player.isInvincible && !anti[i].idList.includes(player.uuid)) {
+    if (anti[i] && anti[i].checkCollision(player) && !player.isInvincible && !anti[i].idList.includes(player.uuid)) {
       anti[i].idList.push(player.uuid); //add player id
       player.score -= 5;
-      if(humanPlaying)
+      if(humanPlaying){
         anti[i].eaten(); 
         anti.splice(i, 1); //remove anti item if human player
+      }
     }
 
     //get rid of anti penalty
     if (anti[i]) {
-    if (player.isInvincible) {
-      anti[i].playInvin = true;  
-    } else {
-      anti[i].playInvin = false; 
+      if (player.isInvincible) {
+        anti[i].playInvin = true;  
+      } else {
+        anti[i].playInvin = false; 
+      }
     }
-  }
   }
 
   //Enemies

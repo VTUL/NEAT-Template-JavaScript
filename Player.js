@@ -434,7 +434,7 @@ class Player {
       // }
       // if (this.decision[i] > max && this.canMove(directions[i])) {
       
-        if (this.canMove(directions[i]) && !this.prevDir.includes(i)) { //prevent bouncing back and forth
+        if (this.canMove(directions[i]) && !this.prevDir.includes(i)) { //prevent bouncing back and forth but limits decision making
           if (this.decision[i] >= max) {
             max = this.decision[i];
             maxIndex = i;

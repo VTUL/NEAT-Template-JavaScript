@@ -1,10 +1,10 @@
 class Anti {
   constructor(x,y) {; 
-    this.gridX = Math.floor((this.x - offsetX) / blockWidth);
-    this.gridY = Math.floor((this.y - offsetY) / blockHeight);
-    let index = goodSpawns.indexOf({ x: this.gridX, y: this.gridY });
     this.x = x;
     this.y = y;
+    this.gridX = Math.floor((this.x - offsetX) / blockWidth);
+    this.gridY = Math.floor((this.y - offsetY) / blockHeight);
+    let index = goodSpawns.findIndex(s => s.x === this.gridX && s.y === this.gridY);
     this.r = 7.5;
     this.spawn = goodSpawns.splice(index, 1)[0];
 
