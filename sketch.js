@@ -58,6 +58,30 @@ let blocks = [];
 let pendingReset = false;
 
 
+// Map array
+
+const screenWidth = 1080
+const screenHeight = 900
+
+const gridWidth = 90;
+const gridHeight = 90;
+
+const gridColumns = 11;
+const gridRows = 9
+
+const mapGrid = [
+  [true, true, true, true, true, true, true, true, true, true, true],
+  [true, false, false, false, false, true, false, false, false, false, true],
+  [true, true, true, true, true, true, true, true, true, true, true],
+  [true, false, false, false, false, true, false, false, false, false, true],
+  [true, true, true, true, true, true, true, true, true, true, true],
+  [true, false, true, true, true, true, true, true, true, false, true],
+  [true, false, false, true, true, true, true, true, false, false, true],
+  [true, false, false, true, false, false, false, true, false, false, true],
+  [true, true, true, true, false, false, false, true, true, true, true],
+]
+
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function preload(){
@@ -84,26 +108,26 @@ function preload(){
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function setup() {
-  let canvas = createCanvas(1080, 900);
+  let canvas = createCanvas(screenWidth, screenHeight);
   canvas.parent("canvasContainer");
 
   population = new Population(500); //maybe make smaller, lots of lag/slowdown
 
-  wall = new Wall(MAP_DATA); //map for collisions
+  // wall = new Wall(MAP_DATA); //map for collisions
 
-  let blockSize = 10;
-  let wallWidth = wall.getColumns() * blockSize;
-  let wallHeight = wall.getRows() * blockSize;
-  let offsetX = (width - wallWidth) / 2;
-  let offsetY = (height - wallHeight) / 2;
+  // let blockSize = 10;
+  // let wallWidth = wall.getColumns() * blockSize;
+  // let wallHeight = wall.getRows() * blockSize;
+  // let offsetX = (width - wallWidth) / 2;
+  // let offsetY = (height - wallHeight) / 2;
 
-  for (let i = 0; i < wall.getRows(); i++) {
-    for (let j = 0; j < wall.getColumns(); j++) {
-      if (wall.getElement(i, j) === '*') {
-        blocks.push(new Block(j * blockSize + offsetX, i * blockSize + offsetY));
-      }
-    }
-  }
+  // for (let i = 0; i < wall.getRows(); i++) {
+  //   for (let j = 0; j < wall.getColumns(); j++) {
+  //     if (wall.getElement(i, j) === '*') {
+  //       blocks.push(new Block(j * blockSize + offsetX, i * blockSize + offsetY));
+  //     }
+  //   }
+  // }
   
   resetGame();
   introTime = millis() + 3000; 
@@ -349,19 +373,17 @@ function drawArrow() {
 
 //temp function to draw a grid for mapping out patrolls and treats
 function drawGrid() {
-  let gridSize = 100; 
-
-  stroke(200); 
+  stroke(100); 
   strokeWeight(1);
 
   //vertical lines
-  for (let x = 0; x <= width; x += gridSize) {
-    line(x, 0, x, height);
+  for (let x = gridWidth/2; x <= (screenWidth - gridWidth/2); x += gridWidth) {
+    line(x, gridWidth/2, x, screenHeight-(gridWidth/2));
   }
 
   //horizontal lines
-  for (let y = 0; y <= height; y += gridSize) {
-    line(0, y, width, y);
+  for (let y = gridHeight/2; y <= (screenHeight - gridHeight/2); y += gridHeight) {
+    line(gridHeight/2, y, screenWidth-(gridHeight/2), y);
   }
 
   noStroke(); 

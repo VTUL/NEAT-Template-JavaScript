@@ -17,6 +17,23 @@ class Player {
     this.penaltyModifier = 100;
     this.distanceModifier = 500;
 
+    this.isReadytoMove = true;
+
+    this.gridWidth = 90;
+    this.gridHeight = 90;
+
+    this.mapGrid = [
+      [true, true, true, true, true, true, true, true, true, true, true],
+      [true, false, false, false, false, true, false, false, false, false, true],
+      [true, true, true, true, true, true, true, true, true, true, true],
+      [true, false, false, false, false, true, false, false, false, false, true],
+      [true, true, true, true, true, true, true, true, true, true, true],
+      [true, false, true, true, true, true, true, true, true, false, true],
+      [true, false, false, true, true, true, true, true, false, false, true],
+      [true, false, false, true, false, false, false, true, false, false, true],
+      [true, true, true, true, false, false, false, true, true, true, true],
+    ]
+
     this.genomeInputs = 22; // 4 for walls, 5 for pickups 1 for enemies
     this.genomeOutputs = 5; // Up, Right, Down, Left, Sprint
     this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
@@ -27,10 +44,12 @@ class Player {
     this.boostedSpeed = 10;
     this.speed = this.baseSpeed;
     this.isInvinUntil = 0;
-    this.x = 516;
-    this.y = 375;
+    this.currentLocation = {x: 5, y: 4}
+    this.nextLocation = {};
     this.w = 40;
     this.h = 24;
+    this.x = (this.currentLocation.x * this.gridWidth) + this.gridWidth - (this.w/2);
+    this.y = (this.currentLocation.y * this.gridHeight) + this.gridHeight - (this.h/2);
     this.dir = "d"; //the direction the player is facing
     this.isInvincible = false;
 
@@ -135,83 +154,64 @@ class Player {
   }
 
   move(direction) {
+    if (!this.isReadytoMove) {
+      
+    };
+
+
     this.facing = direction;
-    let dx = 0;
-    let dy = 0;
+    // let dx = 0;
+    // let dy = 0;
 
     switch (direction) {
       case "a":
-        if (
-          !this.collidesWithBlocks(
-            this.x - this.speed - 2,
-            this.y,
-            this.w,
-            this.h
-          )
-        ) {
-          this.x = this.x - this.speed;
-          if((Math.abs(this.distanceTrackerX - this.x) > this.distanceInterval || Math.abs(this.distanceTrackerY - this.y) > this.distanceInterval)) {
-            this.distanceTrackerX = this.x;
-            this.distanceTrackerY = this.y;
-            this.distance += this.distanceReward;
-          }
+        if (this.mapGrid[this.currentLocation.x - 1][this.currentLocation.y]) {
+          this.nextLocation = {x: this.currentLocation.x - 1, y: this.currentLocation.y}
+          // this.x = this.x - this.speed;
+          // if((Math.abs(this.distanceTrackerX - this.x) > this.distanceInterval || Math.abs(this.distanceTrackerY - this.y) > this.distanceInterval)) {
+          //   this.distanceTrackerX = this.x;
+          //   this.distanceTrackerY = this.y;
+          //   this.distance += this.distanceReward;
+          // }
         } else {
           this.fitnessPenalty += 1;
         }
         break;
       case "d":
-        if (
-          !this.collidesWithBlocks(
-            this.x + this.speed + 2,
-            this.y,
-            this.w,
-            this.h
-          )
-        ) {
-          this.x = this.x + this.speed;
-          if((Math.abs(this.distanceTrackerX - this.x) > this.distanceInterval || Math.abs(this.distanceTrackerY - this.y) > this.distanceInterval)) {
-            this.distanceTrackerX = this.x;
-            this.distanceTrackerY = this.y;
-            this.distance += this.distanceReward;
-          }
+        if (this.mapGrid[this.currentLocation.x + 1][this.currentLocation.y]) {
+          this.nextLocation = {x: this.currentLocation.x + 1, y: this.currentLocation.y}
+          // this.x = this.x + this.speed;
+          // if((Math.abs(this.distanceTrackerX - this.x) > this.distanceInterval || Math.abs(this.distanceTrackerY - this.y) > this.distanceInterval)) {
+          //   this.distanceTrackerX = this.x;
+          //   this.distanceTrackerY = this.y;
+          //   this.distance += this.distanceReward;
+          // }
         } else {
           this.fitnessPenalty += 1;
         }
         break;
       case "w":
-        if (
-          !this.collidesWithBlocks(
-            this.x,
-            this.y - this.speed - 5,
-            this.w,
-            this.h
-          )
-        ) {
-          this.y = this.y - this.speed;
-          if((Math.abs(this.distanceTrackerX - this.x) > this.distanceInterval || Math.abs(this.distanceTrackerY - this.y) > this.distanceInterval)) {
-            this.distanceTrackerX = this.x;
-            this.distanceTrackerY = this.y;
-            this.distance += this.distanceReward;
-          }
+        if (this.mapGrid[this.currentLocation.x][this.currentLocation.y - 1]) {
+          this.nextLocation = {x: this.currentLocation.x, y: this.currentLocation.y - 1}
+          // this.y = this.y - this.speed;
+          // if((Math.abs(this.distanceTrackerX - this.x) > this.distanceInterval || Math.abs(this.distanceTrackerY - this.y) > this.distanceInterval)) {
+          //   this.distanceTrackerX = this.x;
+          //   this.distanceTrackerY = this.y;
+          //   this.distance += this.distanceReward;
+          // }
         } else {
           this.fitnessPenalty += 1;
         }
         break;
       case "s":
-        if (
-          !this.collidesWithBlocks(
-            this.x,
-            this.y + this.speed + 5,
-            this.w,
-            this.h
-          )
-        ) {
-          this.y = this.y + this.speed;
-          if((Math.abs(this.distanceTrackerX - this.x) > this.distanceInterval || Math.abs(this.distanceTrackerY - this.y) > this.distanceInterval)) {
-            this.distanceTrackerX = this.x;
-            this.distanceTrackerY = this.y;
-            this.distance += this.distanceReward;
-          }
+        if (this.mapGrid[this.currentLocation.x][this.currentLocation.y + 1]) {
+          this.nextLocation = {x: this.currentLocation.x, y: this.currentLocation.y + 1}
+          // this.y = this.y + this.speed;
+          // if((Math.abs(this.distanceTrackerX - this.x) > this.distanceInterval || Math.abs(this.distanceTrackerY - this.y) > this.distanceInterval)) {
+          //   this.distanceTrackerX = this.x;
+          //   this.distanceTrackerY = this.y;
+          //   this.distance += this.distanceReward;
+          // }
         } else {
           this.fitnessPenalty += 1;
         }
@@ -512,28 +512,28 @@ getNearest(targets, centerX, centerY) {
   }
 
   //helper method to check if a move is possible (not blocked by wall)
-  canMove(direction) {
-    // console.log(direction);
-    let dx = 0,
-      dy = 0;
-    switch (direction) {
-      case "a":
-        dx -= this.speed;
-        break;
-      case "d":
-        dx += this.speed;
-        break;
-      case "w":
-        dy -= this.speed;
-        break;
-      case "s":
-        dy += this.speed;
-        break;
-    }
+  // canMove(direction) {
+  //   // console.log(direction);
+  //   let dx = 0,
+  //     dy = 0;
+  //   switch (direction) {
+  //     case "a":
+  //       dx -= this.speed;
+  //       break;
+  //     case "d":
+  //       dx += this.speed;
+  //       break;
+  //     case "w":
+  //       dy -= this.speed;
+  //       break;
+  //     case "s":
+  //       dy += this.speed;
+  //       break;
+  //   }
 
-    //check if path is blocked at full step (not pixel by pixel here)
-    return !this.collidesWithBlocks(this.x + dx, this.y + dy, this.w, this.h);
-  }
+  //   //check if path is blocked at full step (not pixel by pixel here)
+  //   return !this.collidesWithBlocks(this.x + dx, this.y + dy, this.w, this.h);
+  // }
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   //returns a clone of this player with the same brian
@@ -579,15 +579,15 @@ getNearest(targets, centerX, centerY) {
     return child;
   }
 
-  collidesWithBlocks(x, y, w, h) {
-    //creates a temporary object with x,y,w,h to mimic player position
-    let tempPlayer = { x: x, y: y, w: w, h: h };
+  // collidesWithBlocks(x, y, w, h) {
+  //   //creates a temporary object with x,y,w,h to mimic player position
+  //   let tempPlayer = { x: x, y: y, w: w, h: h };
 
-    for (let block of blocks) {
-      if (block.intersects(tempPlayer)) {
-        return true;
-      }
-    }
-    return false;
-  }
+  //   for (let block of blocks) {
+  //     if (block.intersects(tempPlayer)) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
 }
