@@ -1,19 +1,11 @@
-//this is a template to add a NEAT ai to any game
-//note //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-//this means that there is some information specific to the game to input here
-
-
 var nextConnectionNo = 1000;
 var population;
 var speed = 60;
 
-
-var showBest = true; //true if only show the best of the previous generation
+var showBest = false; //true if only show the best of the previous generation
 var runBest = false; //true if replaying the best ever game
 var humanPlaying = false; //true if the user is playing
-
 var humanPlayer;
-
 
 var showBrain = false;
 var showBestEachGen = false;
@@ -57,31 +49,33 @@ let wall;
 let blocks = [];
 let pendingReset = false;
 
-
 // Map array
 
 const screenWidth = 1080
 const screenHeight = 900
 
-const gridWidth = 90;
-const gridHeight = 90;
+const gridWidth = 60;
+const gridHeight = 60;
 
-const gridColumns = 11;
-const gridRows = 9
+const gridColumns = 17;
+const gridRows = 14;
 
 const mapGrid = [
-  [true, true, true, true, true, true, true, true, true, true, true],
-  [true, false, false, false, false, true, false, false, false, false, true],
-  [true, true, true, true, true, true, true, true, true, true, true],
-  [true, false, false, false, false, true, false, false, false, false, true],
-  [true, true, true, true, true, true, true, true, true, true, true],
-  [true, false, true, true, true, true, true, true, true, false, true],
-  [true, false, false, true, true, true, true, true, false, false, true],
-  [true, false, false, true, false, false, false, true, false, false, true],
-  [true, true, true, true, false, false, false, true, true, true, true],
+  [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+  [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
+  [true, false, false, false, false, false, false, true, true, true, false, false, false, false, false, false, true],
+  [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
+  [true, false, false, false, false, false, false, true, true, true, false, false, false, false, false, false, true],
+  [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
+  [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
+  [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
+  [true, true, false, true, true, true, true, true, true, true, true, true, true, true, false, true, true],
+  [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
+  [true, true, false, true, false, true, true, true, true, true, true, true, false, true, false, true, true],
+  [true, true, false, true, false, true, false, false, false, false, false, true, false, true, false, true, true],
+  [true, true, false, true, false, true, true, true, true, true, true, true, false, true, false, true, true],
+  [true, true, true, true, true, true, false, false, false, false, false, true, true, true, true, true, true],
 ]
-
-
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function preload(){
@@ -165,7 +159,7 @@ function draw() {
   
   //move and show enemies, remove inactive
   for (let i = enemies.length - 1; i >= 0; i--) {
-    enemies[i].move();
+    enemies[i].patrol();
     enemies[i].show();
 
     if (!enemies[i].isActive) {
@@ -242,6 +236,9 @@ function draw() {
         if (!population.players[i].dead) {
           handleInteractions(population.players[i]);
         }
+      }
+      for(let j = 0; j < enemies.length; j++) {
+        enemies[j].show();
       }
     } else { //all dead
       //genetic algorithm
@@ -673,7 +670,7 @@ function handleInteractions(player) {
 //function to reset the game state
 function resetGame() {
   Treat.resetSpawns();
-  Enemy.resetSpawns();
+  // Enemy.resetSpawns();
   DogBed.resetSpawns();
   TennisBall.resetSpawns();
   PeanutButter.resetSpawns();
@@ -708,8 +705,10 @@ function resetGame() {
   for (let i = 0; i < 5; i++) {
     enemies.push(new Enemy());
   }
-
-                          
-
 }
 
+function getRandomInt(min, max) {
+  const minCeiled = Math.ceil(min);
+  const maxFloored = Math.floor(max);
+  return Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled); 
+}
