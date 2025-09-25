@@ -1,6 +1,6 @@
 class Player extends Entity {
   constructor() {
-    super({ x: 8, y: 7 }, 40, 24, 5);
+    super({ x: 9, y: 8 }, 40, 24, 5);
     this.fitness = 0;
     this.vision = []; //the input array fed into the neuralNet
     this.decision = []; //the out put of the NN
@@ -39,15 +39,15 @@ class Player extends Entity {
     // this.decisionCount = 15;
 
     //sprite variables
-    this.derek = new Sprite(derek, 64, 32, 4);
-    this.derekUp = new Sprite(derekUp, 28, 72, 4);
-    this.derekDown = new Sprite(derekDown, 28, 72, 4);
-    this.epcot = new Sprite(epcot, 64, 32, 4);
-    this.epcotUp = new Sprite(epcotUp, 28, 72, 4);
-    this.epcotDown = new Sprite(epcotDown, 28, 72, 4);
-    this.josie = new Sprite(josie, 64, 32, 4);
-    this.josieUp = new Sprite(josieUp, 28, 72, 4);
-    this.josieDown = new Sprite(josieDown, 28, 72, 4);
+    this.derek = new Sprite(derek, 86, 46, 4);
+    this.derekUp = new Sprite(derekUp, 43, 80, 4);
+    this.derekDown = new Sprite(derekDown, 46, 86, 4);
+    this.epcot = new Sprite(epcot, 86, 46, 4);
+    this.epcotUp = new Sprite(epcotUp, 43, 80, 4);
+    this.epcotDown = new Sprite(epcotDown, 46, 86, 4);
+    this.josie = new Sprite(josie, 86, 46, 4);
+    this.josieUp = new Sprite(josieUp, 43, 80, 4);
+    this.josieDown = new Sprite(josieDown, 46, 86, 4);
     this.sprite = [this.derek, this.epcot, this.josie];
     this.spriteUp = [this.derekUp, this.epcotUp, this.josieUp];
     this.spriteDown = [this.derekDown, this.epcotDown, this.josieDown];
@@ -71,10 +71,11 @@ class Player extends Entity {
   show() {
     //draw the player sprite
     push();
-    const cx = this.x + this.w / 2;
-    const cy = this.y + this.h / 2;
+    // imageMode(CENTER);
+    // const cx = this.x + this.w / 2;
+    // const cy = this.y + this.h / 2;
 
-    translate(cx, cy);
+    // translate(cx, cy);
 
     if (this.facing === "a") {
       scale(-1, 1);
@@ -88,20 +89,19 @@ class Player extends Entity {
 
     //different sprites for different directions
     if (this.facing === "w") {
-      this.spriteUp[this.i].draw();
-      this.w = 24;
-      this.h = 40;
+      this.spriteUp[this.i].draw(this.x, this.y);
+      // this.w = 24;
+      // this.h = 40;
     } else if (this.facing === "s") {
-      this.spriteDown[this.i].draw();
-      this.w = 24;
-      this.h = 40;
+      this.spriteDown[this.i].draw(this.x, this.y);
+      // this.w = 24;
+      // this.h = 40;
     } else {
-      this.sprite[this.i].draw();
-      this.w = 40;
-      this.h = 24;
+      this.sprite[this.i].draw(this.x, this.y);
+      // this.w = 40;
+      // this.h = 24;
     }
 
-    imageMode(CENTER);
     pop();
 
     //collision box

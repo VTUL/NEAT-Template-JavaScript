@@ -9,10 +9,11 @@ function Sprite(sheet, w, h, frameCount) {
 
     this.frame = 0;
 
-    this.draw = function() {
+    this.draw = function(x, y) {
+        imageMode(CENTER);
         image(
             this.sheet,
-            0, 0, this.w, this.h,                          
+            x, y, this.w, this.h,                          
             this.frameWidth * floor(this.frame), 0,         
             this.frameWidth, this.frameHeight               
         );

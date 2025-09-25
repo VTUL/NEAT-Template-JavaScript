@@ -57,24 +57,26 @@ const screenHeight = 900
 const gridWidth = 60;
 const gridHeight = 60;
 
-const gridColumns = 17;
-const gridRows = 14;
+const gridColumns = 19;
+const gridRows = 16;
 
 const mapGrid = [
-  [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
-  [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-  [true, false, false, false, false, false, false, true, true, true, false, false, false, false, false, false, true],
-  [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-  [true, false, false, false, false, false, false, true, true, true, false, false, false, false, false, false, true],
-  [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-  [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-  [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-  [true, true, false, true, true, true, true, true, true, true, true, true, true, true, false, true, true],
-  [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-  [true, true, false, true, false, true, true, true, true, true, true, true, false, true, false, true, true],
-  [true, true, false, true, false, true, false, false, false, false, false, true, false, true, false, true, true],
-  [true, true, false, true, false, true, true, true, true, true, true, true, false, true, false, true, true],
-  [true, true, true, true, true, true, false, false, false, false, false, true, true, true, true, true, true],
+  [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+  [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
+  [false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false],
+  [false, true, false, false, false, false, false, false, true, true, true, false, false, false, false, false, false, true, false],
+  [false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false],
+  [false, true, false, false, false, false, false, false, true, true, true, false, false, false, false, false, false, true, false],
+  [false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false],
+  [false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false],
+  [false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false],
+  [false, true, true, false, true, true, true, true, true, true, true, true, true, true, true, false, true, true, false],
+  [false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false],
+  [false, true, true, false, true, false, true, true, true, true, true, true, true, false, true, false, true, true, false],
+  [false, true, true, false, true, false, true, false, false, false, false, false, true, false, true, false, true, true, false],
+  [false, true, true, false, true, false, true, true, true, true, true, true, true, false, true, false, true, true, false],
+  [false, true, true, true, true, true, true, false, false, false, false, false, true, true, true, true, true, true, false],
+  [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
 ]
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -82,7 +84,7 @@ function preload(){
   bg = loadImage("images/library_map (1).png");
   blockImg = loadImage("images/square.png");
   acorn = loadImage("images/Acorn_Item.png");
-  squirrel = loadImage("spriteSheets/Enemy_Side_Template.png");
+  squirrel = loadImage("spriteSheets/Enemy_Side_Small.png");
   squirrelDown = loadImage("spriteSheets/Enemy_Vertical_1.png");
   yum = loadImage("images/Dog_Treat.png");
   peanut = loadImage("images/Peanut_Butter.png");
@@ -105,23 +107,7 @@ function setup() {
   let canvas = createCanvas(screenWidth, screenHeight);
   canvas.parent("canvasContainer");
 
-  population = new Population(500); //maybe make smaller, lots of lag/slowdown
-
-  // wall = new Wall(MAP_DATA); //map for collisions
-
-  // let blockSize = 10;
-  // let wallWidth = wall.getColumns() * blockSize;
-  // let wallHeight = wall.getRows() * blockSize;
-  // let offsetX = (width - wallWidth) / 2;
-  // let offsetY = (height - wallHeight) / 2;
-
-  // for (let i = 0; i < wall.getRows(); i++) {
-  //   for (let j = 0; j < wall.getColumns(); j++) {
-  //     if (wall.getElement(i, j) === '*') {
-  //       blocks.push(new Block(j * blockSize + offsetX, i * blockSize + offsetY));
-  //     }
-  //   }
-  // }
+  population = new Population(500);
   
   resetGame();
   introTime = millis() + 3000; 
@@ -186,7 +172,6 @@ function draw() {
     text("Press P to play as human", width - 10, height - 4);
   }
 
-  
   if (!showBestEachGen) {
     noStroke();
     fill(255);
@@ -374,13 +359,13 @@ function drawGrid() {
   strokeWeight(1);
 
   //vertical lines
-  for (let x = gridWidth/2; x <= (screenWidth - gridWidth/2); x += gridWidth) {
-    line(x, gridWidth/2, x, screenHeight-(gridWidth/2));
+  for (let x = -(gridWidth/2); x <= (screenWidth + gridWidth/2); x += gridWidth) {
+    line(x, -(gridWidth/2), x, screenHeight+(gridWidth/2));
   }
 
   //horizontal lines
-  for (let y = gridHeight/2; y <= (screenHeight - gridHeight/2); y += gridHeight) {
-    line(gridHeight/2, y, screenWidth-(gridHeight/2), y);
+  for (let y = -(gridHeight/2); y <= (screenHeight + gridHeight/2); y += gridHeight) {
+    line(-(gridHeight/2), y, screenWidth+(gridHeight/2), y);
   }
 
   noStroke(); 

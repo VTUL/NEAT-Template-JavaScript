@@ -7,9 +7,9 @@ class Entity {
     this.nextLocation = {};
 
     this.x =
-      this.currentLocation.x * gridWidth + gridWidth - this.w / 2;
+      (this.currentLocation.x * gridWidth);
     this.y =
-      this.currentLocation.y * gridHeight + gridHeight - this.h / 2;
+      (this.currentLocation.y * gridHeight);
 
     this.facing = "d";
 
@@ -143,11 +143,11 @@ class Entity {
   getX(location) {
     // console.info("location", location);
     // console.info("gridWidth", gridWidth);
-    return location.x * gridWidth + gridWidth;
+    return location.x * gridWidth;
   }
 
   getY(location) {
-    return location.y * gridHeight + gridHeight;
+    return location.y * gridHeight;
   }
 
   getRandomIntInclusive(min, max) {

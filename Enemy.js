@@ -1,22 +1,22 @@
 class Enemy extends Entity {
- static enemyCount = 0; // static counter shared by all enemies
+  static enemyCount = 0; // static counter shared by all enemies
 
   constructor() {
-    super({ x: getRandomInt(0,16), y: 0 }, 36, 18, 8);
+    const whichWall = getRandomInt(1,4);
+    const spawnX = whichWall === 1 ? 0 : whichWall === 2 ? 15 : getRandomInt(0,15); 
+    const spawnY = whichWall === 3 ? 1 : whichWall === 4 ? 18 : getRandomInt(1,18);
+    super({ x: spawnX, y: spawnY }, 36, 18, 8);
     Enemy.enemyCount++;  // increment count on each new enemy
     this.i = (Enemy.enemyCount % 4) + 1;
     this.spawnIndex = 0;
-
-    // this.h = 18;
-    // this.w = 36;
 
     this.playInvin = false;
 
     this.dropCooldown = 0;
 
     this.isActive = true;
-    this.sprite = new Sprite(squirrel, this.w, this.h, 3);
-    this.spriteDown = new Sprite(squirrelDown, this.h, this.w, 4);
+    this.sprite = new Sprite(squirrel, 48, 24, 3);
+    this.spriteDown = new Sprite(squirrelDown, 24, 24, 4);
 
     this.spawnTime = millis();
     // this.currentLocation = {x: this.getRandomIntInclusive(0,16), y: 0}
@@ -57,10 +57,6 @@ class Enemy extends Entity {
   show() {
     // console.log("update enemies");
     push();
-    const cx = this.x + this.w / 2;
-    const cy = this.y + this.h / 2;
-
-    translate(cx, cy);
 
     if (this.facing === "a") {
       scale(-1, 1);
@@ -69,20 +65,13 @@ class Enemy extends Entity {
   //different sprites for different directions
     if (this.facing === "w") {
       scale(-1, -1);
-      this.spriteDown.draw();
-      this.w = 18;
-      this.h = 36;
+      this.spriteDown.draw(this.x, this.y);
     } else if (this.facing === "s") {
-      this.spriteDown.draw();
-      this.w = 18;
-      this.h = 36;
+      this.spriteDown.draw(this.x, this.y);
     } else {
-      this.sprite.draw();
-      this.w = 36;
-      this.h = 18;
+      this.sprite.draw(this.x, this.y);
     }
 
-    imageMode(CENTER);
     pop();
     // noFill();
     // stroke(255, 0, 0);
