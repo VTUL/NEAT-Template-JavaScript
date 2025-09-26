@@ -1,26 +1,35 @@
 class Entity {
-  constructor(currentLocation, w, h, speed) {
+  constructor(currentLocation, w, h, speed, type, collisionCallback) {
     this.isReadytoMove = true;
     this.currentLocation = currentLocation;
     this.w = w
     this.h = h;
     this.nextLocation = {};
+    this.type = type;
+    this.collisionCallback = collisionCallback;
 
     this.x =
       (this.currentLocation.x * gridWidth);
     this.y =
       (this.currentLocation.y * gridHeight);
 
-    this.facing = "d";
+    this.facing;
 
     this.baseSpeed = speed;
     this.boostedSpeed = 10;
     this.speed = this.baseSpeed;
 
+    this.uuid = crypto.randomUUID();
+
     this.lastDec;
+
+    this.registerLocation(this.currentLocation);
   }
 
   move(direction) {
+    // console.info("Type", this.type);
+    // console.info("Id", this.uuid);
+    // console.info("Location", this.currentLocation);
     // // console.info("direction", direction);
     if (!this.isReadytoMove) {
       // console.info("not ready to move");
@@ -30,7 +39,9 @@ class Entity {
           if (this.x - this.speed <= this.getX(this.nextLocation)) {
             this.x = this.getX(this.nextLocation);
             this.isReadytoMove = true;
+            this.deregisterLocation(this.currentLocation);
             this.currentLocation = this.nextLocation;
+            this.registerLocation(this.currentLocation);
             this.nextLocation = {};
           } else {
             this.x = this.x - this.speed;
@@ -40,7 +51,9 @@ class Entity {
           if (this.x + this.speed >= this.getX(this.nextLocation)) {
             this.x = this.getX(this.nextLocation);
             this.isReadytoMove = true;
+            this.deregisterLocation(this.currentLocation);
             this.currentLocation = this.nextLocation;
+            this.registerLocation(this.currentLocation);
             this.nextLocation = {};
           } else {
             this.x = this.x + this.speed;
@@ -50,7 +63,9 @@ class Entity {
           if (this.y - this.speed <= this.getY(this.nextLocation)) {
             this.y = this.getY(this.nextLocation);
             this.isReadytoMove = true;
+            this.deregisterLocation(this.currentLocation);
             this.currentLocation = this.nextLocation;
+            this.registerLocation(this.currentLocation);
             this.nextLocation = {};
           } else {
             this.y = this.y - this.speed;
@@ -60,7 +75,9 @@ class Entity {
           if (this.y + this.speed >= this.getY(this.nextLocation)) {
             this.y = this.getY(this.nextLocation);
             this.isReadytoMove = true;
+            this.deregisterLocation(this.currentLocation);
             this.currentLocation = this.nextLocation;
+            this.registerLocation(this.currentLocation);
             this.nextLocation = {};
           } else {
             this.y = this.y + this.speed;
@@ -72,12 +89,16 @@ class Entity {
       // console.info("direction", direction);
       switch (direction) {
         case "a":
-          if (typeof mapGrid[this.currentLocation.y]?.[this.currentLocation.x - 1] !== "undefined" && mapGrid[this.currentLocation.y]?.[this.currentLocation.x - 1]) {
+          if (typeof mapGrid[this.currentLocation.y]?.[this.currentLocation.x - 1] !== "undefined" && mapGrid[this.currentLocation.y]?.[this.currentLocation.x - 1]?.valid) {
             this.facing = direction;
             this.nextLocation = {
               x: this.currentLocation.x - 1,
               y: this.currentLocation.y,
             };
+            let collisions = this.checkCollision(this.nextLocation);
+            if(collisions) {
+              this.collisionCallback(collisions);
+            }
             this.lastDec = "a";
             this.isReadytoMove = false;
           } else {
@@ -86,12 +107,16 @@ class Entity {
           }
           break;
         case "d":
-          if (typeof mapGrid[this.currentLocation.y]?.[this.currentLocation.x + 1] !== "undefined" && mapGrid[this.currentLocation.y]?.[this.currentLocation.x + 1]) {
+          if (typeof mapGrid[this.currentLocation.y]?.[this.currentLocation.x + 1] !== "undefined" && mapGrid[this.currentLocation.y]?.[this.currentLocation.x + 1]?.valid) {
             this.facing = direction;
             this.nextLocation = {
               x: this.currentLocation.x + 1,
               y: this.currentLocation.y,
             };
+            let collisions = this.checkCollision(this.nextLocation);
+            if(collisions) {
+              this.collisionCallback(collisions);
+            }
             this.lastDec = "d";
             this.isReadytoMove = false;
           } else {
@@ -100,12 +125,16 @@ class Entity {
           }
           break;
         case "w":
-          if (typeof mapGrid[this.currentLocation.y - 1]?.[this.currentLocation.x] !== "undefined" && mapGrid[this.currentLocation.y - 1]?.[this.currentLocation.x]) {
+          if (typeof mapGrid[this.currentLocation.y - 1]?.[this.currentLocation.x] !== "undefined" && mapGrid[this.currentLocation.y - 1]?.[this.currentLocation.x]?.valid) {
             this.facing = direction;
             this.nextLocation = {
               x: this.currentLocation.x,
               y: this.currentLocation.y - 1,
             };
+            let collisions = this.checkCollision(this.nextLocation);
+            if(collisions) {
+              this.collisionCallback(collisions);
+            }
             this.lastDec = "w";
             this.isReadytoMove = false;
           } else {
@@ -114,12 +143,16 @@ class Entity {
           }
           break;
         case "s":
-          if (typeof mapGrid[this.currentLocation.y + 1]?.[this.currentLocation.x] !== "undefined" && mapGrid[this.currentLocation.y + 1]?.[this.currentLocation.x]) {
+          if (typeof mapGrid[this.currentLocation.y + 1]?.[this.currentLocation.x] !== "undefined" && mapGrid[this.currentLocation.y + 1]?.[this.currentLocation.x]?.valid) {
             this.facing = direction;
             this.nextLocation = {
               x: this.currentLocation.x,
               y: this.currentLocation.y + 1,
             };
+            let collisions = this.checkCollision(this.nextLocation);
+            if(collisions) {
+              this.collisionCallback(collisions);
+            }
             this.lastDec = "s";
             this.isReadytoMove = false;
           } else {
@@ -133,26 +166,29 @@ class Entity {
     }
   }
 
-  getCenter(location) {
-    return {
-      x: getX(location),
-      y: getY(location),
-    };
+  checkCollision(location) {
+    if(mapGrid[location.y][location.x].occupants.length === 0) {
+      return false;      
+    } else {
+      return mapGrid[location.y][location.x].occupants;
+    }
+  }
+
+  registerLocation(location) {
+    mapGrid[location.y]?.[location.x]?.occupants.push({type: this.type, id: this.uuid})
+  }
+
+  deregisterLocation(location) {
+    mapGrid[location.y][location.x].occupants = mapGrid[location.y][location.x].occupants.filter(value => { 
+      return value.id !== this.uuid;
+    })
   }
 
   getX(location) {
-    // console.info("location", location);
-    // console.info("gridWidth", gridWidth);
     return location.x * gridWidth;
   }
 
   getY(location) {
     return location.y * gridHeight;
-  }
-
-  getRandomIntInclusive(min, max) {
-    const minCeiled = Math.ceil(min);
-    const maxFloored = Math.floor(max);
-    return Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled); 
   }
 }

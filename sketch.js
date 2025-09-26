@@ -2,6 +2,8 @@ var nextConnectionNo = 1000;
 var population;
 var speed = 60;
 
+let mapGrid = JSON.parse(JSON.stringify(mapGridOriginal));
+
 var showBest = false; //true if only show the best of the previous generation
 var runBest = false; //true if replaying the best ever game
 var humanPlaying = false; //true if the user is playing
@@ -15,7 +17,7 @@ var genPlayerTemp; //player
 var showNothing = false; 
 let treats = [];
 let enemies = []; 
-let anti = [];
+// let anti = [];
 let beds = [];
 let balls = [];
 let bedsRespawnTime = 0;
@@ -28,75 +30,58 @@ let pb = [];
 //images
 var bg;
 var blockImg;
-var derek;
+var derekLeft;
+var derekRight;
 var derekUp;
 var derekDown;
-var epcot;
+var epcotLeft;
+var epcotRight
 var epcotUp;
 var epcotDown;
-var josie;
+var josieLeft;
+var josieRight
 var josieUp;
 var josieDown;
 var acorn;
-var squirrel;
+var squirrelUp;
+var squirrelDown;
+var squirrelRight;
+var squirrelLeft;
 var peanut;
-var yum;
+var treat;
 var bed;
 var tennis;
 var arrow;
 
+let occupantList = ["player", "enemy", "treat", "peanut", "bed", "tennis"]
+
 let wall;
 let blocks = [];
 let pendingReset = false;
-
-// Map array
-
-const screenWidth = 1080
-const screenHeight = 900
-
-const gridWidth = 60;
-const gridHeight = 60;
-
-const gridColumns = 19;
-const gridRows = 16;
-
-const mapGrid = [
-  [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
-  [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
-  [false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false],
-  [false, true, false, false, false, false, false, false, true, true, true, false, false, false, false, false, false, true, false],
-  [false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false],
-  [false, true, false, false, false, false, false, false, true, true, true, false, false, false, false, false, false, true, false],
-  [false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false],
-  [false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false],
-  [false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false],
-  [false, true, true, false, true, true, true, true, true, true, true, true, true, true, true, false, true, true, false],
-  [false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, false],
-  [false, true, true, false, true, false, true, true, true, true, true, true, true, false, true, false, true, true, false],
-  [false, true, true, false, true, false, true, false, false, false, false, false, true, false, true, false, true, true, false],
-  [false, true, true, false, true, false, true, true, true, true, true, true, true, false, true, false, true, true, false],
-  [false, true, true, true, true, true, true, false, false, false, false, false, true, true, true, true, true, true, false],
-  [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false],
-]
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function preload(){
   bg = loadImage("images/library_map (1).png");
   blockImg = loadImage("images/square.png");
   acorn = loadImage("images/Acorn_Item.png");
-  squirrel = loadImage("spriteSheets/Enemy_Side_Small.png");
-  squirrelDown = loadImage("spriteSheets/Enemy_Vertical_1.png");
-  yum = loadImage("images/Dog_Treat.png");
+  squirrelLeft = loadImage("spriteSheets/EnemyLeft.png");
+  squirrelDown = loadImage("spriteSheets/EnemyDown.png");
+  squirrelRight = loadImage("spriteSheets/EnemyRight.png");
+  squirrelUp = loadImage("spriteSheets/EnemyUp.png");
+  treat = loadImage("images/Dog_Treat.png");
   peanut = loadImage("images/Peanut_Butter.png");
-  derek = loadImage("spriteSheets/Derek_walk.png");
-  derekUp = loadImage("spriteSheets/Derek_Overhead_Walk_2.png");
-  derekDown = loadImage("spriteSheets/Derek_overhead_walk.png");
-  epcot = loadImage("spriteSheets/Epcot_walk.png");
-  epcotUp = loadImage("spriteSheets/Epcot_Overhead_Walk_2.png");
-  epcotDown = loadImage("spriteSheets/Epcot_overhead_walk.png");
-  josie = loadImage("spriteSheets/Josie_walk.png");
-  josieUp = loadImage("spriteSheets/Josie_Overhead_Walk_2.png");
-  josieDown = loadImage("spriteSheets/Josie_overhead_walk.png");
+  derekLeft = loadImage("spriteSheets/DerekLeft.png");
+  derekUp = loadImage("spriteSheets/DerekUp.png");
+  derekDown = loadImage("spriteSheets/DerekDown.png");
+  derekRight = loadImage("spriteSheets/DerekRight.png");
+  epcotLeft = loadImage("spriteSheets/EpcotLeft.png");
+  epcotUp = loadImage("spriteSheets/EpcotUp.png");
+  epcotDown = loadImage("spriteSheets/EpcotDown.png");
+  epcotRight = loadImage("spriteSheets/EpcotRight.png");
+  josieLeft = loadImage("spriteSheets/JosieLeft.png");
+  josieUp = loadImage("spriteSheets/JosieUp.png");
+  josieDown = loadImage("spriteSheets/JosieDown.png");
+  josieRight = loadImage("spriteSheets/JosieRight.png");
   bed = loadImage("images/Dog_Bed-1.png.png");
   tennis = loadImage("images/Ball-1.png.png");
   arrow = loadImage("images/red-pixel-arrow.png"); //stand in
@@ -121,6 +106,7 @@ function draw() {
 
   //add treats/collectibles to the screen
   if (bg) {
+    imageMode(CORNER);
     image(bg, 0, 0, width, height); 
   }
 
@@ -146,11 +132,11 @@ function draw() {
   //move and show enemies, remove inactive
   for (let i = enemies.length - 1; i >= 0; i--) {
     enemies[i].patrol();
-    enemies[i].show();
+    // enemies[i].show();
 
-    if (!enemies[i].isActive) {
-      enemies.splice(i, 1); //0.1% chance to disappear
-    }
+    // if (!enemies[i].isActive) {
+    //   enemies.splice(i, 1); //0.1% chance to disappear
+    // }
   }
 
   // if(population.players.length > 0){
@@ -159,9 +145,9 @@ function draw() {
   // point(population.players[0].x,population.players[0].y)
   // }
 
-  for (let a of anti) {
-    a.show();
-  }
+  // for (let a of anti) {
+  //   a.show();
+  // }
   
   //placeholder text so player knows how to start playing
   if (!humanPlaying && !runBest && !showBestEachGen) {
@@ -252,7 +238,7 @@ function draw() {
 function handleRespawns() {
   //respawn Peanut Butter if missing and timer passed
   if (pb?.length < 1 && millis() > PBRespawnTime) {
-    pb.push(new PeanutButter());
+    pb.push(new PeanutButter(peanut, 24, 24));
     PBRespawnTime = millis() + 60000;
   }
 
@@ -262,13 +248,13 @@ function handleRespawns() {
 
    //respawn beds if it was collected and 10 seconds passed
   if (beds.length === 0 && millis() > bedsRespawnTime) {
-    beds.push(new DogBed());
+    beds.push(new DogBed(bed, 48, 48));
     bedsRespawnTime = millis() + 20000;
   }
 
   //respawn TennisBall if it was collected and 30 seconds passed
   if (balls.length === 0 && millis() > ballRespawnTime) {
-    balls.push(new TennisBall());
+    balls.push(new TennisBall(tennis, 16, 16));
     ballRespawnTime = millis() + 40000;
   }
 
@@ -280,20 +266,20 @@ function handleRespawns() {
 
   //respawn treats 
  if (treats.length < 25) {
-    treats.push(new Treat());
+    treats.push(new Treat(treat, 16, 16));
     
   }
 
   //remove expired anti items
-  for (let i = anti.length - 1; i >= 0; i--) {
-    if (anti[i].life < millis()) {
-      anti.splice(i, 1);
-    }
-  }
+  // for (let i = anti.length - 1; i >= 0; i--) {
+  //   if (anti[i].life < millis()) {
+  //     anti.splice(i, 1);
+  //   }
+  // }
   //remove expired treats causes game to crash
 for (let i = treats.length - 1; i >= 0; i--) {
   if (treats[i].life < millis()) {
-    treats[i].eaten(); //call eaten to reset spawn point
+    // treats[i].eaten(); //call eaten to reset spawn point
     treats.splice(i, 1);
   }
 }
@@ -574,106 +560,108 @@ function handleInteractions(player) {
   if (player.dead) return;
 
   //Treats
-  for (let i = treats.length - 1; i >= 0; i--) {
-    if (treats[i] && treats[i].checkCollision(player) && !treats[i].idList.includes(player.uuid)) {
-      player.score += 1;
-      treats[i].idList.push(player.uuid); //add player id to the treat
-      if(humanPlaying){
-        treats[i].eaten(); 
-        treats.splice(i, 1); //remove anti item if human player
-      }
-      player.lastScoreMillis = millis();
-    }
-  }
+  // for (let i = treats.length - 1; i >= 0; i--) {
+  //   if (treats[i] && treats[i].checkCollision(player) && !treats[i].idList.includes(player.uuid)) {
+  //     player.score += 1;
+  //     treats[i].idList.push(player.uuid); //add player id to the treat
+  //     if(humanPlaying){
+  //       treats[i].eaten(); 
+  //       treats.splice(i, 1); //remove anti item if human player
+  //     }
+  //     player.lastScoreMillis = millis();
+  //   }
+  // }
 
   //Dog Beds
-  if (beds?.length >= 0 && beds[0]?.checkCollision(player) && !beds[0].idList.includes(player.uuid)) {
-    player.stamina = player.maxStamina; //reset stamina
-    beds[0].idList.push(player.uuid); //add player id
-    if(humanPlaying)
-      beds.splice(0, 1); //remove anti item if human player
-    bedsRespawnTime = millis() + 20000;
-  }
+  // if (beds?.length >= 0 && beds[0]?.checkCollision(player) && !beds[0].idList.includes(player.uuid)) {
+  //   player.stamina = player.maxStamina; //reset stamina
+  //   beds[0].idList.push(player.uuid); //add player id
+  //   if(humanPlaying)
+  //     beds.splice(0, 1); //remove anti item if human player
+  //   bedsRespawnTime = millis() + 20000;
+  // }
 
   //TennisBall
-  if (balls?.length >= 0 && balls[0]?.checkCollision(player) && !balls[0].idList.includes(player.uuid)) {
-    player.isInvincible = true;
-    player.isInvinUntil = millis() + 10000;
-    balls[0].idList.push(player.uuid); //add player id
-    if(humanPlaying)
-      balls.splice(0, 1); //remove anti item if human player
-    ballRespawnTime = millis() + 40000;
-  }
+  // if (balls?.length >= 0 && balls[0]?.checkCollision(player) && !balls[0].idList.includes(player.uuid)) {
+  //   player.isInvincible = true;
+  //   player.isInvinUntil = millis() + 10000;
+  //   balls[0].idList.push(player.uuid); //add player id
+  //   if(humanPlaying)
+  //     balls.splice(0, 1); //remove anti item if human player
+  //   ballRespawnTime = millis() + 40000;
+  // }
 
    //Peanut Butter
-  if (pb?.length >= 0 && pb[0]?.checkCollision(player) && !pb[0].idList.includes(player.uuid)) {
-    pb[0].idList.push(player.uuid); //add player id
-    player.score += 10;
-    if(humanPlaying)
-      pb.splice(0, 1); //remove anti item if human player
-    PBRespawnTime = millis() + 60000;
-    player.lastScoreMillis = millis();
-  }
+  // if (pb?.length >= 0 && pb[0]?.checkCollision(player) && !pb[0].idList.includes(player.uuid)) {
+  //   pb[0].idList.push(player.uuid); //add player id
+  //   player.score += 10;
+  //   if(humanPlaying)
+  //     pb.splice(0, 1); //remove anti item if human player
+  //   PBRespawnTime = millis() + 60000;
+  //   player.lastScoreMillis = millis();
+  // }
 
   //Anti
-  for (let i = anti.length - 1; i >= 0; i--) {
-    if (anti[i].checkCollision(player) && !player.isInvincible && !anti[i].idList.includes(player.uuid)) {
-      anti[i].idList.push(player.uuid); //add player id
-      player.score -= 5;
-      if(humanPlaying)
-        anti.splice(i, 1); //remove anti item if human player
-    }
+  // for (let i = anti.length - 1; i >= 0; i--) {
+  //   if (anti[i].checkCollision(player) && !player.isInvincible && !anti[i].idList.includes(player.uuid)) {
+  //     anti[i].idList.push(player.uuid); //add player id
+  //     player.score -= 5;
+  //     if(humanPlaying)
+  //       anti.splice(i, 1); //remove anti item if human player
+  //   }
 
     //get rid of anti penalty
-    if (anti[i]) {
-    if (player.isInvincible) {
-      anti[i].playInvin = true;  
-    } else {
-      anti[i].playInvin = false; 
-    }
-  }
+  //   if (anti[i]) {
+  //   if (player.isInvincible) {
+  //     anti[i].playInvin = true;  
+  //   } else {
+  //     anti[i].playInvin = false; 
+  //   }
+  // }
   }
 
   //Enemies
-  for (let i = enemies.length - 1; i >= 0; i--) {
-  if (enemies[i].checkCollision(player) && !player.isInvincible) {
-    player.dead = true;
-  }
+  // for (let i = enemies.length - 1; i >= 0; i--) {
+  // if (enemies[i].checkCollision(player) && !player.isInvincible) {
+  //   player.dead = true;
+  // }
 
   //enemy invincibility handling
-  if (enemies[i]) {
-    if (player.isInvincible) {
-      enemies[i].playInvin = true;  
-    } else {
-      enemies[i].playInvin = false; 
-    }
-  }
-}
+//   if (enemies[i]) {
+//     if (player.isInvincible) {
+//       enemies[i].playInvin = true;  
+//     } else {
+//       enemies[i].playInvin = false; 
+//     }
+//   }
+// }
 
-}
+// }
 
 //function to reset the game state
 function resetGame() {
-  Treat.resetSpawns();
+  // Treat.resetSpawns();
   // Enemy.resetSpawns();
-  DogBed.resetSpawns();
-  TennisBall.resetSpawns();
-  PeanutButter.resetSpawns();
+  // DogBed.resetSpawns();
+  // TennisBall.resetSpawns();
+  // PeanutButter.resetSpawns();
+
+  mapGrid = JSON.parse(JSON.stringify(mapGridOriginal));
 
   treats = [];
   enemies = [];
   beds = [];
   balls = [];
   pb = [];
-  anti = [];
+  // anti = [];
 
   treats.length = 0;
   enemies.length = 0;
-  anti.length = 0;
+  // anti.length = 0;
 
-  beds.push(new DogBed());
-  balls.push(new TennisBall());
-  pb.push(new PeanutButter());
+  beds.push(new DogBed(bed, 48, 48));
+  balls.push(new TennisBall(tennis, 16, 16));
+  pb.push(new PeanutButter(peanut, 24, 24));
 
   //reset timers for collectible respawns
   bedsRespawnTime = millis() + 20000;       //dog bed in 20 seconds
@@ -684,7 +672,7 @@ function resetGame() {
   treatRemoveTime = millis() + 1000;        //treats removed after 1 second
 
   for (let i = 0; i < 25; i++) {
-    treats.push(new Treat());
+    treats.push(new Treat(treat, 16, 16));
   }
 
   for (let i = 0; i < 5; i++) {

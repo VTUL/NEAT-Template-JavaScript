@@ -1,6 +1,16 @@
 class Player extends Entity {
   constructor() {
-    super({ x: 9, y: 8 }, 40, 24, 5);
+
+    const collisionCallback = (collisions) => {
+      collisions.forEach((occupant) => {
+        if(occupant.type === 1) {
+          console.log("Dog collided with Squirrel");
+          this.dead = true;
+        }
+      })
+    }
+
+    super({ x: 9, y: 8 }, 40, 24, 5, 0, collisionCallback);
     this.fitness = 0;
     this.vision = []; //the input array fed into the neuralNet
     this.decision = []; //the out put of the NN
@@ -18,11 +28,9 @@ class Player extends Entity {
     this.penaltyModifier = 100;
     // this.distanceModifier = 500;
 
-    this.genomeInputs = 10; // 4 for walls, 5 for pickups 1 for enemies
+    this.genomeInputs = 9; // 4 for walls, 5 for pickups 1 for enemies
     this.genomeOutputs = 5; // Up, Right, Down, Left, Sprint
     this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
-
-    this.uuid = crypto.randomUUID();
 
     this.isInvinUntil = 0;
     
@@ -39,19 +47,23 @@ class Player extends Entity {
     // this.decisionCount = 15;
 
     //sprite variables
-    this.derek = new Sprite(derek, 86, 46, 4);
+    this.derekRight = new Sprite(derekRight, 86, 46, 4);
+    this.derekLeft = new Sprite(derekLeft, 86, 46, 4);
     this.derekUp = new Sprite(derekUp, 43, 80, 4);
     this.derekDown = new Sprite(derekDown, 46, 86, 4);
-    this.epcot = new Sprite(epcot, 86, 46, 4);
+    this.epcotRight = new Sprite(epcotRight, 86, 46, 4);
+    this.epcotLeft = new Sprite(epcotLeft, 86, 46, 4);
     this.epcotUp = new Sprite(epcotUp, 43, 80, 4);
     this.epcotDown = new Sprite(epcotDown, 46, 86, 4);
-    this.josie = new Sprite(josie, 86, 46, 4);
+    this.josieRight = new Sprite(josieRight, 86, 46, 4);
+    this.josieLeft = new Sprite(josieLeft, 86, 46, 4);
     this.josieUp = new Sprite(josieUp, 43, 80, 4);
     this.josieDown = new Sprite(josieDown, 46, 86, 4);
-    this.sprite = [this.derek, this.epcot, this.josie];
+    this.spriteLeft = [this.derekLeft, this.epcotLeft, this.josieLeft];
+    this.spriteRight = [this.derekRight, this.epcotRight, this.josieRight];
     this.spriteUp = [this.derekUp, this.epcotUp, this.josieUp];
     this.spriteDown = [this.derekDown, this.epcotDown, this.josieDown];
-    this.i = 0;
+    this.i = getRandomInt(0,2);
 
     this.distanceTrackerX = this.x;
     this.distanceTrackerY = this.y;
@@ -61,25 +73,11 @@ class Player extends Entity {
     this.staminaDrainRate = 0.8; //per frame when sprinting
     this.staminaRegenRate = this.maxStamina / (30 * 60); //regen over 30 seconds at 60 fps
     this.isSprinting = false;
-
-    // this.checkUp = this.checkUp.bind(this);
-    // this.checkRight = this.checkRight.bind(this);
-    // this.checkDown = this.checkDown.bind(this);
-    // this.checkLeft = this.checkLeft.bind(this);
   }
 
   show() {
     //draw the player sprite
     push();
-    // imageMode(CENTER);
-    // const cx = this.x + this.w / 2;
-    // const cy = this.y + this.h / 2;
-
-    // translate(cx, cy);
-
-    if (this.facing === "a") {
-      scale(-1, 1);
-    }
 
     if (this.isInvincible) {
       tint(0, 255, 0);
@@ -90,16 +88,12 @@ class Player extends Entity {
     //different sprites for different directions
     if (this.facing === "w") {
       this.spriteUp[this.i].draw(this.x, this.y);
-      // this.w = 24;
-      // this.h = 40;
     } else if (this.facing === "s") {
       this.spriteDown[this.i].draw(this.x, this.y);
-      // this.w = 24;
-      // this.h = 40;
+    } else if (this.facing === "d") {
+      this.spriteRight[this.i].draw(this.x, this.y);
     } else {
-      this.sprite[this.i].draw(this.x, this.y);
-      // this.w = 40;
-      // this.h = 24;
+      this.spriteLeft[this.i].draw(this.x, this.y);
     }
 
     pop();
@@ -167,9 +161,9 @@ class Player extends Entity {
     this.vision.push(
       map(this.getDistance(treats, centerX, centerY), 0, 1500, 0, 1)
     );
-    this.vision.push(
-      map(this.getDistance(anti, centerX, centerY), 0, 1500, 0, 1)
-    );
+    // this.vision.push(
+    //   map(this.getDistance(anti, centerX, centerY), 0, 1500, 0, 1)
+    // );
     this.vision.push(
       map(this.getDistance(balls, centerX, centerY), 0, 1500, 0, 1)
     );
@@ -206,7 +200,7 @@ class Player extends Entity {
   checkUp() {
     let dist;
     for(let steps = 1; steps <= gridRows; steps++) {
-      if (typeof mapGrid[this.currentLocation.y - steps]?.[this.currentLocation.x] === "undefined" || !mapGrid[this.currentLocation.y - steps]?.[this.currentLocation.x]) {
+      if (typeof mapGrid[this.currentLocation.y - steps]?.[this.currentLocation.x] === "undefined" || !mapGrid[this.currentLocation.y - steps]?.[this.currentLocation.x]?.valid) {
         dist = steps;
         break; 
       }
@@ -217,7 +211,7 @@ class Player extends Entity {
   checkRight() {
     let dist;
     for(let steps = 1; steps <= gridColumns; steps++) {
-      if (typeof mapGrid[this.currentLocation.y]?.[this.currentLocation.x + steps] === "undefined" || !mapGrid[this.currentLocation.y]?.[this.currentLocation.x + steps]) {
+      if (typeof mapGrid[this.currentLocation.y]?.[this.currentLocation.x + steps] === "undefined" || !mapGrid[this.currentLocation.y]?.[this.currentLocation.x + steps]?.valid) {
         dist = steps;
         break; 
       }
@@ -228,7 +222,7 @@ class Player extends Entity {
   checkDown() {
     let dist;
     for(let steps = 1; steps <= gridRows; steps++) {
-      if (typeof mapGrid[this.currentLocation.y + steps]?.[this.currentLocation.x] === "undefined" || !mapGrid[this.currentLocation.y + steps]?.[this.currentLocation.x]) {
+      if (typeof mapGrid[this.currentLocation.y + steps]?.[this.currentLocation.x] === "undefined" || !mapGrid[this.currentLocation.y + steps]?.[this.currentLocation.x]?.valid) {
         dist = steps;
         break; 
       }
@@ -239,7 +233,7 @@ class Player extends Entity {
   checkLeft() {
     let dist;
     for(let steps = 1; steps <= gridColumns; steps++) {
-      if (typeof mapGrid[this.currentLocation.y]?.[this.currentLocation.x - steps] === "undefined" || !mapGrid[this.currentLocation.y]?.[this.currentLocation.x - steps]) {
+      if (typeof mapGrid[this.currentLocation.y]?.[this.currentLocation.x - steps] === "undefined" || !mapGrid[this.currentLocation.y]?.[this.currentLocation.x - steps]?.valid) {
         dist = steps;
         break; 
       }
