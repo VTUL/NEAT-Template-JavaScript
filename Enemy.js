@@ -14,8 +14,8 @@ class Enemy extends Entity {
     }
 
     const whichWall = getRandomInt(1,4);
-    const spawnX = whichWall === 1 ? 0 : whichWall === 2 ? 15 : getRandomInt(0,15); 
-    const spawnY = whichWall === 3 ? 1 : whichWall === 4 ? 18 : getRandomInt(1,18);
+    const spawnX = whichWall === 1 ? 0 : whichWall === 2 ? 15 : getRandomInt(1,14); 
+    const spawnY = whichWall === 3 ? 1 : whichWall === 4 ? 18 : getRandomInt(2,17);
     super({ x: spawnX, y: spawnY }, 36, 18, 8, 1, collisionCallback);
     Enemy.enemyCount++;  // increment count on each new enemy
     // this.i = (Enemy.enemyCount % 4) + 1;

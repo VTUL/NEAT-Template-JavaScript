@@ -4,8 +4,27 @@ class Player extends Entity {
     const collisionCallback = (collisions) => {
       collisions.forEach((occupant) => {
         if(occupant.type === 1) {
-          console.log("Dog collided with Squirrel");
+          // console.log("Dog collided with Squirrel");
           this.dead = true;
+          return;
+        } else if(occupant.type === 2 || occupant.type === 3) {
+          if(this.occupant.type === 2) {
+            for(let i = 0; i <= treats.length; i++) {
+              if (treats[i].uuid === occupant.id) {
+                if(treats[i].idList.contains(this.uuid)) {
+                  return;
+                } else {
+                  this.score += occupant.type === 2 ? Treat.value : PeanutButter.value;
+                }
+              }
+            }
+          }
+          
+        } else if(occupant.type === 4) {
+          this.stamina = 100;
+        } else {
+          this.isInvincible = true;
+          this.isInvinUntil = 10000;
         }
       })
     }
@@ -146,14 +165,12 @@ class Player extends Entity {
 
   look() {
     this.vision = [];
-    const centerX = this.x + this.w / 2;
-    const centerY = this.y + this.h / 2;
 
-    //push distances to vision array
-    this.vision.push(map(this.checkUp(), 1, 14, 0, 1));
-    this.vision.push(map(this.checkRight(), 1, 17, 0, 1));
-    this.vision.push(map(this.checkDown(), 1, 14, 0, 1));
-    this.vision.push(map(this.checkLeft(), 1, 17, 0, 1));
+    //push walls to vision array
+    this.vision.push(1/this.checkUp());
+    this.vision.push(1/this.checkRight());
+    this.vision.push(1/this.checkDown());
+    this.vision.push(1/this.checkLeft());
 
     this.vision.push(
       map(this.getDistance(enemies, centerX, centerY), 0, 1500, 0, 1)
@@ -174,27 +191,6 @@ class Player extends Entity {
       map(this.getDistance(pb, centerX, centerY), 0, 1500, 0, 1)
     );
 
-  }
-
-  getNearest(targets, centerX, centerY) {
-    if (!targets || targets.length === 0) return null;
-
-    let nearest = null;
-    let minDist = Infinity;
-
-    for (let t of targets) {
-      if (t.idList?.includes(this.uuid)) continue;
-      const dx = t.x - centerX;
-      const dy = t.y - centerY;
-      const dist = Math.abs(dx) + Math.abs(dy);
-
-      if (dist < minDist) {
-        minDist = dist;
-        nearest = t;
-      }
-    }
-
-    return nearest;
   }
 
   checkUp() {

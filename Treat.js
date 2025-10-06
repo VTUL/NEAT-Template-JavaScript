@@ -1,4 +1,5 @@
 class Treat extends Pickup {
+  static value = 100;
   constructor(sprite, width, height) {
     let location = false;
     while(!location) {

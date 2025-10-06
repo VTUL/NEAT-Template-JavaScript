@@ -101,7 +101,7 @@ function setup() {
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 function draw() {
-  frameRate(30);
+  frameRate(120);
   background(255);
 
   //add treats/collectibles to the screen
@@ -188,9 +188,7 @@ function draw() {
     textAlign(CENTER, TOP); 
     textSize(32);
     text("AI Playing", 540, 15);
-  }
-
-  
+  }  
 
   drawToScreen();
 
@@ -341,6 +339,7 @@ function drawArrow() {
 
 //temp function to draw a grid for mapping out patrolls and treats
 function drawGrid() {
+  // console.info("mapgrid", mapGrid);
   stroke(100); 
   strokeWeight(1);
 
@@ -460,7 +459,7 @@ function writeInfo() {
       //when all runs visible 
       info += "Gen: " + population.gen + "<br>";
       info += "Species: " + population.species.length + "<br>";
-      info += "Global Best Score: " + population.bestScore + "<br>";
+      info += "Global Best Score: " + population.globalBestScore + "<br>";
     }
   }
 

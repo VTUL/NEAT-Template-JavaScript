@@ -1,4 +1,5 @@
 class PeanutButter extends Pickup {
+  static value = 1000;
   constructor(sprite, width, height) {
     let location = false;
     while(!location) {
