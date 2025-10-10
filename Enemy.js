@@ -1,156 +1,195 @@
 class Enemy {
   //commented out spawns that arent on the outer edges
-  static topLeftSpawn = [
-    //top left
+  static enemySpawns = [
+    //outside the map
+    //left
+    { spawn: {x: -1, y: -1 }},
+    { spawn: {x: -1, y: 0 }},
+    { spawn: {x: -1, y: 1 }},
+    { spawn: {x: -1, y: 2 }},
+    { spawn: {x: -1, y: 3 }},
+    { spawn: {x: -1, y: 4 }},
+    { spawn: {x: -1, y: 5 }},
+    { spawn: {x: -1, y: 6 }},
+    { spawn: {x: -1, y: 7 }},
+    { spawn: {x: -1, y: 8 }},
+    { spawn: {x: -1, y: 9 }},
+    { spawn: {x: -1, y: 10 }},
+    { spawn: {x: -1, y: 11 }},
+    { spawn: {x: -1, y: 12 }},
+    { spawn: {x: -1, y: 13 }},
+    { spawn: {x: -1, y: 14 }},
+    { spawn: {x: -1, y: 15 }},
+    { spawn: {x: -1, y: 16 }},
+    { spawn: {x: -1, y: 17 }},
+    { spawn: {x: -1, y: 18 }},
+    { spawn: {x: -1, y: 19 }},
+    { spawn: {x: -1, y: 20 }},
+    { spawn: {x: -1, y: 21 }},
+    { spawn: {x: -1, y: 22 }},
+    { spawn: {x: -1, y: 23 }},
+    { spawn: {x: -1, y: 24 }},
+    { spawn: {x: -1, y: 25 }},
+    { spawn: {x: -1, y: 26 }},
+    { spawn: {x: -1, y: 27 }},
+    //right
+    { spawn: {x: 23, y: -1 }},
+    { spawn: {x: 23, y: 0 }},
+    { spawn: {x: 23, y: 1 }},
+    { spawn: {x: 23, y: 2 }},
+    { spawn: {x: 23, y: 3 }},
+    { spawn: {x: 23, y: 4 }},
+    { spawn: {x: 23, y: 5 }},
+    { spawn: {x: 23, y: 6 }},
+    { spawn: {x: 23, y: 7 }},
+    { spawn: {x: 23, y: 8 }},
+    { spawn: {x: 23, y: 9 }},
+    { spawn: {x: 23, y: 10 }},
+    { spawn: {x: 23, y: 11 }},
+    { spawn: {x: 23, y: 12 }},
+    { spawn: {x: 23, y: 13 }},
+    { spawn: {x: 23, y: 14 }},
+    { spawn: {x: 23, y: 15 }},
+    { spawn: {x: 23, y: 16 }},
+    { spawn: {x: 23, y: 17 }},
+    { spawn: {x: 23, y: 18 }},
+    { spawn: {x: 23, y: 19 }},
+    { spawn: {x: 23, y: 20 }},
+    { spawn: {x: 23, y: 21 }},
+    { spawn: {x: 23, y: 22 }},
+    { spawn: {x: 23, y: 23 }},
+    { spawn: {x: 23, y: 24 }},
+    { spawn: {x: 23, y: 25 }},
+    { spawn: {x: 23, y: 26 }},
+    { spawn: {x: 23, y: 27 }},
+    //top
+    { spawn: {x: 0, y: -1 }},
+    { spawn: {x: 1, y: -1 }},
+    { spawn: {x: 2, y: -1 }},
+    { spawn: {x: 3, y: -1 }},
+    { spawn: {x: 4, y: -1 }},
+    { spawn: {x: 5, y: -1 }},
+    { spawn: {x: 6, y: -1 }},
+    { spawn: {x: 7, y: -1 }},
+    { spawn: {x: 8, y: -1 }},
+    { spawn: {x: 9, y: -1 }},
+    { spawn: {x: 10, y: -1 }},
+    { spawn: {x: 11, y: -1 }},
+    { spawn: {x: 12, y: -1 }},
+    { spawn: {x: 13, y: -1 }},
+    { spawn: {x: 14, y: -1 }},
+    { spawn: {x: 15, y: -1 }},
+    { spawn: {x: 16, y: -1 }},
+    { spawn: {x: 17, y: -1 }},
+    { spawn: {x: 18, y: -1 }},
+    { spawn: {x: 19, y: -1 }},
+    { spawn: {x: 20, y: -1 }},
+    { spawn: {x: 21, y: -1 }},
+    { spawn: {x: 22, y: -1 }},
+    { spawn: {x: 23, y: -1 }},
+    //bottom
+    { spawn: {x: -1, y: 27 }},
+    { spawn: {x: 0, y: 27 }},
+    { spawn: {x: 1, y: 27 }},
+    { spawn: {x: 2, y: 27 }},
+    { spawn: {x: 3, y: 27 }},
+    { spawn: {x: 4, y: 27 }},
+    { spawn: {x: 5, y: 27 }},
+    { spawn: {x: 6, y: 27 }},
+    { spawn: {x: 7, y: 27 }},
+    { spawn: {x: 8, y: 27 }},
+    { spawn: {x: 9, y: 27 }},
+    { spawn: {x: 10, y: 27 }},
+    { spawn: {x: 11, y: 27 }},
+    { spawn: {x: 12, y: 27 }},
+    { spawn: {x: 13, y: 27 }},
+    { spawn: {x: 14, y: 27 }},
+    { spawn: {x: 15, y: 27 }},
+    { spawn: {x: 16, y: 27 }},
+    { spawn: {x: 17, y: 27 }},
+    { spawn: {x: 18, y: 27 }},
+    { spawn: {x: 19, y: 27 }},
+    { spawn: {x: 20, y: 27 }},
+    { spawn: {x: 21, y: 27 }},
+    { spawn: {x: 22, y: 27 }},
+    { spawn: {x: 23, y: 27 }},
+  ]
 
-    { spawn: {x: -1, y: 3 }, patrol: [{ x: 1, y: 3 }, { x: 10, y: 3 }] },
-    { spawn: {x: 10, y: -1 }, patrol: [{ x: 10, y: 2 }, { x: 1, y: 2 }] },
-    { spawn: { x: -1, y: 7 }, patrol: [{ x: 1, y: 7 }, { x: 10, y: 7 }] },
-    { spawn: { x: -1, y: 14 },  patrol: [{ x: 1, y: 14 }, { x: 10, y: 14 }] },
-    { spawn: { x: -1, y: 12 },  patrol: [{ x: 1, y: 12 }, { x: 10, y: 12 }] },
-    { spawn: { x: -1, y: 10 },  patrol: [{ x: 1, y: 10 }, { x: 10, y: 10 }] },
-    { spawn: { x: 10, y: -1}, patrol: [{ x: 10, y: 2}, { x: 10, y: 10 }] },
-    { spawn: {x: 1, y: -1}, patrol: [{ x: 1, y: 2 }, { x: 1, y: 11 }] },
-
-  ];
-  static topRightSpawn = [
-    //top right
   
-    { spawn: {x: 22, y: 2 }, patrol: [{ x: 20, y: 2 }, { x: 11, y: 2 }] }, 
-    { spawn: {x: 11, y: -1 }, patrol: [{ x: 11, y: 3 }, { x: 20, y: 3 }] },
-    { spawn: { x: 22, y: 7 }, patrol: [{ x: 20, y: 7 }, { x: 11, y: 7 }] },
-    { spawn: { x: 22, y: 14 },  patrol: [{ x: 20, y: 14 }, { x: 11, y: 14 }] },
-    { spawn: { x: 22, y: 12 },  patrol: [{ x: 20, y: 12 }, { x: 11, y: 12 }] },
-    { spawn: { x: 22, y: 10 },  patrol: [{ x: 20, y: 10 }, { x: 11, y: 10 }] },
-    { spawn: { x: 11, y: -1}, patrol: [{ x: 11, y: 2 }, { x: 11, y: 10 }] },
-    { spawn: { x: 20, y: -1}, patrol: [{ x: 20, y: 2 }, { x: 20, y: 9 }] },
-
-  ];
-  static bottomLeftSpawn = [
-    //bottom left
-
-    { spawn: { x: 1, y: 26}, patrol: [{ x: 1, y: 24 }, { x: 1, y: 10 }] },
-    { spawn: { x: 2, y: 26}, patrol: [{ x: 2, y: 24 }, { x: 2, y: 10 }] },
-    { spawn: { x: 4, y: 26}, patrol: [{ x: 4, y: 24 }, { x: 4, y: 10 }] },
-    { spawn: {x: 7, y: 26}, patrol: [{ x: 7, y: 24 }, { x: 7, y: 10 }] },
-    { spawn: {x: -1, y: 17}, patrol: [{ x: 1, y: 17 }, { x: 10, y: 17 }] },
-    { spawn: {x: -1, y: 23}, patrol: [{ x: 1, y: 23 }, { x: 7, y: 23 }] },
-    { spawn: {x: 7, y: 26}, patrol: [{ x: 7, y: 22 }, { x: 14, y: 22 }] },
-    { spawn: {x: -1, y: 24}, patrol: [{ x: 1, y: 24 }, { x: 10, y: 24 }] },
-    
-  ];
-  static bottomRightSpawn = [
-    //bottom right
-
-    { spawn: { x: 20, y: 26}, patrol: [{ x: 20, y: 24 }, { x: 20, y: 10 }] },
-    { spawn: { x: 19, y: 26}, patrol: [{ x: 19, y: 24 }, { x: 19, y: 10 }] },
-    { spawn: {x: 22, y: 17}, patrol: [{ x: 20, y: 17 }, { x: 11, y: 17 }] },
-    { spawn: {x: 14, y: 26}, patrol: [{ x: 14, y: 24 }, { x: 14, y: 10 }] },
-    { spawn: {x: 17, y: 26}, patrol: [{ x: 17, y: 24 }, { x: 17, y: 10 }] },
-    { spawn: {x: 22, y: 24}, patrol: [{ x: 20, y: 24 }, { x: 11, y: 24 }] },
-    { spawn: {x: 14, y: 26}, patrol: [{ x: 14, y: 21 }, { x: 7, y: 21 }] },
-    { spawn: {x: 22, y: 23}, patrol: [{ x: 20, y: 23 }, { x: 14, y: 23 }] },
-    
-  ];
-
-  
-  static topLeftSpawnOptions = [...Enemy.topLeftSpawn];
-  static topRightSpawnOptions = [...Enemy.topRightSpawn];
-  static bottomLeftSpawnOptions = [...Enemy.bottomLeftSpawn];
-  static bottomRightSpawnOptions = [...Enemy.bottomRightSpawn];
+  static enemySpawnOptions = [...Enemy.enemySpawns];
+ 
 
   static resetSpawns() {
-    Enemy.topLeftSpawnOptions = [...Enemy.topLeftSpawn];
-    Enemy.topRightSpawnOptions = [...Enemy.topRightSpawn]; 
-    Enemy.bottomLeftSpawnOptions = [...Enemy.bottomLeftSpawn];
-    Enemy.bottomRightSpawnOptions = [...Enemy.bottomRightSpawn];
+    Enemy.enemySpawnOptions = [...Enemy.enemySpawns];
   }
-  static enemyCount = 0; //static counter shared by all enemies
+
 
   constructor() {
-    let randomIndex;
-    Enemy.enemyCount++;  //increment count on each new enemy
-    this.i = (Enemy.enemyCount % 4) + 1;
-    this.spawnIndex = 0;
-    this.topLef = 8;
-    this.topRig = 8;
-    this.botLef = 8;
-    this.botRig = 8;
-
-    switch (this.i) {
-      case 1:
-        randomIndex = floor(random(Enemy.topLeftSpawnOptions.length));
-        this.spawn = Enemy.topLeftSpawnOptions.splice(randomIndex, 1)[0];
-        break;
-      case 2:
-        randomIndex = floor(random(Enemy.topRightSpawnOptions.length));
-        this.spawn = Enemy.topRightSpawnOptions.splice(randomIndex, 1)[0];
-        break;
-      case 3:
-        randomIndex = floor(random(Enemy.bottomLeftSpawnOptions.length));
-        this.spawn = Enemy.bottomLeftSpawnOptions.splice(randomIndex, 1)[0];
-        break;
-      case 4:
-        randomIndex = floor(random(Enemy.bottomRightSpawnOptions.length));
-        this.spawn = Enemy.bottomRightSpawnOptions.splice(randomIndex, 1)[0];
-        break;
-    }
-
-    this.patrolPoints = this.spawn.patrol;
-  
-    this.x = this.spawn.spawn.x * blockWidth + offsetX + blockWidth / 2;
-    this.y = this.spawn.spawn.y * blockHeight + offsetY + blockHeight / 2;
+    let randomIndex = floor(random(Enemy.enemySpawnOptions.length));
+    this.spawn = Enemy.enemySpawnOptions.splice(randomIndex, 1)[0];
     this.gridX = this.spawn.spawn.x;
     this.gridY = this.spawn.spawn.y;
+
+    //pixel conversion
+    this.x = this.gridX * blockWidth + offsetX + blockWidth / 2;
+    this.y = this.gridY * blockHeight + offsetY + blockHeight / 2;
+
+    //move in to nearest inside bound tile
+    let nearest = this.findNearestValidSpawn(this.gridX, this.gridY);
+    this.targetGrid = { x: nearest.x, y: nearest.y };
 
     this.h = 18;
     this.speed = 5;
     this.w = 36;
-
     this.playInvin = false;
-
     this.currentPatrolIndex = 0;
     this.dropCooldown = 0;
     this.facing = "d";
-
     this.isActive = true;
     this.sprite = new Sprite(squirrel, this.w, this.h, 3);
     this.spriteDown = new Sprite(squirrelDown, this.h, this.w, 4);
-
-    this.spawnTime = millis();
-    //this.collisionDelay = 1500; //if enemy spawns on player, no insta-kill
   }
+
+
 
   moveTo(targetX, targetY) {
     let angle = atan2(targetY - this.y, targetX - this.x);
-    let newX = this.x + this.speed * cos(angle);
-    let newY = this.y + this.speed * sin(angle);
 
-    this.x = newX;
-    this.y = newY  
+    //move toward target
+    this.x += this.speed * cos(angle);
+    this.y += this.speed * sin(angle);
 
+    //update grid
+    this.gridX = Math.floor((this.x - offsetX) / blockWidth);
+    this.gridY = Math.floor((this.y - offsetY) / blockHeight);
+
+    //update facing
     if (abs(targetX - this.x) > abs(targetY - this.y)) {
       this.facing = targetX < this.x ? "a" : "d";
     } else {
       this.facing = targetY < this.y ? "w" : "s";
     }
-  }
+
+    //check if at target
+    let d = dist(this.x, this.y, targetX, targetY);
+    if (d < this.speed) {  
+      this.x = targetX;   
+      this.y = targetY;
+      this.pickNewTarget();
+    }
+
+}
+
+
+
 
   move() {
     //.01% chance per frame to disappear
     if (random(1) < 0.001) {
-      if (this.spawn && this.i == 1) {
-        Enemy.topLeftSpawnOptions.push(this.spawn);
+      if (this.spawn) {
+        Enemy.enemySpawnOptions.push(this.spawn);
       }
-      else if (this.spawn && this.i == 2) {
-        Enemy.topRightSpawnOptions.push(this.spawn);
-      }
-      else if (this.spawn && this.i == 3) {
-        Enemy.bottomLeftSpawnOptions.push(this.spawn);
-      }
-      else if (this.spawn && this.i == 4) {
-        Enemy.bottomRightSpawnOptions.push(this.spawn);
-      }
+     
       this.isActive = false;
       return;
     }
@@ -179,19 +218,74 @@ class Enemy {
   }
 
   patrol() {
-    let targetGrid = this.patrolPoints[this.currentPatrolIndex];
-    let targetX = targetGrid.x * blockWidth + offsetX + blockWidth / 2;
-    let targetY = targetGrid.y * blockHeight + offsetY + blockHeight / 2;
+    if (!this.targetGrid) {
+      this.pickNewTarget();
+    }
+
+    let targetX = this.targetGrid.x * blockWidth + offsetX + blockWidth / 2;
+    let targetY = this.targetGrid.y * blockHeight + offsetY + blockHeight / 2;
+
     let d = dist(this.x, this.y, targetX, targetY);
 
-    if (d < 5) {
-      this.x = targetX;
-      this.y = targetY;
-      this.currentPatrolIndex = (this.currentPatrolIndex + 1) % this.patrolPoints.length;
+    if (d < 1) { 
+      this.pickNewTarget(); 
     } else {
-      this.moveTo(targetX, targetY);
+      this.moveTo(targetX, targetY); 
     }
+  }
+
+
+  pickNewTarget() {
+    //pick a random direction
+    const dirs = ["w", "a", "s", "d"];
+    const dir = random(dirs);
+
+    //random distance
+    const distance = floor(random(3, 6 + 1)); 
+
+    let newX = this.gridX;
+    let newY = this.gridY;
+
+    switch (dir) {
+      case "w": newY -= distance; break;
+      case "s": newY += distance; break;
+      case "a": newX -= distance; break;
+      case "d": newX += distance; break;
+    }
+
+  //step towards target until hitting a wall
+  let stepX = this.gridX;
+  let stepY = this.gridY;
+  let lastValid = { x: stepX, y: stepY };
+
+  let dx = Math.sign(newX - stepX);
+  let dy = Math.sign(newY - stepY);
+
+  while (stepX !== newX || stepY !== newY) {
+    if (this.isWalkable(stepX + dx, stepY + dy)) {
+      stepX += dx;
+      stepY += dy;
+      lastValid = { x: stepX, y: stepY };
+    } else {
+      break; //stop, wall
+    }
+  }
+
+  this.targetGrid = {
+  x: constrain(lastValid.x, 1, MAP_DATA[0].length - 2),
+  y: constrain(lastValid.y, 1, MAP_DATA.length - 2)
+};
+ //set the farthest valid cell in that direction
+
 }
+
+
+isWalkable(x, y) {
+  if (y < 0 || y >= MAP_DATA.length) return false;
+  if (x < 0 || x >= MAP_DATA[0].length) return false;
+  return MAP_DATA[y][x] === "-"; 
+}
+
 
 show() {
   push();
@@ -234,4 +328,20 @@ checkCollision(player) {
   return this.gridX === playerGridX && this.gridY === playerGridY;
 }
 
+findNearestValidSpawn(x, y) {
+  let nearest = fullSpawns[0];
+  let bestDist = dist(x, y, nearest.x, nearest.y);
+
+  for (let s of fullSpawns) {
+    let d = dist(x, y, s.x, s.y);
+    if (d < bestDist) {
+      bestDist = d;
+      nearest = s;
+    }
+  }
+  return nearest;
 }
+
+
+}
+

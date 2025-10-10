@@ -135,9 +135,9 @@ function draw() {
     image(bg, 0, 0, width, height); 
   }
 
-  /*for(var i = 0; i < blocks.length; i++){
+  for(var i = 0; i < blocks.length; i++){
     blocks[i].show();
-  }*/
+  }
 
   for (let i = treats.length - 1; i >= 0; i--) {
     if (treats?.length >= 1) 
@@ -253,7 +253,7 @@ function handleRespawns() {
   }
 
    //respawn enemies if killed and 5 seconds passed
- if (millis() > enemyRespawnTime && enemies.length < 15) {
+ if (millis() > enemyRespawnTime && enemies.length < 20) {
     enemies.push(new Enemy());
     enemyRespawnTime = millis() + 5000; 
   }
@@ -671,7 +671,7 @@ function resetGame() {
     treats.push(new Treat());
   }
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 10; i++) {
     enemies.push(new Enemy());
   }
 

@@ -17,7 +17,7 @@ class Player {
     this.penaltyModifier = 1;
     this.distanceModifier = 500;
 
-    this.genomeInputs = 22; // 4 for walls, 5 for pickups 1 for enemies 22
+    this.genomeInputs = 18; // (4 for walls - not right now), 5 for pickups 1 for enemies 22
     this.genomeOutputs = 5; // Up, Right, Down, Left, Sprint
     this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
     
@@ -269,10 +269,10 @@ class Player {
   const gridY = this.gridY;
 
   //push distances to vision array
-  this.vision.push(map(this.getWallDistances(this.checkUp), 1, 30, 0, 1));
-  this.vision.push(map(this.getWallDistances(this.checkRight), 1, 30, 0, 1));
-  this.vision.push(map(this.getWallDistances(this.checkDown), 1, 30, 0, 1));
-  this.vision.push(map(this.getWallDistances(this.checkLeft), 1, 30, 0, 1));
+  //this.vision.push(map(this.getWallDistances(this.checkUp), 1, 30, 0, 1));
+  //this.vision.push(map(this.getWallDistances(this.checkRight), 1, 30, 0, 1));
+  //this.vision.push(map(this.getWallDistances(this.checkDown), 1, 30, 0, 1));
+  //this.vision.push(map(this.getWallDistances(this.checkLeft), 1, 30, 0, 1));
 
   // --- Nearest treat/enemy grid distances ---
   // Treats: smaller is better (closer is attractive)
@@ -434,7 +434,7 @@ class Player {
       // }
       // if (this.decision[i] > max && this.canMove(directions[i])) {
       
-        if (this.canMove(directions[i]) && !this.prevDir.includes(i)) { //prevent bouncing back and forth but limits decision making
+        if (this.canMove(directions[i]) ) { //prevent bouncing back and forth but limits decision making && !this.prevDir.includes(i)
           if (this.decision[i] >= max) {
             max = this.decision[i];
             maxIndex = i;
@@ -455,13 +455,34 @@ class Player {
       // this.move(directions[Math.floor(Math.random() * directions.length)]);
     // } else {
       //console.info("Decision: ", directions[this.lastDec]);
-      this.prevDir.push(maxIndex);
-      if (this.prevDir.length > 2) this.prevDir.shift();
+      //this.prevDir.push(maxIndex);
+      //if (this.prevDir.length > 2) this.prevDir.shift();
       this.move(directions[this.lastDec]);
     }
       
     // }
   }
+
+    //OLD think method
+    /*think() {
+    let max = 0;
+    let maxIndex = 0;
+    
+    this.decision = this.brain.feedForward(this.vision);
+
+    //movement decision
+    let directions = ["w", "d", "s", "a"];
+    for (let i = 0; i < 5; i++) {
+      if (this.decision[i] > max) {
+        max = this.decision[i];
+        maxIndex = i;
+      }
+    }
+
+    this.isSprinting = this.decision[4] >= 0.7 && this.stamina > 0;
+   
+  }*/
+
 
 
   //helper method to check if a move is possible (not blocked by wall)
@@ -513,7 +534,8 @@ class Player {
   calculateFitness() {
     const exploreReward = this.visitedTiles.size * 1000; //100 points per unique tile
     //this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier)  - this.fitnessPenalty;
-    this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier) + exploreReward - this.fitnessPenalty;
+    //this.fitness = (this.score * this.score * this.pickupRewardModifier) + (this.distanceMarker * this.distanceRewardModifier) + exploreReward - this.fitnessPenalty;
+    this.fitness = (this.score  * this.score)
   }
 
   crossover(parent2) {
