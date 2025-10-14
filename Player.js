@@ -167,10 +167,10 @@ class Player extends Entity {
     this.vision = [];
 
     //push walls to vision array
-    this.vision.push(1/this.checkUp());
-    this.vision.push(1/this.checkRight());
-    this.vision.push(1/this.checkDown());
-    this.vision.push(1/this.checkLeft());
+    this.vision.push(this.checkwall());
+    this.vision.push(this.checkwall());
+    this.vision.push(this.checkwall());
+    this.vision.push(this.checkwall());
 
     this.vision.push(
       map(this.getDistance(enemies, centerX, centerY), 0, 1500, 0, 1)
@@ -191,6 +191,23 @@ class Player extends Entity {
       map(this.getDistance(pb, centerX, centerY), 0, 1500, 0, 1)
     );
 
+  }
+
+  checkWall(condition, direction) {
+    let dist;
+    for(let steps = 1; steps <= direction; steps++) {
+      if (typeof mapGrid[this.currentLocation.y - steps]?.[this.currentLocation.x] === "undefined" || !mapGrid[this.currentLocation.y - steps]?.[this.currentLocation.x]?.valid) {
+        dist = steps;
+        break; 
+      }
+    }
+    return 1/dist;
+  }
+
+  checkOther() {
+    let dist;
+
+    return 1/dist;
   }
 
   checkUp() {
