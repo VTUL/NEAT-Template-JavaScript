@@ -5,7 +5,7 @@ class PeanutButter extends Pickup {
     while(!location) {
       let tempX = getRandomInt(0,15);
       let tempY = getRandomInt(0,18);
-      if(typeof mapGrid[tempY]?.[tempX] !== "undefined" && mapGrid[tempY]?.[tempX]?.valid) {
+      if(typeof mapGrid[tempY]?.[tempX] !== "undefined" && mapGrid[tempY]?.[tempX]?.valid && mapGrid[tempY]?.[tempX]?.occupants.length === 0) {
         location = {
           x: tempX,
           y: tempY

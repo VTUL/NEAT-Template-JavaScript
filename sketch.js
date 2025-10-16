@@ -1,6 +1,6 @@
 var nextConnectionNo = 1000;
 var population;
-var speed = 60;
+var speed = 30;
 
 let mapGrid = JSON.parse(JSON.stringify(mapGridOriginal));
 
@@ -96,12 +96,12 @@ function setup() {
   
   resetGame();
   introTime = millis() + 3000; 
+  frameRate(speed);
 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 function draw() {
-  frameRate(120);
   background(255);
 
   //add treats/collectibles to the screen
@@ -114,9 +114,8 @@ function draw() {
     blocks[i].show();
   }*/
 
-  for (let i = treats.length - 1; i >= 0; i--) {
-    if (treats?.length >= 1) 
-      treats[i].show();
+  for (let i = 0; i < treats.length; i++) {
+    treats[i].show();
   }
 
   if (beds?.length >= 1) {
@@ -263,9 +262,8 @@ function handleRespawns() {
   }
 
   //respawn treats 
- if (treats.length < 25) {
+ if (treats.length < 15) {
     treats.push(new Treat(treat, 16, 16));
-    
   }
 
   //remove expired anti items
@@ -275,9 +273,10 @@ function handleRespawns() {
   //   }
   // }
   //remove expired treats causes game to crash
-for (let i = treats.length - 1; i >= 0; i--) {
+
+for (let i = 0; i < treats.length; i++) {
   if (treats[i].life < millis()) {
-    // treats[i].eaten(); //call eaten to reset spawn point
+    treats[i].deregisterLocation();
     treats.splice(i, 1);
   }
 }
@@ -285,6 +284,7 @@ for (let i = treats.length - 1; i >= 0; i--) {
   //remove expired peanut butter
 for (let i = pb.length - 1; i >= 0; i--) {
   if (pb[i].life < millis()) {
+    pb[i].deregisterLocation();
     pb.splice(i, 1);
   }
 }
@@ -292,6 +292,7 @@ for (let i = pb.length - 1; i >= 0; i--) {
 //remove expired beds
 for (let i = beds.length - 1; i >= 0; i--) {
   if (beds[i].life < millis()) {
+    beds[i].deregisterLocation();
     beds.splice(i, 1);
   }
 }
@@ -299,6 +300,7 @@ for (let i = beds.length - 1; i >= 0; i--) {
 //remove expired tennis balls
 for (let i = balls.length - 1; i >= 0; i--) {
   if (balls[i].life < millis()) {
+    balls[i].deregisterLocation();
     balls.splice(i, 1);
   }
 }
@@ -473,21 +475,24 @@ function writeInfo() {
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 
 function keyPressed() {
+  console.info("key pressed", key)
   switch (key) {
     case ' ':
       //toggle showBest
       showBest = !showBest;
       break;
-       case '+': //speed up frame rate
-         speed += 10;
+       case 'k': //speed up frame rate
+        //  console.log("Plus pressed");
+         speed = frameRate() + 30;
+         console.info("speed", speed);
          frameRate(speed);
-         prvarln(speed);
+        //  prvarln(speed);
          break;
-       case '-': //slow down frame rate
-         if(speed > 10) {
-           speed -= 10;
+       case 'm': //slow down frame rate
+         if(speed > 40) {
+           speed = frameRate() - 30;
            frameRate(speed);
-           prvarln(speed);
+          //  prvarln(speed);
          }
          break;
     case 'B': //run the best

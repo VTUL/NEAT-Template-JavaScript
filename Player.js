@@ -8,13 +8,14 @@ class Player extends Entity {
           this.dead = true;
           return;
         } else if(occupant.type === 2 || occupant.type === 3) {
-          if(this.occupant.type === 2) {
+          if(occupant.type === 2) {
             for(let i = 0; i <= treats.length; i++) {
-              if (treats[i].uuid === occupant.id) {
-                if(treats[i].idList.contains(this.uuid)) {
+              if (treats[i]?.uuid === occupant.id) {
+                if(treats[i].idList.includes(this.uuid)) {
                   return;
                 } else {
                   this.score += occupant.type === 2 ? Treat.value : PeanutButter.value;
+                  treats[i].idList.push(this.uuid);
                 }
               }
             }
@@ -47,7 +48,7 @@ class Player extends Entity {
     this.penaltyModifier = 100;
     // this.distanceModifier = 500;
 
-    this.genomeInputs = 9; // 4 for walls, 5 for pickups 1 for enemies
+    this.genomeInputs = 24; // 4 for walls, 5 for pickups 1 for enemies
     this.genomeOutputs = 5; // Up, Right, Down, Left, Sprint
     this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
 
@@ -165,125 +166,101 @@ class Player extends Entity {
 
   look() {
     this.vision = [];
-
     //push walls to vision array
-    this.vision.push(this.checkwall());
-    this.vision.push(this.checkwall());
-    this.vision.push(this.checkwall());
-    this.vision.push(this.checkwall());
+    this.vision.push(this.checkWall(1));
+    this.vision.push(this.checkWall(2));
+    this.vision.push(this.checkWall(3));
+    this.vision.push(this.checkWall(4));
 
-    this.vision.push(
-      map(this.getDistance(enemies, centerX, centerY), 0, 1500, 0, 1)
-    );
-    this.vision.push(
-      map(this.getDistance(treats, centerX, centerY), 0, 1500, 0, 1)
-    );
-    // this.vision.push(
-    //   map(this.getDistance(anti, centerX, centerY), 0, 1500, 0, 1)
-    // );
-    this.vision.push(
-      map(this.getDistance(balls, centerX, centerY), 0, 1500, 0, 1)
-    );
-    this.vision.push(
-      map(this.getDistance(beds, centerX, centerY), 0, 1500, 0, 1)
-    );
-    this.vision.push(
-      map(this.getDistance(pb, centerX, centerY), 0, 1500, 0, 1)
-    );
-
+    //push enemies to vision array
+    this.vision.push(this.checkOther(1, 1));
+    this.vision.push(this.checkOther(2, 1));
+    this.vision.push(this.checkOther(3, 1));
+    this.vision.push(this.checkOther(4, 1));
+    //push pickups to vision array
+    this.vision.push(this.checkOther(1, 2));
+    this.vision.push(this.checkOther(2, 2));
+    this.vision.push(this.checkOther(3, 2));
+    this.vision.push(this.checkOther(4, 2));
+    this.vision.push(this.checkOther(1, 3));
+    this.vision.push(this.checkOther(2, 3));
+    this.vision.push(this.checkOther(3, 3));
+    this.vision.push(this.checkOther(4, 3));
+    this.vision.push(this.checkOther(1, 4));
+    this.vision.push(this.checkOther(2, 4));
+    this.vision.push(this.checkOther(3, 4));
+    this.vision.push(this.checkOther(4, 4));
+    this.vision.push(this.checkOther(1, 5));
+    this.vision.push(this.checkOther(2, 5));
+    this.vision.push(this.checkOther(3, 5));
+    this.vision.push(this.checkOther(4, 5));
   }
 
-  checkWall(condition, direction) {
-    let dist;
-    for(let steps = 1; steps <= direction; steps++) {
-      if (typeof mapGrid[this.currentLocation.y - steps]?.[this.currentLocation.x] === "undefined" || !mapGrid[this.currentLocation.y - steps]?.[this.currentLocation.x]?.valid) {
-        dist = steps;
-        break; 
+  checkWall(direction) {
+    for(let steps = 1; steps <= 19; steps++) {
+      let tempX;
+      let tempY;
+      switch(direction){
+        case 1:
+          tempX = 0;
+          tempY = 0 - steps;
+          break;
+        case 2:
+          tempX = steps;
+          tempY = 0;
+          break;
+        case 3:
+          tempX = 0;
+          tempY = steps;
+          break;
+        case 4:
+          tempX = 0 - steps;
+          tempY = 0;
+          break;
+      }
+      if (typeof mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX] === "undefined" || !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.valid) {
+        return 1/steps;
       }
     }
-    return 1/dist;
   }
 
-  checkOther() {
-    let dist;
-
-    return 1/dist;
-  }
-
-  checkUp() {
-    let dist;
-    for(let steps = 1; steps <= gridRows; steps++) {
-      if (typeof mapGrid[this.currentLocation.y - steps]?.[this.currentLocation.x] === "undefined" || !mapGrid[this.currentLocation.y - steps]?.[this.currentLocation.x]?.valid) {
-        dist = steps;
-        break; 
+  checkOther(direction, target) {
+    for(let steps = 1; steps <= 19; steps++) {
+      let tempX;
+      let tempY;
+      switch(direction){
+        case 1:
+          tempX = 0;
+          tempY = 0 - steps;
+          break;
+        case 2:
+          tempX = steps;
+          tempY = 0;
+          break;
+        case 3:
+          tempX = 0;
+          tempY = steps;
+          break;
+        case 4:
+          tempX = 0 - steps;
+          tempY = 0;
+          break;
       }
+      if (typeof mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX] === "undefined" || !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.valid) {
+        return 0;
+      } else if (mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => occupant.type === target) && !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))){
+        return 1/steps;
+      } 
     }
-    return dist;
-  }
-
-  checkRight() {
-    let dist;
-    for(let steps = 1; steps <= gridColumns; steps++) {
-      if (typeof mapGrid[this.currentLocation.y]?.[this.currentLocation.x + steps] === "undefined" || !mapGrid[this.currentLocation.y]?.[this.currentLocation.x + steps]?.valid) {
-        dist = steps;
-        break; 
-      }
-    }
-    return dist;
-  }
-
-  checkDown() {
-    let dist;
-    for(let steps = 1; steps <= gridRows; steps++) {
-      if (typeof mapGrid[this.currentLocation.y + steps]?.[this.currentLocation.x] === "undefined" || !mapGrid[this.currentLocation.y + steps]?.[this.currentLocation.x]?.valid) {
-        dist = steps;
-        break; 
-      }
-    }
-    return dist;
-  }
-
-  checkLeft() {
-    let dist;
-    for(let steps = 1; steps <= gridColumns; steps++) {
-      if (typeof mapGrid[this.currentLocation.y]?.[this.currentLocation.x - steps] === "undefined" || !mapGrid[this.currentLocation.y]?.[this.currentLocation.x - steps]?.valid) {
-        dist = steps;
-        break; 
-      }
-    }
-    return dist;
-  }
-
-  getDistance(targets, centerX, centerY) {
-    if (!targets || targets.length === 0) {
-      return 1500;
-    }
-    return targets?.reduce((accumulator, currentValue) => {
-      if (currentValue.idList?.includes(this.uuid)) {
-        return accumulator;
-      }
-      const temp =
-        Math.abs(centerX - currentValue.x) + Math.abs(centerY - currentValue.y);
-      if (temp < accumulator) {
-        return temp;
-      }
-      return accumulator;
-    }, 1500);
   }
 
   think() {
     let max = 0;
     let maxIndex = 0;
-    // console.info("Vision - Up: ", this.vision[0]);
-    // console.info("Vision - Right: ", this.vision[1]);
-    // console.info("Vision - Down: ", this.vision[2]);
-    // console.info("Vision - Left: ", this.vision[3]);
-    // console.info("Vision - Enemies: ", this.vision[4]);
-    // console.info("Vision - Treats: ", this.vision[5]);
-    // console.info("Vision - Anti: ", this.vision[6]);
-    // console.info("Vision - balls: ", this.vision[7]);
-    // console.info("Vision - Ball: ", this.vision[8]);
-    // console.info("Vision - PB: ", this.vision[9]);
+    // console.info("Vision - tUp: ", this.vision[8]);
+    // console.info("Vision - tRight: ", this.vision[9]);
+    // console.info("Vision - tDown: ", this.vision[10]);
+    // console.info("Vision - tLeft: ", this.vision[11]);
 
     //movement decision
     let directions = ["w", "d", "s", "a"];
