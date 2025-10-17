@@ -481,14 +481,14 @@ function keyPressed() {
       //toggle showBest
       showBest = !showBest;
       break;
-       case 'k': //speed up frame rate
+       case 'I': //speed up frame rate
         //  console.log("Plus pressed");
          speed = frameRate() + 30;
          console.info("speed", speed);
          frameRate(speed);
         //  prvarln(speed);
          break;
-       case 'm': //slow down frame rate
+       case 'U': //slow down frame rate
          if(speed > 40) {
            speed = frameRate() - 30;
            frameRate(speed);

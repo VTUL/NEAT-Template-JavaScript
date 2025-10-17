@@ -48,7 +48,7 @@ class Player extends Entity {
     this.penaltyModifier = 100;
     // this.distanceModifier = 500;
 
-    this.genomeInputs = 24; // 4 for walls, 5 for pickups 1 for enemies
+    this.genomeInputs = 29; // 4 for walls, 5 for pickups 1 for enemies
     this.genomeOutputs = 5; // Up, Right, Down, Left, Sprint
     this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
 
@@ -194,6 +194,14 @@ class Player extends Entity {
     this.vision.push(this.checkOther(2, 5));
     this.vision.push(this.checkOther(3, 5));
     this.vision.push(this.checkOther(4, 5));
+    //push directionality of valid treat
+    this.vision.push(this.checkDownArea());
+    this.vision.push(this.checkRightArea());
+    //sprinting to array
+    this.vision.push(100/this.stamina);
+    this.vision.push(5/this.speed);
+    //push invincibility to array
+    this.vision.push(this.isInvincible ? 1 : 0);
   }
 
   checkWall(direction) {
@@ -254,12 +262,36 @@ class Player extends Entity {
     }
   }
 
+  checkDownArea() {
+    for(let rows = this.currentLocation.y + 1; rows <= gridRows; rows++) {
+      for(let steps = 1; steps <= gridColumns - 1; steps++) {
+        if(rows >= gridRows) {
+          return 0;
+        } else if (mapGrid[rows]?.[steps]?.occupants.some(occupant => occupant.type === 2) && !mapGrid[rows]?.[steps]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))) {
+          return 1;
+        }
+      }
+    }
+  }
+
+  checkRightArea() {
+    for(let columns = this.currentLocation.x + 1; columns <= gridColumns; columns++) {
+      for(let steps = 1; steps <= gridRows - 1; steps++) {
+        if(columns >= gridColumns) {
+          return 0;
+        } else if (mapGrid[steps]?.[columns]?.occupants.some(occupant => occupant.type === 2) && !mapGrid[steps]?.[columns]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))) {
+          return 1;
+        }
+        }
+    }
+  }
+
   think() {
     let max = 0;
     let maxIndex = 0;
     // console.info("Vision - tUp: ", this.vision[8]);
-    // console.info("Vision - tRight: ", this.vision[9]);
-    // console.info("Vision - tDown: ", this.vision[10]);
+    // console.info("Vision - tRight: ", this.vision[25]);
+    // console.info("Vision - tDown: ", this.vision[24]);
     // console.info("Vision - tLeft: ", this.vision[11]);
 
     //movement decision
@@ -273,7 +305,9 @@ class Player extends Entity {
       }
     }
 
+    if(this.decision[4] > 0.5) {this.isSprinting = true};
     this.move(directions[maxIndex]);
+
   }
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
