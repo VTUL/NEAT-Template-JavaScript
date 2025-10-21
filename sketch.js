@@ -68,7 +68,7 @@ function preload(){
   squirrelDown = loadImage("spriteSheets/EnemyDown.png");
   squirrelRight = loadImage("spriteSheets/EnemyRight.png");
   squirrelUp = loadImage("spriteSheets/EnemyUp.png");
-  treat = loadImage("images/Dog_Treat.png");
+  treat = loadImage("images\Treat_Dark_Outline.png");
   peanut = loadImage("images/Peanut_Butter.png");
   derekLeft = loadImage("spriteSheets/DerekLeft.png");
   derekUp = loadImage("spriteSheets/DerekUp.png");
@@ -148,37 +148,6 @@ function draw() {
   //   a.show();
   // }
   
-  //placeholder text so player knows how to start playing
-  if (!humanPlaying && !runBest && !showBestEachGen) {
-    noStroke();
-    fill(255);
-    textAlign(RIGHT, BOTTOM); 
-    textSize(24);
-    text("Press P to play as human", width - 10, height - 4);
-  }
-
-  if (!showBestEachGen) {
-    noStroke();
-    fill(255);
-    textAlign(LEFT, BOTTOM); 
-    textSize(24);
-    text("Press G to see best AI each gen", 400, height - 4);
-  }
-
-    noStroke();
-    fill(0);
-    textAlign(CENTER, TOP); 
-    textSize(24);
-    text("Press J to play as another dog!", 540, 50);
-
-  //placeholder text for debugging
-  if (showBest) {
-    noStroke();
-    fill(255);
-    textAlign(LEFT, BOTTOM); 
-    textSize(24);
-    text("Press Space to see all AI runs", 10, height - 4);
-  }
 
   //lets player know if AI is playing
   if (!humanPlaying) {
