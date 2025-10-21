@@ -23,7 +23,7 @@ class Player extends Entity {
           
         } else if(occupant.type === 4) {
           this.stamina = 100;
-        } else {
+        } else if(occupant.type === 5) {
           this.isInvincible = true;
           this.isInvinUntil = 10000;
         }
