@@ -2,6 +2,7 @@ class Enemy extends Entity {
   static enemyCount = 0; // static counter shared by all enemies
 
   constructor() {
+    //Is this collision callback needed here?
     const collisionCallback = (collisions) => {
   collisions.forEach((occupant) => {
     if (occupant.type === 0) {
@@ -11,7 +12,8 @@ class Enemy extends Entity {
     } else {
       // AI players
       let deadPlayer = population.players.filter((player) => occupant.id === player.uuid);
-      if (deadPlayer[0] && !deadPlayer.isInvincible) deadPlayer[0].dead = true;
+      if (deadPlayer[0] && !deadPlayer[0].isInvincible) deadPlayer[0].dead = true;
+      
     }
   });
 };

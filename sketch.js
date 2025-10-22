@@ -470,20 +470,20 @@ function keyPressed() {
     case 'J':
       //switch to next dog sprite
       if (humanPlaying) {
-        humanPlayer.i = (humanPlayer.i + 1) % humanPlayer.sprite.length;
+        humanPlayer.i = (humanPlayer.i + 1) % 3;
       }
       else if (showBestEachGen) {
-        genPlayerTemp.i = (genPlayerTemp.i + 1) % genPlayerTemp.sprite.length;
+        genPlayerTemp.i = (genPlayerTemp.i + 1) % 3;
       }
       else if (showBest) {
-        population.players[0].i = (population.players[0].i + 1) % population.players[0].sprite.length;
+        population.players[0].i = (population.players[0].i + 1) % 3;
       }
       else if (runBest) {
-        population.bestPlayer.i = (population.bestPlayer.i + 1) % population.bestPlayer.sprite.length;
+        population.bestPlayer.i = (population.bestPlayer.i + 1) % 3;
       }
       else if (population && population.players) {
         for (let player of population.players) {
-          player.i = (player.i + 1) % player.sprite.length;
+          player.i = (player.i + 1) % 3;
         }
 }
   }

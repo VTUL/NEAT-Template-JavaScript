@@ -5,7 +5,9 @@ class Player extends Entity {
       collisions.forEach((occupant) => {
         if(occupant.type === 1) {
           // console.log("Dog collided with Squirrel");
-          this.dead = true;
+          if(!this.isInvincible) {
+            this.dead = true;
+          }
           return;
         } else if(occupant.type === 2 || occupant.type === 3) {
           if(occupant.type === 2) {
@@ -126,8 +128,7 @@ class Player extends Entity {
     this.spriteRight = [this.derekRight, this.epcotRight, this.josieRight];
     this.spriteUp = [this.derekUp, this.epcotUp, this.josieUp];
     this.spriteDown = [this.derekDown, this.epcotDown, this.josieDown];
-    //this.sprite = [this.derek, this.epcot, this.josie];
-    this.i = getRandomInt(0,2);
+    this.i = 0;
 
     this.distanceTrackerX = this.x;
     this.distanceTrackerY = this.y;
