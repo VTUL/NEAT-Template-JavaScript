@@ -68,7 +68,7 @@ function preload(){
   squirrelDown = loadImage("spriteSheets/EnemyDown.png");
   squirrelRight = loadImage("spriteSheets/EnemyRight.png");
   squirrelUp = loadImage("spriteSheets/EnemyUp.png");
-  treat = loadImage("images\Treat_Dark_Outline.png");
+  treat = loadImage("images/Treat_Dark_Outline.png");
   peanut = loadImage("images/Peanut_Butter.png");
   derekLeft = loadImage("spriteSheets/DerekLeft.png");
   derekUp = loadImage("spriteSheets/DerekUp.png");
@@ -232,7 +232,7 @@ function handleRespawns() {
 
   //respawn treats 
  if (treats.length < 15) {
-    treats.push(new Treat(treat, 16, 16));
+    treats.push(new Treat(treat, 20, 20));
   }
 
   //remove expired anti items
@@ -290,21 +290,6 @@ function drawStaminaBar(player) {
   stroke(255);
   noFill();
   rect(20, 20, barWidth, barHeight);
-}
-
-function drawArrow() {
-  let tempSprite = new Sprite(derek, 64, 32, 4);
-  imageMode(CENTER);
-  image(arrow, 480, 430, 30, 30);
-  imageMode(CORNER);
-
-  noStroke();
-  fill(0);
-  textAlign(LEFT, TOP); 
-  textSize(20);
-  text("This is the player", 470, 390);
-  translate(510, 420); 
-  tempSprite.draw();
 }
 
 
@@ -645,7 +630,7 @@ function resetGame() {
   treatRemoveTime = millis() + 1000;        //treats removed after 1 second
 
   for (let i = 0; i < 25; i++) {
-    treats.push(new Treat(treat, 16, 16));
+    treats.push(new Treat(treat, 20, 20));
   }
 
   for (let i = 0; i < 5; i++) {

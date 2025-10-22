@@ -69,16 +69,16 @@ class Player extends Entity {
     //sprite variables
     this.derekRight = new Sprite(derekRight, 86, 46, 4);
     this.derekLeft = new Sprite(derekLeft, 86, 46, 4);
-    this.derekUp = new Sprite(derekUp, 43, 80, 4);
-    this.derekDown = new Sprite(derekDown, 46, 86, 4);
+    this.derekUp = new Sprite(derekUp, 40, 100, 4);
+    this.derekDown = new Sprite(derekDown, 40, 100, 4);
     this.epcotRight = new Sprite(epcotRight, 86, 46, 4);
     this.epcotLeft = new Sprite(epcotLeft, 86, 46, 4);
-    this.epcotUp = new Sprite(epcotUp, 43, 80, 4);
-    this.epcotDown = new Sprite(epcotDown, 46, 86, 4);
+    this.epcotUp = new Sprite(epcotUp, 40, 100, 4);
+    this.epcotDown = new Sprite(epcotDown, 40, 100, 4);
     this.josieRight = new Sprite(josieRight, 86, 46, 4);
     this.josieLeft = new Sprite(josieLeft, 86, 46, 4);
-    this.josieUp = new Sprite(josieUp, 43, 80, 4);
-    this.josieDown = new Sprite(josieDown, 46, 86, 4);
+    this.josieUp = new Sprite(josieUp, 40, 100, 4);
+    this.josieDown = new Sprite(josieDown, 40, 100, 4);
     this.spriteLeft = [this.derekLeft, this.epcotLeft, this.josieLeft];
     this.spriteRight = [this.derekRight, this.epcotRight, this.josieRight];
     this.spriteUp = [this.derekUp, this.epcotUp, this.josieUp];

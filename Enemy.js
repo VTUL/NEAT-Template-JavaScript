@@ -27,9 +27,9 @@ class Enemy extends Entity {
 
     this.isActive = true;
     this.spriteLeft = new Sprite(squirrelLeft, 48, 24, 3);
-    this.spriteDown = new Sprite(squirrelDown, 24, 24, 4);
+    this.spriteDown = new Sprite(squirrelDown, 24, 48, 4);
     this.spriteRight = new Sprite(squirrelRight, 48, 24, 3);
-    this.spriteUp = new Sprite(squirrelUp, 24, 24, 4);
+    this.spriteUp = new Sprite(squirrelUp, 24, 48, 4);
 
     this.spawnTime = millis();
   }
