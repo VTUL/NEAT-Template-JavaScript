@@ -3,15 +3,18 @@ class Enemy extends Entity {
 
   constructor() {
     const collisionCallback = (collisions) => {
-      collisions.forEach((occupant) => {
-        if(occupant.type === 0) {          
-          let deadPlayer = population.players.filter((player) => {
-            return occupant.id === player.uuid;
-          })
-          deadPlayer[0].dead = true;
-        }
-      })
+  collisions.forEach((occupant) => {
+    if (occupant.type === 0) {
+      if (humanPlaying && !humanPlayer.isInvincible) {
+        humanPlayer.dead = true;
+      }
+    } else {
+      // AI players
+      let deadPlayer = population.players.filter((player) => occupant.id === player.uuid);
+      if (deadPlayer[0] && !deadPlayer.isInvincible) deadPlayer[0].dead = true;
     }
+  });
+};
 
     const whichWall = getRandomInt(1,4);
     const spawnX = whichWall === 1 ? 0 : whichWall === 2 ? 15 : getRandomInt(1,14); 

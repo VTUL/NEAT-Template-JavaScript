@@ -14,18 +14,61 @@ class Player extends Entity {
                 if(treats[i].idList.includes(this.uuid)) {
                   return;
                 } else {
-                  this.score += occupant.type === 2 ? Treat.value : PeanutButter.value;
+                  //OG:this.score += occupant.type === 2 ? Treat.value : PeanutButter.value;
+                  this.score += Treat.value
                   treats[i].idList.push(this.uuid);
+                  if(humanPlaying) {
+                    treats[i].deregisterLocation();
+                    treats.splice(i, 1);
+                  }
                 }
               }
             }
           }
+          else if(occupant.type === 3) {
+            if (pb[0]?.uuid === occupant.id) {
+              if(pb[0].idList.includes(this.uuid)) {
+                return;
+              } else {
+                this.score += PeanutButter.value;
+                pb[0].idList.push(this.uuid);
+                if(humanPlaying) {
+                  pb[0].deregisterLocation();
+                  pb.splice(0, 1);
+                }
+              }
+            }
+          }
+            
+          
           
         } else if(occupant.type === 4) {
-          this.stamina = 100;
+          if (beds[0]?.uuid === occupant.id) {
+            if(beds[0].idList.includes(this.uuid)) {
+              return;
+            } else {
+              beds[0].idList.push(this.uuid);
+              this.stamina = 100;
+              if(humanPlaying) {
+                  beds[0].deregisterLocation();
+                  beds.splice(0, 1);
+                }
+            }
+          }
         } else if(occupant.type === 5) {
-          this.isInvincible = true;
-          this.isInvinUntil = 10000;
+          if (balls[0]?.uuid === occupant.id) {
+            if(balls[0].idList.includes(this.uuid)) {
+              return;
+            } else {
+              balls[0].idList.push(this.uuid);
+              this.isInvincible = true;
+              this.isInvinUntil = 10000 + millis();
+              if(humanPlaying) {
+                  balls[0].deregisterLocation();
+                  balls.splice(0, 1);
+                }
+            }
+          }
         }
       })
     }
@@ -83,6 +126,7 @@ class Player extends Entity {
     this.spriteRight = [this.derekRight, this.epcotRight, this.josieRight];
     this.spriteUp = [this.derekUp, this.epcotUp, this.josieUp];
     this.spriteDown = [this.derekDown, this.epcotDown, this.josieDown];
+    //this.sprite = [this.derek, this.epcot, this.josie];
     this.i = getRandomInt(0,2);
 
     this.distanceTrackerX = this.x;

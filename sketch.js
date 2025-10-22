@@ -24,6 +24,7 @@ let bedsRespawnTime = 0;
 let treatRemoveTime = 0; 
 let ballRespawnTime = 0;
 let enemyRespawnTime = 0;
+let deathMessageTime = 0;
 let introTime = 0;
 let pb = [];
 
@@ -131,7 +132,7 @@ function draw() {
   //move and show enemies, remove inactive
   for (let i = enemies.length - 1; i >= 0; i--) {
     enemies[i].patrol();
-    // enemies[i].show();
+    enemies[i].show();
 
     // if (!enemies[i].isActive) {
     //   enemies.splice(i, 1); //0.1% chance to disappear
@@ -144,9 +145,6 @@ function draw() {
   // point(population.players[0].x,population.players[0].y)
   // }
 
-  // for (let a of anti) {
-  //   a.show();
-  // }
   
 
   //lets player know if AI is playing
@@ -171,11 +169,8 @@ function draw() {
       population.updateAlive();
       for (let i = 0; i < population.players.length; i++) {
         if (!population.players[i].dead) {
-          handleInteractions(population.players[i]);
+          //handleInteractions(population.players[i]);
         }
-      }
-      for(let j = 0; j < enemies.length; j++) {
-        enemies[j].show();
       }
     } else { //all dead
       //genetic algorithm
@@ -196,8 +191,12 @@ function draw() {
     drawStaminaBar(population.players[0]);
   }
 
-  /*if(millis() < introTime)
-    drawArrow();*/
+  if (millis() - deathMessageTime < 2000 && deathMessageTime !== 0) {
+    fill(255);
+    textAlign(CENTER, TOP); 
+    textSize(60);
+    text("You Got Distracted!", 540, 460);
+  }
 
 }
 
@@ -320,7 +319,7 @@ function showBestPlayersForEachGeneration() {
     genPlayerTemp.think();
     genPlayerTemp.update();
     genPlayerTemp.show();
-    handleInteractions(genPlayerTemp);
+    //handleInteractions(genPlayerTemp);
   } else { //if dead move on to the next generation
     upToGen++;
     if (upToGen >= population.genPlayers.length) { //if at the end then return to the start and stop doing it
@@ -337,11 +336,12 @@ function showHumanPlaying() {
     humanPlayer.look();
     humanPlayer.update();
     humanPlayer.show();
-    handleInteractions(humanPlayer); //handle interactions with treats, enemies, and the tennis ball
+    //handleInteractions(humanPlayer); //handle interactions with treats, enemies, and the tennis ball
 
   }
   else { //once done return to ai
     humanPlaying = false;
+    deathMessageTime = millis();
     //different way to let the user know they died
     /*
     fill(255);
@@ -358,7 +358,7 @@ function showBestEverPlayer() {
     population.bestPlayer.think();
     population.bestPlayer.update();
     population.bestPlayer.show();
-    handleInteractions(bestPlayer);
+    //handleInteractions(bestPlayer);
   } else { //once dead
     runBest = false; //stop replaying it
     population.bestPlayer = population.bestPlayer.cloneForReplay(); //reset the best player so it can play again
@@ -462,7 +462,8 @@ function keyPressed() {
     case 'N': //show absolutely nothing in order to speed up computation
       showNothing = !showNothing;
       break;
-    case 'P': //play
+    case 'P': //playz
+      resetGame();
       humanPlaying = !humanPlaying;
       humanPlayer = new Player();
       break;
@@ -514,7 +515,7 @@ function keyPressed() {
 }
 
 //maybe have unique function for humanplayer where things disappear
-function handleInteractions(player) {
+/*function handleInteractions(player) {
   if (player.dead) return;
 
   //Treats
@@ -576,7 +577,7 @@ function handleInteractions(player) {
   //     anti[i].playInvin = false; 
   //   }
   // }
-  }
+  }*/
 
   //Enemies
   // for (let i = enemies.length - 1; i >= 0; i--) {
