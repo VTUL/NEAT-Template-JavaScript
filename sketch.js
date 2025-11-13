@@ -375,10 +375,10 @@ function drawToScreen() {
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function drawBrain() { //show the brain of whatever genome is currently showing
-  var startX = 600; //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+  var startX = 800; //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
   var startY = 10;
-  var w = 600;
-  var h = 400;
+  var w = 400;
+  var h = 90;
 
   if (runBest) {
     population.bestPlayer.brain.drawGenome(startX, startY, w, h);
