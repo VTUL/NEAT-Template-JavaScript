@@ -375,10 +375,10 @@ function drawToScreen() {
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function drawBrain() { //show the brain of whatever genome is currently showing
-  var startX = 0; //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-  var startY = 0;
-  var w = 0;
-  var h = 0;
+  var startX = 600; //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+  var startY = 10;
+  var w = 600;
+  var h = 400;
 
   if (runBest) {
     population.bestPlayer.brain.drawGenome(startX, startY, w, h);
@@ -390,6 +390,11 @@ function drawBrain() { //show the brain of whatever genome is currently showing
   } else {
     population.players[0].brain.drawGenome(startX, startY, w, h);
   }
+
+  //write the info to the HTML div
+  /*let canvas2 = document.getElementById("canvas2");
+  if (canvas2) {
+    canvas2.innerHTML = brain;*/
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //writes info about the current player
