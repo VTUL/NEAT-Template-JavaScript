@@ -9,11 +9,12 @@ class Enemy extends Entity {
       if (humanPlaying && !humanPlayer.isInvincible) {
         humanPlayer.dead = true;
       }
-    } else {
+      else {
       // AI players
       let deadPlayer = population.players.filter((player) => occupant.id === player.uuid);
       if (deadPlayer[0] && !deadPlayer[0].isInvincible) deadPlayer[0].dead = true;
       
+      }
     }
   });
 };
