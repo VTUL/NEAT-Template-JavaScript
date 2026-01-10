@@ -128,7 +128,9 @@ class Player extends Entity {
     this.spriteRight = [this.derekRight, this.epcotRight, this.josieRight];
     this.spriteUp = [this.derekUp, this.epcotUp, this.josieUp];
     this.spriteDown = [this.derekDown, this.epcotDown, this.josieDown];
-    this.i = 0;
+    this.i = floor(random(3));
+
+    
 
     this.distanceTrackerX = this.x;
     this.distanceTrackerY = this.y;

@@ -99,6 +99,25 @@ function setup() {
   introTime = millis() + 3000; 
   frameRate(speed);
 
+  var acc = document.getElementsByClassName("accordion");
+  var i;
+
+  for (i = 0; i < acc.length; i++) {
+    acc[i].addEventListener("click", function() {
+      /* Toggle between adding and removing the "active" class,
+      to highlight the button that controls the panel */
+      this.classList.toggle("active");
+
+      /* Toggle between hiding and showing the active panel */
+      var panel = this.nextElementSibling;
+      if (panel.style.display === "block") {
+        panel.style.display = "none";
+      } else {
+        panel.style.display = "block";
+      }
+    });
+  }
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -403,7 +422,7 @@ function writeInfo() {
 
   if (showBestEachGen) {
     info += "Score: " + genPlayerTemp.score + "<br>";
-    info += "Gen: " + (genPlayerTemp.gen + 1) + "<br>";
+    info += "Generation: " + (genPlayerTemp.gen + 1) + "<br>";
   } else if (humanPlaying) {
     info += "Score: " + humanPlayer.score + "<br>";
   } else if (runBest) {
@@ -412,13 +431,21 @@ function writeInfo() {
   } else {
     if (showBest) {
       info += "Score: " + population.players[0].score + "<br>";
-      info += "Gen: " + population.gen + "<br>";
+      info += "Generation: " + population.gen + "<br>";
       info += "Species: " + population.species.length + "<br>";
       info += "Global Best Score: " + population.bestScore + "<br>";
     }
     else{
+      //added this code because population.players[0].score is measured by fitness scores, not actual game score 
+      let bestScoreThisGen = 0;
+      for (let i = 0; i < population.players.length; i++) {
+        if (population.players[i].score > bestScoreThisGen) {
+            bestScoreThisGen = population.players[i].score;
+        }
+      }
       //when all runs visible 
-      info += "Gen: " + population.gen + "<br>";
+      info += "Best Score this Gen: " + bestScoreThisGen + "<br>";
+      info += "Generation: " + population.gen + "<br>";
       info += "Species: " + population.species.length + "<br>";
       info += "Global Best Score: " + population.globalBestScore + "<br>";
     }
@@ -474,7 +501,7 @@ function keyPressed() {
       break;
     case 'J':
       //switch to next dog sprite
-      if (humanPlaying) {
+      /*if (humanPlaying) {
         humanPlayer.i = (humanPlayer.i + 1) % 3;
       }
       else if (showBestEachGen) {
@@ -490,7 +517,7 @@ function keyPressed() {
         for (let player of population.players) {
           player.i = (player.i + 1) % 3;
         }
-}
+}*/
   }
   //any of the arrow keys
   switch (keyCode) {

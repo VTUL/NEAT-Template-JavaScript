@@ -64,10 +64,10 @@
       font-size: 25px;
       background-color: #29284d;
       border-top: 2px solid #57327c;
-      padding-top: 30px;
+      padding-top: 15px;
       padding-left: 30px;
       height: 150;
-      width: 350;
+      width: 400;
       text-align: left;
       font-family: monospace; 
     }
@@ -78,17 +78,10 @@
       background-color: #29284d;
       border-top: 2px solid #57327c;
       height: 150;
-      width: 350;
+      width: 400;
       text-align: left;
       font-family: monospace; 
       line-height: 5px;
-    }
-
-    h3 {
-      text-align: center;
-      font-family: sans-serif;
-      font-size: 25px;
-      color: #6ab9c9;
     }
 
     .container {
@@ -100,29 +93,38 @@
       margin-bottom: 20px;
     }
 
-    #textInfo {
-      color: #eeeefd;
-      font-size: 20px;
-      background-color: #29284d;
+    .accordion {
+      text-align: center;
+      font-family: sans-serif;
+      font-size: 25px;
+      color: #6ab9c9;
+      background-color: #57327c;
+      cursor: pointer;
       padding: 10px;
-      border-top: 2px solid #57327c;
-      margin: 10px;
-      width: fit-content;
-      text-align: left;
-      font-family: monospace; 
+      width: 100%;
+      border: none;
+      outline: none;
+      transition: 0.4s;
+      margin-bottom: 20px;
     }
 
-    #neatInfo {
+    .accordion:hover {
+      background-color: #8264a0;
+    }
+
+    
+    .panel {
       color: #eeeefd;
       font-size: 20px;
       background-color: #29284d;
       padding: 10px;
-      border-top: 2px solid #57327c;
-      margin: 10px auto;
-      line-height: 1.5;
       width: fit-content;
       text-align: left;
       font-family: monospace; 
+      display: none;
+      overflow: hidden;
+      margin-top: -20px;
+      margin-bottom: 20px;
     }
 
   </style>
@@ -137,19 +139,20 @@
       <div id="controlsInfo">
         <h3>Controls</h3>
         <p><b>P:</b> Play the game!</p>
-        <p><b>G:</b> Best AI each gen</p>
-        <p><b>J:</b> Switch dogs!</p>
-        <p><b>Space:</b> Best AI this gen</p>
+        <p><b>G:</b> Breakdown Game controls</p>
       </div>
     </div>
-    <h3>Game Explanation</h3>
-    <div id="textInfo">
+    
+
+    <button class="accordion"><b>Game Explanation +</b></button>
+    <div class="panel">
         <p>Looks strange, doesn't it? Why are there so many dogs on screen? That's because there are actually 500 versions of the AI with slightly different brains playing the game at one time, each trying to get the highest score they can. The ones that do get to move on to the next round of training.</p>
         <p>So what's this game? This is a custom video game made in-house that features the VT Therapy Dogs. You play as Epcot, Derek, or Josie as they explore the library, looking for treats and toys while avoiding getting distracted by one of the many sneaky squirrels on campus. The squirrels drop things like chocolate that the dogs need to avoid in order to get a high score, and if the dog runs into a squirrel, they lose focus and the game. The dogs can also get tired from all that running around, so there are also dog beds they can find to recharge. What do you do to recharge when your energy is feeling low? Rest is an important part of keeping your mind sharp and healthy.</p>
     </div>
-    <h3>NEAT Explanation</h3>
-    <div id="neatInfo">
-      <p>How does this whole training thing work? Well, this AI uses a Neuroevolution of augmenting topologies algorithm, or NEAT for short. It sounds complicated, but it is really just an algorithm for mimicking the real-world process of Natural Selection. We give the AI a brain in the form of a matrix, which you might remember from algebra as a grid of numbers. A very simplified example might look like this:  </p> 
+
+    <button class="accordion"><b>How does this work? +</b></button>
+    <div class="panel">
+      <p>How does this whole training thing work? Well, this AI uses a Neuroevolution of Augmenting Topologies algorithm, or NEAT for short. It sounds complicated, but it is really just an algorithm for mimicking the real-world process of Natural Selection. We give the AI a brain in the form of a matrix, which you might remember from algebra as a grid of numbers. A very simplified example might look like this:  </p> 
         <pre>
                                               4 | 8 | 0
                                               5 | 3 | 8
@@ -162,8 +165,9 @@
       <p>At first, they all move around randomly and are really bad at the game. But eventually some of them get lucky. One of their brains will have a tendency to take the input number for the distance to a treat and want to make that number as low as possible by taking the action that lowers that number (so move right if the treat is to the right to make the distance less). Then, because that individual version of the AI did well and scored points by collecting a treat, its brain goes on and is copied and serves as the basis for the next generation. So the next generation of brains is more likely to want to do the same thing, and over time, the AI gets better and better at the game.</p>
       <p>The visualization below is an attempt to show how this brain functions, and it represents the brain of the AI that has the highest score this generation.</p>
     </div>
-    <h3>Controller Explanation</h3>
-    <div id="textInfo">
+    
+     <button class="accordion"><b>Can I Play? +</b></button>
+      <div class="panel">
       <p>Think you can do better? Probably. If you want to try your hand at the game and see how your score stacks up against the best the AI can muster right now, grab the controller and hit "A" to start playing the game. Once you're done, compare your score to the top score the AI has gotten? How close were you?</p>
       <p>But the AI will continue to improve over time, and if you come back tomorrow, you might not be able to beat it anymore. AI often eventually surpasses human capabilities at specialized tasks like this, so challenge it again in the future to see how you stack up then.</p>
     </div>
