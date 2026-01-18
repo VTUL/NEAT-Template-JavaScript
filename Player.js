@@ -171,40 +171,65 @@ class Player extends Entity {
     //rect(this.x, this.y, this.w, this.h);
   }
 
+  deadzone(v, dz = 0.25) {
+  return Math.abs(v) < dz ? 0 : v;
+  }
+
   update() {
     if (this.dead) return;
 
     this.isInvincible = millis() < this.isInvinUntil;
 
     if (humanPlaying) {
-      if (keyIsDown(87)) {
-        // W
-        this.move("w");
-      }
-      if (keyIsDown(83)) {
-        // S
-        this.move("s");
-      }
-      if (keyIsDown(65)) {
-        // A
-        this.move("a");
-      }
-      if (keyIsDown(68)) {
-        // D
-        this.move("d");
-      }
 
-      this.isSprinting = keyIsDown(SHIFT) && this.stamina > 0;
+      //KEYBOARD
+      if (keyIsDown(87)) this.move("w"); // W
+      if (keyIsDown(83)) this.move("s"); // S
+      if (keyIsDown(65)) this.move("a"); // A
+      if (keyIsDown(68)) this.move("d"); // D
+
+      //GAMEPAD - left stick for movement, A button for sprinting
+      const gp = navigator.getGamepads()[activeGamepadIndex ?? 0];
+      if (gp) {
+        let lx = this.deadzone(gp.axes[0]);
+        let ly = this.deadzone(gp.axes[1]);
+
+        // Vertical
+        if (ly < 0) this.move("w");
+        if (ly > 0) this.move("s");
+
+        // Horizontal
+        if (lx < 0) this.move("a");
+        if (lx > 0) this.move("d");
+
+        // Sprint (button 0 = A)
+        if ((gp.buttons[0]?.pressed || keyIsDown(SHIFT)) && this.stamina > 0) {
+          this.isSprinting = true;
+        } else {
+          this.isSprinting = false;
+        }
+      } else {
+        // Keyboard only
+        this.isSprinting = keyIsDown(SHIFT) && this.stamina > 0;
+      }
     }
 
     //sprint logic
     if (this.isSprinting && this.stamina > 0) {
       this.speed = this.boostedSpeed;
       this.stamina -= this.staminaDrainRate;
-      if (this.stamina < 0) this.stamina = 0;
+
+      if (this.stamina <= 0) {
+        this.stamina = 0;
+        this.isSprinting = false;      // stop sprinting immediately
+        this.staminaCooldown = millis() + 3000; // 3 seconds cooldown
+      }
+
     } else {
       this.speed = this.baseSpeed;
-      if (this.stamina < this.maxStamina) {
+
+      //added cooldown for stamina regen after sprinting
+      if (this.stamina < this.maxStamina && (!this.staminaCooldown || millis() > this.staminaCooldown)) {
         this.stamina += this.staminaRegenRate;
         if (this.stamina > this.maxStamina) this.stamina = this.maxStamina;
       }

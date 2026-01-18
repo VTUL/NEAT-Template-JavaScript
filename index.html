@@ -66,7 +66,8 @@
       border-top: 2px solid #57327c;
       padding-top: 15px;
       padding-left: 30px;
-      height: 150;
+      line-height: 1.5;
+      height: 180;
       width: 400;
       text-align: left;
       font-family: monospace; 
@@ -77,7 +78,7 @@
       font-size: 20px;
       background-color: #29284d;
       border-top: 2px solid #57327c;
-      height: 150;
+      height: 180;
       width: 400;
       text-align: left;
       font-family: monospace; 
@@ -106,6 +107,10 @@
       outline: none;
       transition: 0.4s;
       margin-bottom: 20px;
+    }
+
+    .accordion.selected {
+      outline: 3px solid #4cff4c;
     }
 
     .accordion:hover {
@@ -138,8 +143,11 @@
       <div id="gameInfo"></div>
       <div id="controlsInfo">
         <h3>Controls</h3>
-        <p><b>P:</b> Play the game!</p>
-        <p><b>G:</b> Breakdown Game controls</p>
+        <p><b>Start:</b> &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Play the game!</p>
+        <p><b>A:</b> &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Sprint</p>
+        <p><b>Left Stick:</b> &emsp;&emsp;&emsp;&emsp;Move</p>
+        <p><b>Right Stick:</b> &emsp;&emsp;&emsp;Navigate Info</p>
+        <p><b>B:</b> &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Select Info</p>
       </div>
     </div>
     

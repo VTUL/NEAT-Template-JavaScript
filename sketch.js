@@ -59,6 +59,14 @@ let occupantList = ["player", "enemy", "treat", "peanut", "bed", "tennis"]
 let wall;
 let blocks = [];
 let pendingReset = false;
+let startWasPressed = false;
+let activeGamepadIndex = null;
+let accordionIndex = 0;
+let bWasPressed = false;
+let rightStickCooldown = 0;
+
+
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function preload(){
@@ -119,6 +127,24 @@ function setup() {
   }
 
 }
+
+function toggleAccordion(index) {
+  const acc = document.getElementsByClassName("accordion");
+  const btn = acc[index];
+  if (!btn) return;
+
+  btn.classList.toggle("active");
+
+  const panel = btn.nextElementSibling;
+  panel.style.display =
+    panel.style.display === "block" ? "none" : "block";
+}
+
+
+window.addEventListener("gamepadconnected", (e) => {
+  activeGamepadIndex = e.gamepad.index;
+});
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------------
 function draw() {
@@ -217,7 +243,55 @@ function draw() {
     text("You Got Distracted!", 540, 460);
   }
 
+  //handle gamepad input for toggling human play - mapping to button 9 (Start on Xbox controller)
+  const gp = navigator.getGamepads()?.[activeGamepadIndex ?? 0];
+  if (gp && gp.buttons?.length > 9) {
+    const startPressed = gp.buttons[9].pressed;
+
+    if (startPressed && !startWasPressed) {
+      toggleHumanPlay();
+    }
+
+    startWasPressed = startPressed;
+  }
+
+  //gamepad UI controls (accordions)
+  const acc = document.getElementsByClassName("accordion");
+
+  if (gp && acc.length > 0) {
+
+    //right stick UP / DOWN selects accordion (axes[3])
+    if (millis() > rightStickCooldown) {
+      const selectY = gp.axes[3];
+
+      if (selectY > 0.6) {
+        accordionIndex = Math.min(accordionIndex + 1, acc.length - 1);
+        rightStickCooldown = millis() + 250;
+      }
+      else if (selectY < -0.6) {
+        accordionIndex = Math.max(accordionIndex - 1, 0);
+        rightStickCooldown = millis() + 250;
+      }
+    }
+
+    //B button toggles accordion (button 1)
+    const bPressed = gp.buttons[1]?.pressed;
+    if (bPressed && !bWasPressed) {
+      toggleAccordion(accordionIndex);
+    }
+    bWasPressed = bPressed;
+
+    //visual highlight
+    for (let i = 0; i < acc.length; i++) {
+      acc[i].classList.toggle("selected", i === accordionIndex);
+    }
+  }
+
+
+
 }
+
+
 
 function handleRespawns() {
   //respawn Peanut Butter if missing and timer passed
@@ -495,9 +569,7 @@ function keyPressed() {
       showNothing = !showNothing;
       break;
     case 'P': //playz
-      resetGame();
-      humanPlaying = !humanPlaying;
-      humanPlayer = new Player();
+      toggleHumanPlay();
       break;
     case 'J':
       //switch to next dog sprite
@@ -676,3 +748,11 @@ function getRandomInt(min, max) {
   const maxFloored = Math.floor(max);
   return Math.floor(Math.random() * (maxFloored - minCeiled + 1) + minCeiled); 
 }
+
+function toggleHumanPlay() {
+  resetGame();
+  humanPlaying = !humanPlaying;
+  humanPlayer = new Player();
+}
+
+
