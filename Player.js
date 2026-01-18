@@ -194,22 +194,20 @@ class Player extends Entity {
         let lx = this.deadzone(gp.axes[0]);
         let ly = this.deadzone(gp.axes[1]);
 
-        // Vertical
         if (ly < 0) this.move("w");
         if (ly > 0) this.move("s");
 
-        // Horizontal
         if (lx < 0) this.move("a");
         if (lx > 0) this.move("d");
 
-        // Sprint (button 0 = A)
+        //sprint (button 0 = A)
         if ((gp.buttons[0]?.pressed || keyIsDown(SHIFT)) && this.stamina > 0) {
           this.isSprinting = true;
         } else {
           this.isSprinting = false;
         }
       } else {
-        // Keyboard only
+        //keyboard
         this.isSprinting = keyIsDown(SHIFT) && this.stamina > 0;
       }
     }
@@ -221,8 +219,8 @@ class Player extends Entity {
 
       if (this.stamina <= 0) {
         this.stamina = 0;
-        this.isSprinting = false;      // stop sprinting immediately
-        this.staminaCooldown = millis() + 3000; // 3 seconds cooldown
+        this.isSprinting = false;      //stop sprinting
+        this.staminaCooldown = millis() + 3000; 
       }
 
     } else {
