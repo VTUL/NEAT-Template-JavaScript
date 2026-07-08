@@ -233,128 +233,7 @@ class Player extends Entity {
       }
     }
   }
-
-  look() {
-    this.vision = [];
-    //push walls to vision array
-    this.vision.push(this.checkWall(1));
-    this.vision.push(this.checkWall(2));
-    this.vision.push(this.checkWall(3));
-    this.vision.push(this.checkWall(4));
-
-    //push enemies to vision array
-    this.vision.push(this.checkOther(1, 1));
-    this.vision.push(this.checkOther(2, 1));
-    this.vision.push(this.checkOther(3, 1));
-    this.vision.push(this.checkOther(4, 1));
-    //push pickups to vision array
-    this.vision.push(this.checkOther(1, 2));
-    this.vision.push(this.checkOther(2, 2));
-    this.vision.push(this.checkOther(3, 2));
-    this.vision.push(this.checkOther(4, 2));
-    this.vision.push(this.checkOther(1, 3));
-    this.vision.push(this.checkOther(2, 3));
-    this.vision.push(this.checkOther(3, 3));
-    this.vision.push(this.checkOther(4, 3));
-    this.vision.push(this.checkOther(1, 4));
-    this.vision.push(this.checkOther(2, 4));
-    this.vision.push(this.checkOther(3, 4));
-    this.vision.push(this.checkOther(4, 4));
-    this.vision.push(this.checkOther(1, 5));
-    this.vision.push(this.checkOther(2, 5));
-    this.vision.push(this.checkOther(3, 5));
-    this.vision.push(this.checkOther(4, 5));
-    //push directionality of valid treat
-    this.vision.push(this.checkDownArea());
-    this.vision.push(this.checkRightArea());
-    //sprinting to array
-    this.vision.push(100/this.stamina);
-    this.vision.push(5/this.speed);
-    //push invincibility to array
-    this.vision.push(this.isInvincible ? 1 : 0);
-  }
-
-  checkWall(direction) {
-    for(let steps = 1; steps <= 19; steps++) {
-      let tempX;
-      let tempY;
-      switch(direction){
-        case 1:
-          tempX = 0;
-          tempY = 0 - steps;
-          break;
-        case 2:
-          tempX = steps;
-          tempY = 0;
-          break;
-        case 3:
-          tempX = 0;
-          tempY = steps;
-          break;
-        case 4:
-          tempX = 0 - steps;
-          tempY = 0;
-          break;
-      }
-      if (typeof mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX] === "undefined" || !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.valid) {
-        return 1/steps;
-      }
-    }
-  }
-
-  checkOther(direction, target) {
-    for(let steps = 1; steps <= 19; steps++) {
-      let tempX;
-      let tempY;
-      switch(direction){
-        case 1:
-          tempX = 0;
-          tempY = 0 - steps;
-          break;
-        case 2:
-          tempX = steps;
-          tempY = 0;
-          break;
-        case 3:
-          tempX = 0;
-          tempY = steps;
-          break;
-        case 4:
-          tempX = 0 - steps;
-          tempY = 0;
-          break;
-      }
-      if (typeof mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX] === "undefined" || !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.valid) {
-        return 0;
-      } else if (mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => occupant.type === target) && !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))){
-        return 1/steps;
-      } 
-    }
-  }
-
-  checkDownArea() {
-    for(let rows = this.currentLocation.y + 1; rows <= gridRows; rows++) {
-      for(let steps = 1; steps <= gridColumns - 1; steps++) {
-        if(rows >= gridRows) {
-          return 0;
-        } else if (mapGrid[rows]?.[steps]?.occupants.some(occupant => occupant.type === 2) && !mapGrid[rows]?.[steps]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))) {
-          return 1;
-        }
-      }
-    }
-  }
-
-  checkRightArea() {
-    for(let columns = this.currentLocation.x + 1; columns <= gridColumns; columns++) {
-      for(let steps = 1; steps <= gridRows - 1; steps++) {
-        if(columns >= gridColumns) {
-          return 0;
-        } else if (mapGrid[steps]?.[columns]?.occupants.some(occupant => occupant.type === 2) && !mapGrid[steps]?.[columns]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))) {
-          return 1;
-        }
-        }
-    }
-  }
+ 
 
   think() {
     let max = 0;
@@ -365,8 +244,10 @@ class Player extends Entity {
     // console.info("Vision - tLeft: ", this.vision[11]);
 
     //movement decision
-    let directions = ["w", "d", "s", "a"];
+    console.log("vision: ", this.vision)
+    
     this.decision = this.brain.feedForward(this.vision);
+    console.log("decision: ", this.decision);
 
     for (let i = 0; i < 4; i++) {
       if (this.decision[i] > max) {

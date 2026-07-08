@@ -1,5 +1,3 @@
-var nextConnectionNo = 1000;
-var population;
 var speed = 30;
 
 let mapGrid = JSON.parse(JSON.stringify(mapGridOriginal));
@@ -17,7 +15,6 @@ var genPlayerTemp; //player
 var showNothing = false; 
 let treats = [];
 let enemies = []; 
-// let anti = [];
 let beds = [];
 let balls = [];
 let bedsRespawnTime = 0;
@@ -61,12 +58,9 @@ let blocks = [];
 let pendingReset = false;
 let startWasPressed = false;
 let activeGamepadIndex = null;
-let accordionIndex = 0;
+
 let bWasPressed = false;
 let rightStickCooldown = 0;
-
-
-
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function preload(){
@@ -100,44 +94,11 @@ function preload(){
 function setup() {
   let canvas = createCanvas(screenWidth, screenHeight);
   canvas.parent("canvasContainer");
-
-  population = new Population(500);
   
   resetGame();
   introTime = millis() + 3000; 
   frameRate(speed);
 
-  var acc = document.getElementsByClassName("accordion");
-  var i;
-
-  for (i = 0; i < acc.length; i++) {
-    acc[i].addEventListener("click", function() {
-      /* Toggle between adding and removing the "active" class,
-      to highlight the button that controls the panel */
-      this.classList.toggle("active");
-
-      /* Toggle between hiding and showing the active panel */
-      var panel = this.nextElementSibling;
-      if (panel.style.display === "block") {
-        panel.style.display = "none";
-      } else {
-        panel.style.display = "block";
-      }
-    });
-  }
-
-}
-
-function toggleAccordion(index) {
-  const acc = document.getElementsByClassName("accordion");
-  const btn = acc[index];
-  if (!btn) return;
-
-  btn.classList.toggle("active");
-
-  const panel = btn.nextElementSibling;
-  panel.style.display =
-    panel.style.display === "block" ? "none" : "block";
 }
 
 
@@ -155,10 +116,6 @@ function draw() {
     imageMode(CORNER);
     image(bg, 0, 0, width, height); 
   }
-
-  /*for(var i = 0; i < blocks.length; i++){
-    blocks[i].show();
-  }*/
 
   for (let i = 0; i < treats.length; i++) {
     treats[i].show();
@@ -183,14 +140,6 @@ function draw() {
     //   enemies.splice(i, 1); //0.1% chance to disappear
     // }
   }
-
-  // if(population.players.length > 0){
-  //   stroke('blue');
-  // strokeWeight(5);
-  // point(population.players[0].x,population.players[0].y)
-  // }
-
-  
 
   //lets player know if AI is playing
   if (!humanPlaying) {
@@ -223,7 +172,7 @@ function draw() {
       resetGame(); //reset the game state for the next generation
     }
   }
-  drawGrid(); 
+  // drawGrid(); 
 
   if (humanPlaying && humanPlayer && humanPlayer.stamina !== undefined) {
     drawStaminaBar(humanPlayer);
@@ -256,36 +205,7 @@ function draw() {
   }
 
   //gamepad UI controls (accordions)
-  const acc = document.getElementsByClassName("accordion");
-
-  if (gp && acc.length > 0) {
-
-    //right stick UP / DOWN selects accordion (axes[3])
-    if (millis() > rightStickCooldown) {
-      const selectY = gp.axes[3];
-
-      if (selectY > 0.6) {
-        accordionIndex = Math.min(accordionIndex + 1, acc.length - 1);
-        rightStickCooldown = millis() + 250;
-      }
-      else if (selectY < -0.6) {
-        accordionIndex = Math.max(accordionIndex - 1, 0);
-        rightStickCooldown = millis() + 250;
-      }
-    }
-
-    //B button toggles accordion (button 1)
-    const bPressed = gp.buttons[1]?.pressed;
-    if (bPressed && !bWasPressed) {
-      toggleAccordion(accordionIndex);
-    }
-    bWasPressed = bPressed;
-
-    //visual highlight
-    for (let i = 0; i < acc.length; i++) {
-      acc[i].classList.toggle("selected", i === accordionIndex);
-    }
-  }
+  
 
 
 
@@ -462,8 +382,8 @@ function showBestEverPlayer() {
 function drawToScreen() {
   if (!showNothing) {
     //pretty stuff
-    drawBrain();
-    writeInfo();
+    // drawBrain();
+    // writeInfo();
   }
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -471,7 +391,7 @@ function drawBrain() { //show the brain of whatever genome is currently showing
   var startX = 800; //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
   var startY = 10;
   var w = 400;
-  var h = 90;
+  var h = 200;
 
   if (runBest) {
     population.bestPlayer.brain.drawGenome(startX, startY, w, h);
@@ -617,89 +537,6 @@ function keyPressed() {
       break;
   }
 }
-
-//maybe have unique function for humanplayer where things disappear
-/*function handleInteractions(player) {
-  if (player.dead) return;
-
-  //Treats
-  // for (let i = treats.length - 1; i >= 0; i--) {
-  //   if (treats[i] && treats[i].checkCollision(player) && !treats[i].idList.includes(player.uuid)) {
-  //     player.score += 1;
-  //     treats[i].idList.push(player.uuid); //add player id to the treat
-  //     if(humanPlaying){
-  //       treats[i].eaten(); 
-  //       treats.splice(i, 1); //remove anti item if human player
-  //     }
-  //     player.lastScoreMillis = millis();
-  //   }
-  // }
-
-  //Dog Beds
-  // if (beds?.length >= 0 && beds[0]?.checkCollision(player) && !beds[0].idList.includes(player.uuid)) {
-  //   player.stamina = player.maxStamina; //reset stamina
-  //   beds[0].idList.push(player.uuid); //add player id
-  //   if(humanPlaying)
-  //     beds.splice(0, 1); //remove anti item if human player
-  //   bedsRespawnTime = millis() + 20000;
-  // }
-
-  //TennisBall
-  // if (balls?.length >= 0 && balls[0]?.checkCollision(player) && !balls[0].idList.includes(player.uuid)) {
-  //   player.isInvincible = true;
-  //   player.isInvinUntil = millis() + 10000;
-  //   balls[0].idList.push(player.uuid); //add player id
-  //   if(humanPlaying)
-  //     balls.splice(0, 1); //remove anti item if human player
-  //   ballRespawnTime = millis() + 40000;
-  // }
-
-   //Peanut Butter
-  // if (pb?.length >= 0 && pb[0]?.checkCollision(player) && !pb[0].idList.includes(player.uuid)) {
-  //   pb[0].idList.push(player.uuid); //add player id
-  //   player.score += 10;
-  //   if(humanPlaying)
-  //     pb.splice(0, 1); //remove anti item if human player
-  //   PBRespawnTime = millis() + 60000;
-  //   player.lastScoreMillis = millis();
-  // }
-
-  //Anti
-  // for (let i = anti.length - 1; i >= 0; i--) {
-  //   if (anti[i].checkCollision(player) && !player.isInvincible && !anti[i].idList.includes(player.uuid)) {
-  //     anti[i].idList.push(player.uuid); //add player id
-  //     player.score -= 5;
-  //     if(humanPlaying)
-  //       anti.splice(i, 1); //remove anti item if human player
-  //   }
-
-    //get rid of anti penalty
-  //   if (anti[i]) {
-  //   if (player.isInvincible) {
-  //     anti[i].playInvin = true;  
-  //   } else {
-  //     anti[i].playInvin = false; 
-  //   }
-  // }
-  }*/
-
-  //Enemies
-  // for (let i = enemies.length - 1; i >= 0; i--) {
-  // if (enemies[i].checkCollision(player) && !player.isInvincible) {
-  //   player.dead = true;
-  // }
-
-  //enemy invincibility handling
-//   if (enemies[i]) {
-//     if (player.isInvincible) {
-//       enemies[i].playInvin = true;  
-//     } else {
-//       enemies[i].playInvin = false; 
-//     }
-//   }
-// }
-
-// }
 
 //function to reset the game state
 function resetGame() {
