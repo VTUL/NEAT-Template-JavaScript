@@ -42,15 +42,6 @@ class Enemy extends Entity {
 
   patrol() {
     this.move(this.getRandDirection());
-
-  // if (this.dropCooldown > 0) {
-  //     this.dropCooldown--;
-  //   } else {
-  //     if (random(1) < 0.0001) {
-  //       this.dropAnti();
-  //       this.dropCooldown = 60000;
-  //     }
-  //   }
 }
 
   getRandDirection() {
@@ -67,10 +58,6 @@ class Enemy extends Entity {
         return "a";
     }
   }
-
-  // dropAnti() {
-  //   anti.push(new Anti(this.x, this.y));
-  // }
 
   show() {
     // console.log("update enemies");

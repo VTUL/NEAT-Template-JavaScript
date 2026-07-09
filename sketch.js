@@ -17,7 +17,6 @@ var genPlayerTemp; //player
 var showNothing = false; 
 let treats = [];
 let enemies = []; 
-// let anti = [];
 let beds = [];
 let balls = [];
 let bedsRespawnTime = 0;
@@ -327,14 +326,6 @@ function handleRespawns() {
     treats.push(new Treat(treat, 20, 20));
   }
 
-  //remove expired anti items
-  // for (let i = anti.length - 1; i >= 0; i--) {
-  //   if (anti[i].life < millis()) {
-  //     anti.splice(i, 1);
-  //   }
-  // }
-  //remove expired treats causes game to crash
-
 for (let i = 0; i < treats.length; i++) {
   if (treats[i].life < millis()) {
     treats[i].deregisterLocation();
@@ -629,7 +620,7 @@ function keyPressed() {
   //     treats[i].idList.push(player.uuid); //add player id to the treat
   //     if(humanPlaying){
   //       treats[i].eaten(); 
-  //       treats.splice(i, 1); //remove anti item if human player
+  //       treats.splice(i, 1); 
   //     }
   //     player.lastScoreMillis = millis();
   //   }
@@ -640,7 +631,7 @@ function keyPressed() {
   //   player.stamina = player.maxStamina; //reset stamina
   //   beds[0].idList.push(player.uuid); //add player id
   //   if(humanPlaying)
-  //     beds.splice(0, 1); //remove anti item if human player
+  //     beds.splice(0, 1); 
   //   bedsRespawnTime = millis() + 20000;
   // }
 
@@ -650,7 +641,7 @@ function keyPressed() {
   //   player.isInvinUntil = millis() + 10000;
   //   balls[0].idList.push(player.uuid); //add player id
   //   if(humanPlaying)
-  //     balls.splice(0, 1); //remove anti item if human player
+  //     balls.splice(0, 1); 
   //   ballRespawnTime = millis() + 40000;
   // }
 
@@ -659,29 +650,11 @@ function keyPressed() {
   //   pb[0].idList.push(player.uuid); //add player id
   //   player.score += 10;
   //   if(humanPlaying)
-  //     pb.splice(0, 1); //remove anti item if human player
+  //     pb.splice(0, 1); 
   //   PBRespawnTime = millis() + 60000;
   //   player.lastScoreMillis = millis();
   // }
 
-  //Anti
-  // for (let i = anti.length - 1; i >= 0; i--) {
-  //   if (anti[i].checkCollision(player) && !player.isInvincible && !anti[i].idList.includes(player.uuid)) {
-  //     anti[i].idList.push(player.uuid); //add player id
-  //     player.score -= 5;
-  //     if(humanPlaying)
-  //       anti.splice(i, 1); //remove anti item if human player
-  //   }
-
-    //get rid of anti penalty
-  //   if (anti[i]) {
-  //   if (player.isInvincible) {
-  //     anti[i].playInvin = true;  
-  //   } else {
-  //     anti[i].playInvin = false; 
-  //   }
-  // }
-  }*/
 
   //Enemies
   // for (let i = enemies.length - 1; i >= 0; i--) {
@@ -716,11 +689,9 @@ function resetGame() {
   beds = [];
   balls = [];
   pb = [];
-  // anti = [];
 
   treats.length = 0;
   enemies.length = 0;
-  // anti.length = 0;
 
   beds.push(new DogBed(bed, 48, 48));
   balls.push(new TennisBall(tennis, 16, 16));
