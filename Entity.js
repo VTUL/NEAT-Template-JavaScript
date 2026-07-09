@@ -23,6 +23,8 @@ class Entity {
 
     this.lastDec;
 
+    this.movesWithoutTreat = 0;
+
     this.registerLocation(this.currentLocation);
   }
 

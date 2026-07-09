@@ -1,20 +1,20 @@
-var nextConnectionNo = 1000;
-var population;
-var speed = 30;
+let nextConnectionNo = 1000;
+let population;
+let speed = 30;
 
 let mapGrid = JSON.parse(JSON.stringify(mapGridOriginal));
 
-var showBest = false; //true if only show the best of the previous generation
-var runBest = false; //true if replaying the best ever game
-var humanPlaying = false; //true if the user is playing
-var humanPlayer;
+let showBest = false; //true if only show the best of the previous generation
+let runBest = false; //true if replaying the best ever game
+let humanPlaying = false; //true if the user is playing
+let humanPlayer;
 
-var showBrain = false;
-var showBestEachGen = false;
-var upToGen = 0;
-var genPlayerTemp; //player
+let showBrain = false;
+let showBestEachGen = false;
+let upToGen = 0;
+let genPlayerTemp; //player
 
-var showNothing = false; 
+let showNothing = false; 
 let treats = [];
 let enemies = []; 
 let beds = [];
@@ -28,30 +28,30 @@ let introTime = 0;
 let pb = [];
 
 //images
-var bg;
-var blockImg;
-var derekLeft;
-var derekRight;
-var derekUp;
-var derekDown;
-var epcotLeft;
-var epcotRight
-var epcotUp;
-var epcotDown;
-var josieLeft;
-var josieRight
-var josieUp;
-var josieDown;
-var acorn;
-var squirrelUp;
-var squirrelDown;
-var squirrelRight;
-var squirrelLeft;
-var peanut;
-var treat;
-var bed;
-var tennis;
-var arrow;
+let bg;
+let blockImg;
+let derekLeft;
+let derekRight;
+let derekUp;
+let derekDown;
+let epcotLeft;
+let epcotRight
+let epcotUp;
+let epcotDown;
+let josieLeft;
+let josieRight
+let josieUp;
+let josieDown;
+let acorn;
+let squirrelUp;
+let squirrelDown;
+let squirrelRight;
+let squirrelLeft;
+let peanut;
+let treat;
+let bed;
+let tennis;
+let arrow;
 
 let occupantList = ["player", "enemy", "treat", "peanut", "bed", "tennis"]
 
@@ -64,7 +64,63 @@ let accordionIndex = 0;
 let bWasPressed = false;
 let rightStickCooldown = 0;
 
+const MAX_MOVES_WITHOUT_TREAT = 500;
 
+const config = new Config({
+  // Basic network structure
+  inputSize: 29,                    // Number of input nodes
+  outputSize: 5,                   // Number of output nodes
+
+  // Activation function (string-based selection)
+  // activationFunction: 'Sigmoid',   // 'Sigmoid', 'NEATSigmoid', 'Tanh', 'ReLU', 'LeakyReLU', 'Gaussian'
+
+  // Bias settings
+  // bias: 1.0,                       // Bias value
+  // connectBias: true,               // Connect the bias node to all output nodes
+  // biasMode: 'WEIGHTED_NODE',       // Bias implementation mode
+
+  // Fitness function
+  // fitnessFunction: 'XOR',          // Default XOR fitness function
+
+  // Weight initialization
+  weightInitialization: {
+    type: 'Random',
+    params: [-1, 1]                // Min and max values for random weights
+  },
+
+  // Speciation parameters
+  // c1: 1.0,                         // Coefficient for excess genes
+  // c2: 1.0,                         // Coefficient for disjoint genes
+  // c3: 0.4,                         // Coefficient for weight differences
+  // compatibilityThreshold: 3.0,     // Species compatibility threshold
+  // interspeciesMatingRate: 0.001,   // Rate of interspecies mating
+
+  // Mutation parameters
+  mutationRate: 1.0,               // Overall mutation rate
+  weightMutationRate: 0.8,         // Mutation rate for weights
+  addConnectionMutationRate: 0.05, // Rate for adding new connections
+  addNodeMutationRate: 0.03,       // Rate for adding new nodes
+  minWeight: -4.0,                 // Minimum allowed weight
+  maxWeight: 4.0,                  // Maximum allowed weight
+  reinitializeWeightRate: 0.1,     // Rate to completely reinitialize weights
+  minPerturb: -0.5,                // Minimum perturbation value
+  maxPerturb: 0.5,                 // Maximum perturbation value
+
+  // Evolution parameters
+  populationSize: 250,             // Size of the population
+  generations: 10000,                // Number of generations
+  targetFitness: 0.95,             // Target fitness to achieve
+  survivalRate: 0.2,               // Proportion that survives each generation
+  numOfElite: 15,                  // Number of elite individuals to retain
+  dropOffAge: 15,                  // Maximum age before dropping off
+  populationStagnationLimit: 15,   // Generations with no improvement before reset
+  keepDisabledOnCrossOverRate: 0.75, // Keep disabled connections during crossover
+  mutateOnlyProb: 0.25,            // Probability for mutation-only
+
+  // Recurrent network options
+  allowRecurrentConnections: true, // Allow recurrent connections
+  recurrentConnectionRate: 1.0     // Rate for recurrent connections
+});
 
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
@@ -97,17 +153,19 @@ function preload(){
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
 function setup() {
+
   let canvas = createCanvas(screenWidth, screenHeight);
   canvas.parent("canvasContainer");
 
-  population = new Population(500);
+  population = new Pool(config);
+  // console.log("population: ", population);
   
   resetGame();
   introTime = millis() + 3000; 
   frameRate(speed);
 
-  var acc = document.getElementsByClassName("accordion");
-  var i;
+  let acc = document.getElementsByClassName("accordion");
+  let i;
 
   for (i = 0; i < acc.length; i++) {
     acc[i].addEventListener("click", function() {
@@ -116,7 +174,7 @@ function setup() {
       this.classList.toggle("active");
 
       /* Toggle between hiding and showing the active panel */
-      var panel = this.nextElementSibling;
+      let panel = this.nextElementSibling;
       if (panel.style.display === "block") {
         panel.style.display = "none";
       } else {
@@ -155,7 +213,7 @@ function draw() {
     image(bg, 0, 0, width, height); 
   }
 
-  /*for(var i = 0; i < blocks.length; i++){
+  /*for(let i = 0; i < blocks.length; i++){
     blocks[i].show();
   }*/
 
@@ -202,6 +260,8 @@ function draw() {
 
   drawToScreen();
 
+  // console.log("population: ", population);
+
   if (showBestEachGen) { //show the best of each gen
     showBestPlayersForEachGeneration();
   } else if (humanPlaying) { //if the user is controling the ship
@@ -211,14 +271,16 @@ function draw() {
   } else { //if just evolving normally
     if (!population.done()) { //if any players are alive then update them
       population.updateAlive();
-      for (let i = 0; i < population.players.length; i++) {
-        if (!population.players[i].dead) {
+      for (let i = 0; i < population.genomes.length; i++) {
+        if (!population.genomes[i].dead) {
           //handleInteractions(population.players[i]);
         }
       }
     } else { //all dead
       //genetic algorithm
-      population.naturalSelection();
+      population.calculateFitness();
+      population.evolve();
+      console.log("population after evolve: ", population);
       resetGame(); //reset the game state for the next generation
     }
   }
@@ -285,12 +347,7 @@ function draw() {
       acc[i].classList.toggle("selected", i === accordionIndex);
     }
   }
-
-
-
 }
-
-
 
 function handleRespawns() {
   //respawn Peanut Butter if missing and timer passed
@@ -396,90 +453,90 @@ function drawGrid() {
 }
 
 //-----------------------------------------------------------------------------------
-function showBestPlayersForEachGeneration() {
-  if (!genPlayerTemp.dead) { //if current gen player is not dead then update it
+// function showBestPlayersForEachGeneration() {
+//   if (!genPlayerTemp.dead) { //if current gen player is not dead then update it
 
-    genPlayerTemp.look();
-    genPlayerTemp.think();
-    genPlayerTemp.update();
-    genPlayerTemp.show();
-    //handleInteractions(genPlayerTemp);
-  } else { //if dead move on to the next generation
-    upToGen++;
-    if (upToGen >= population.genPlayers.length) { //if at the end then return to the start and stop doing it
-      upToGen = 0;
-      showBestEachGen = false;
-    } else { //if not at the end then get the next generation
-      genPlayerTemp = population.genPlayers[upToGen].cloneForReplay();
-    }
-  }
-}
+//     genPlayerTemp.look();
+//     genPlayerTemp.think();
+//     genPlayerTemp.update();
+//     genPlayerTemp.show();
+//     //handleInteractions(genPlayerTemp);
+//   } else { //if dead move on to the next generation
+//     upToGen++;
+//     if (upToGen >= population.genPlayers.length) { //if at the end then return to the start and stop doing it
+//       upToGen = 0;
+//       showBestEachGen = false;
+//     } else { //if not at the end then get the next generation
+//       genPlayerTemp = population.genPlayers[upToGen].cloneForReplay();
+//     }
+//   }
+// }
 //-----------------------------------------------------------------------------------
-function showHumanPlaying() {
-  if (!humanPlayer.dead) { //if the player isnt dead then move and show the player based on input
-    humanPlayer.look();
-    humanPlayer.update();
-    humanPlayer.show();
-    //handleInteractions(humanPlayer); //handle interactions with treats, enemies, and the tennis ball
+// function showHumanPlaying() {
+//   if (!humanPlayer.dead) { //if the player isnt dead then move and show the player based on input
+//     humanPlayer.look();
+//     humanPlayer.update();
+//     humanPlayer.show();
+//     //handleInteractions(humanPlayer); //handle interactions with treats, enemies, and the tennis ball
 
-  }
-  else { //once done return to ai
-    humanPlaying = false;
-    deathMessageTime = millis();
-    //different way to let the user know they died
-    /*
-    fill(255);
-    textAlign(CENTER, TOP); 
-    textSize(50);
-    text("You Died", 540, 450);
-  }*/
-  }
-}
+//   }
+//   else { //once done return to ai
+//     humanPlaying = false;
+//     deathMessageTime = millis();
+//     //different way to let the user know they died
+//     /*
+//     fill(255);
+//     textAlign(CENTER, TOP); 
+//     textSize(50);
+//     text("You Died", 540, 450);
+//   }*/
+//   }
+// }
 //-----------------------------------------------------------------------------------
-function showBestEverPlayer() {
-  if (!population.bestPlayer.dead) { //if best player is not dead
-    population.bestPlayer.look();
-    population.bestPlayer.think();
-    population.bestPlayer.update();
-    population.bestPlayer.show();
-    //handleInteractions(bestPlayer);
-  } else { //once dead
-    runBest = false; //stop replaying it
-    population.bestPlayer = population.bestPlayer.cloneForReplay(); //reset the best player so it can play again
-  }
-}
+// function showBestEverPlayer() {
+//   if (!population.bestPlayer.dead) { //if best player is not dead
+//     population.bestPlayer.look();
+//     population.bestPlayer.think();
+//     population.bestPlayer.update();
+//     population.bestPlayer.show();
+//     //handleInteractions(bestPlayer);
+//   } else { //once dead
+//     runBest = false; //stop replaying it
+//     population.bestPlayer = population.bestPlayer.cloneForReplay(); //reset the best player so it can play again
+//   }
+// }
 //---------------------------------------------------------------------------------------------------------------------------------------------------------
 //draws the display screen
 function drawToScreen() {
   if (!showNothing) {
     //pretty stuff
-    drawBrain();
+    // drawBrain();
     writeInfo();
   }
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-function drawBrain() { //show the brain of whatever genome is currently showing
-  var startX = 800; //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-  var startY = 10;
-  var w = 400;
-  var h = 90;
+// function drawBrain() { //show the brain of whatever genome is currently showing
+//   let startX = 800; //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+//   let startY = 10;
+//   let w = 400;
+//   let h = 90;
 
-  if (runBest) {
-    population.bestPlayer.brain.drawGenome(startX, startY, w, h);
-  } else
-  if (humanPlaying) {
-    showBrain = false;
-  } else if (showBestEachGen) {
-    genPlayerTemp.brain.drawGenome(startX, startY, w, h);
-  } else {
-    population.players[0].brain.drawGenome(startX, startY, w, h);
-  }
+//   if (runBest) {
+//     population.bestPlayer.brain.drawGenome(startX, startY, w, h);
+//   } else
+//   if (humanPlaying) {
+//     showBrain = false;
+//   } else if (showBestEachGen) {
+//     genPlayerTemp.brain.drawGenome(startX, startY, w, h);
+//   } else {
+//     population.players[0].brain.drawGenome(startX, startY, w, h);
+//   }
 
-  //write the info to the HTML div
-  /*let canvas2 = document.getElementById("canvas2");
-  if (canvas2) {
-    canvas2.innerHTML = brain;*/
-}
+//   //write the info to the HTML div
+//   /*let canvas2 = document.getElementById("canvas2");
+//   if (canvas2) {
+//     canvas2.innerHTML = brain;*/
+// }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //writes info about the current player
 function writeInfo() {
@@ -487,16 +544,16 @@ function writeInfo() {
 
   if (showBestEachGen) {
     info += "Score: " + genPlayerTemp.score + "<br>";
-    info += "Generation: " + (genPlayerTemp.gen + 1) + "<br>";
+    info += "Generation: " + (population.generation + 1) + "<br>";
   } else if (humanPlaying) {
     info += "Score: " + humanPlayer.score + "<br>";
   } else if (runBest) {
     info += "Score: " + population.bestPlayer.score + "<br>";
-    info += "Gen: " + population.gen + "<br>";
+    info += "Gen: " + population.generation + "<br>";
   } else {
     if (showBest) {
-      info += "Score: " + population.players[0].score + "<br>";
-      info += "Generation: " + population.gen + "<br>";
+      info += "Score: " + population.genomes[0].score + "<br>";
+      info += "Generation: " + population.generation + "<br>";
       info += "Species: " + population.species.length + "<br>";
       info += "Global Best Score: " + population.bestScore + "<br>";
     }
@@ -510,7 +567,7 @@ function writeInfo() {
       }
       //when all runs visible 
       info += "Best Score this Gen: " + bestScoreThisGen + "<br>";
-      info += "Generation: " + population.gen + "<br>";
+      info += "Generation: " + population.generation + "<br>";
       info += "Species: " + population.species.length + "<br>";
       info += "Global Best Score: " + population.globalBestScore + "<br>";
     }
@@ -610,8 +667,8 @@ function keyPressed() {
 }
 
 //maybe have unique function for humanplayer where things disappear
-/*function handleInteractions(player) {
-  if (player.dead) return;
+//  function handleInteractions(player) {
+  // if (player.dead) return;
 
   //Treats
   // for (let i = treats.length - 1; i >= 0; i--) {
@@ -712,6 +769,11 @@ function resetGame() {
   for (let i = 0; i < 5; i++) {
     enemies.push(new Enemy());
   }
+
+  for(let i = 0; i < population.genomes.length; i++) {
+    population.players[i] = new Player(population.genomes[i]);
+  }
+
 }
 
 function getRandomInt(min, max) {

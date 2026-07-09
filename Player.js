@@ -1,5 +1,5 @@
 class Player extends Entity {
-  constructor() {
+  constructor(brain) {
 
     const collisionCallback = (collisions) => {
       collisions.forEach((occupant) => {
@@ -18,6 +18,7 @@ class Player extends Entity {
                 } else {
                   //OG:this.score += occupant.type === 2 ? Treat.value : PeanutButter.value;
                   this.score += Treat.value
+                  this.movesWithoutTreat = 0;
                   treats[i].idList.push(this.uuid);
                   if(humanPlaying) {
                     treats[i].deregisterLocation();
@@ -33,6 +34,7 @@ class Player extends Entity {
                 return;
               } else {
                 this.score += PeanutButter.value;
+                this.movesWithoutTreat = 0;
                 pb[0].idList.push(this.uuid);
                 if(humanPlaying) {
                   pb[0].deregisterLocation();
@@ -76,7 +78,6 @@ class Player extends Entity {
     }
 
     super({ x: 9, y: 8 }, 40, 24, 5, 0, collisionCallback);
-    this.fitness = 0;
     this.vision = []; //the input array fed into the neuralNet
     this.decision = []; //the out put of the NN
     this.unadjustedFitness;
@@ -95,7 +96,7 @@ class Player extends Entity {
 
     this.genomeInputs = 29; // 4 for walls, 5 for pickups 1 for enemies
     this.genomeOutputs = 5; // Up, Right, Down, Left, Sprint
-    this.brain = new Genome(this.genomeInputs, this.genomeOutputs);
+    this.brain = brain;
 
     this.isInvinUntil = 0;
     
@@ -366,7 +367,7 @@ class Player extends Entity {
 
     //movement decision
     let directions = ["w", "d", "s", "a"];
-    this.decision = this.brain.feedForward(this.vision);
+    this.decision = this.brain.propagate(this.vision);
 
     for (let i = 0; i < 4; i++) {
       if (this.decision[i] > max) {
@@ -375,42 +376,49 @@ class Player extends Entity {
       }
     }
 
-    if(this.decision[4] > 0.5) {this.isSprinting = true};
-    this.move(directions[maxIndex]);
+    if(this.decision[4] > 0.5) {this.isSprinting = true} else {this.isSprinting = false};
 
+    if (this.isReadytoMove) {
+      this.movesWithoutTreat++;
+      if(this.movesWithoutTreat > MAX_MOVES_WITHOUT_TREAT) {
+      this.dead = true;
+      return;
+      }
+    }
+    this.move(directions[maxIndex]);
   }
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------
   //returns a clone of this player with the same brian
-  clone() {
-    var clone = new Player();
-    clone.brain = this.brain.clone();
-    clone.fitness = this.fitness;
-    clone.brain.generateNetwork();
-    clone.gen = this.gen;
-    clone.bestScore = this.score;
-    clone.stamina = this.stamina;
-    clone.maxStamina = this.maxStamina;
-    return clone;
-  }
+  // clone() {
+  //   var clone = new Player();
+  //   clone.brain = this.brain.clone();
+  //   clone.fitness = this.fitness;
+  //   clone.brain.generateNetwork();
+  //   clone.gen = this.gen;
+  //   clone.bestScore = this.score;
+  //   clone.stamina = this.stamina;
+  //   clone.maxStamina = this.maxStamina;
+  //   return clone;
+  // }
 
   //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
   //since there is some randomness in games sometimes when we want to replay the game we need to remove that randomness
   //this fuction does that
 
-  cloneForReplay() {
-    var clone = new Player();
-    clone.brain = this.brain.clone();
-    clone.fitness = this.fitness;
-    clone.brain.generateNetwork();
-    clone.gen = this.gen;
-    clone.bestScore = this.score;
-    clone.stamina = this.stamina;
-    clone.maxStamina = this.maxStamina;
+  // cloneForReplay() {
+  //   var clone = new Player();
+  //   clone.brain = this.brain.clone();
+  //   clone.fitness = this.fitness;
+  //   clone.brain.generateNetwork();
+  //   clone.gen = this.gen;
+  //   clone.bestScore = this.score;
+  //   clone.stamina = this.stamina;
+  //   clone.maxStamina = this.maxStamina;
 
-    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-    return clone;
-  }
+  //   //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
+  //   return clone;
+  // }
 
   calculateFitness() {
     // this.fitness =
@@ -418,14 +426,23 @@ class Player extends Entity {
     //   this.distance * this.distanceModifier -
     //   this.fitnessPenalty * this.penaltyModifier;
 
-    this.fitness = this.score * this.score * this.pickupRewardModifier - (this.fitnessPenalty * this.penaltyModifier);
+    this.brain.fitness = this.score * this.score * this.pickupRewardModifier - (this.fitnessPenalty * this.penaltyModifier);
   }
 
-  crossover(parent2) {
-    var child = new Player();
-    child.brain = this.brain.crossover(parent2.brain);
-    child.brain.generateNetwork();
-    return child;
-  }
+  // rebirth() {
+  //   this.dead = false;
+  //   this.movesWithoutTreat = 0;
+  //   this.x = 9;
+  //   this.y = 8;
+  //   this.stamina = 100;
+  //   this.isSprinting = false;
+  // }
+
+  // crossover(parent2) {
+  //   var child = new Player();
+  //   child.brain = this.brain.crossover(parent2.brain);
+  //   child.brain.generateNetwork();
+  //   return child;
+  // }
 
 }
