@@ -1,5 +1,5 @@
 class Treat extends Pickup {
-  static value = 100;
+  static value = 1;
   constructor(sprite, width, height) {
     let location = false;
     while(!location) {
@@ -15,6 +15,6 @@ class Treat extends Pickup {
 
     super(location, sprite, 2, width, height)
 
-    this.life = millis() + 15000;
+    this.life = millis() + 5000;
   }
 }

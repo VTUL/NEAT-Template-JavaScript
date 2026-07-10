@@ -88,7 +88,7 @@ class Player extends Entity {
     this.gen = 0;
     // this.distanceInterval = 20;
     // this.distanceReward = 100;
-    this.pickupRewardModifier = 2000;
+    // this.pickupRewardModifier = 2000;
     // this.distance = 0;
     this.fitnessPenalty = 0;
     this.penaltyModifier = 100;
@@ -136,6 +136,10 @@ class Player extends Entity {
     this.distanceTrackerX = this.x;
     this.distanceTrackerY = this.y;
 
+    this.r = getRandomInt(0, 255);
+    this.g = getRandomInt(0, 255);
+    this.b = getRandomInt(0, 255);
+
     this.stamina = 100;
     this.maxStamina = 100;
     this.staminaDrainRate = 0.8; //per frame when sprinting
@@ -167,9 +171,10 @@ class Player extends Entity {
     pop();
 
     //collision box
-    //noFill();
-    //stroke(255, 0, 0);
-    //rect(this.x, this.y, this.w, this.h);
+    // noFill();
+    // strokeWeight(4);
+    // stroke(this.r, this.g, this.b);
+    // rect(this.x - this.w, this.y - this.h, this.w*2, this.h*2);
   }
 
   deadzone(v, dz = 0.25) {
@@ -214,12 +219,12 @@ class Player extends Entity {
     }
 
     //sprint logic
-    if (this.isSprinting && this.stamina > 0) {
+    if (this.isSprinting && this.stamina > 1) {
       this.speed = this.boostedSpeed;
       this.stamina -= this.staminaDrainRate;
 
       if (this.stamina <= 0) {
-        this.stamina = 0;
+        this.stamina = 1;
         this.isSprinting = false;      //stop sprinting
         this.staminaCooldown = millis() + 3000; 
       }
@@ -269,14 +274,14 @@ class Player extends Entity {
     this.vision.push(this.checkDownArea());
     this.vision.push(this.checkRightArea());
     //sprinting to array
-    this.vision.push(100/this.stamina);
-    this.vision.push(5/this.speed);
+    this.vision.push((this.stamina/100).toFixed(3));
+    this.vision.push(this.speed === 5 ? 0 : 1);
     //push invincibility to array
     this.vision.push(this.isInvincible ? 1 : 0);
   }
 
   checkWall(direction) {
-    for(let steps = 1; steps <= 19; steps++) {
+    for(let steps = 1; steps <= 17; steps++) {
       let tempX;
       let tempY;
       switch(direction){
@@ -298,7 +303,7 @@ class Player extends Entity {
           break;
       }
       if (typeof mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX] === "undefined" || !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.valid) {
-        return 1/steps;
+        return (1/steps).toFixed(3);
       }
     }
   }
@@ -328,7 +333,7 @@ class Player extends Entity {
       if (typeof mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX] === "undefined" || !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.valid) {
         return 0;
       } else if (mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => occupant.type === target) && !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))){
-        return 1/steps;
+        return (1/steps).toFixed(3);
       } 
     }
   }
@@ -367,6 +372,7 @@ class Player extends Entity {
 
     //movement decision
     let directions = ["w", "d", "s", "a"];
+    // console.log(`Player ${this.uuid} vision: ${this.vision}`)
     this.decision = this.brain.propagate(this.vision);
 
     for (let i = 0; i < 4; i++) {
@@ -421,12 +427,7 @@ class Player extends Entity {
   // }
 
   calculateFitness() {
-    // this.fitness =
-    //   this.score * this.score * this.pickupRewardModifier +
-    //   this.distance * this.distanceModifier -
-    //   this.fitnessPenalty * this.penaltyModifier;
-
-    this.brain.fitness = this.score * this.score * this.pickupRewardModifier - (this.fitnessPenalty * this.penaltyModifier);
+    this.brain.fitness = this.score + (this.movesTaken / 100);
   }
 
   // rebirth() {

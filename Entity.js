@@ -24,6 +24,7 @@ class Entity {
     this.lastDec;
 
     this.movesWithoutTreat = 0;
+    this.movesTaken = 0;
 
     this.registerLocation(this.currentLocation);
   }
@@ -92,6 +93,7 @@ class Entity {
       switch (direction) {
         case "a":
           if (typeof mapGrid[this.currentLocation.y]?.[this.currentLocation.x - 1] !== "undefined" && mapGrid[this.currentLocation.y]?.[this.currentLocation.x - 1]?.valid) {
+            this.movesTaken++;
             this.facing = direction;
             this.nextLocation = {
               x: this.currentLocation.x - 1,
@@ -104,12 +106,14 @@ class Entity {
             this.lastDec = "a";
             this.isReadytoMove = false;
           } else {
+            this.facing = direction;
             // console.log("Not a valid move in the 'a' direction.")
             this.fitnessPenalty += 1;
           }
           break;
         case "d":
           if (typeof mapGrid[this.currentLocation.y]?.[this.currentLocation.x + 1] !== "undefined" && mapGrid[this.currentLocation.y]?.[this.currentLocation.x + 1]?.valid) {
+            this.movesTaken++;
             this.facing = direction;
             this.nextLocation = {
               x: this.currentLocation.x + 1,
@@ -122,12 +126,14 @@ class Entity {
             this.lastDec = "d";
             this.isReadytoMove = false;
           } else {
+            this.facing = direction;
             // console.log("Not a valid move in the 'd' direction.")
             this.fitnessPenalty += 1;
           }
           break;
         case "w":
           if (typeof mapGrid[this.currentLocation.y - 1]?.[this.currentLocation.x] !== "undefined" && mapGrid[this.currentLocation.y - 1]?.[this.currentLocation.x]?.valid) {
+            this.movesTaken++;
             this.facing = direction;
             this.nextLocation = {
               x: this.currentLocation.x,
@@ -140,12 +146,14 @@ class Entity {
             this.lastDec = "w";
             this.isReadytoMove = false;
           } else {
+            this.facing = direction;
             // console.log("Not a valid move in the 'w' direction.")
             this.fitnessPenalty += 1;
           }
           break;
         case "s":
           if (typeof mapGrid[this.currentLocation.y + 1]?.[this.currentLocation.x] !== "undefined" && mapGrid[this.currentLocation.y + 1]?.[this.currentLocation.x]?.valid) {
+            this.movesTaken++;
             this.facing = direction;
             this.nextLocation = {
               x: this.currentLocation.x,
@@ -158,6 +166,7 @@ class Entity {
             this.lastDec = "s";
             this.isReadytoMove = false;
           } else {
+            this.facing = direction;
             // console.log("Not a valid move in the 's' direction.")
             this.fitnessPenalty += 1;
           }

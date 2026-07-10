@@ -64,7 +64,7 @@ let accordionIndex = 0;
 let bWasPressed = false;
 let rightStickCooldown = 0;
 
-const MAX_MOVES_WITHOUT_TREAT = 500;
+const MAX_MOVES_WITHOUT_TREAT = 35;
 
 const config = new Config({
   // Basic network structure
@@ -72,7 +72,7 @@ const config = new Config({
   outputSize: 5,                   // Number of output nodes
 
   // Activation function (string-based selection)
-  // activationFunction: 'Sigmoid',   // 'Sigmoid', 'NEATSigmoid', 'Tanh', 'ReLU', 'LeakyReLU', 'Gaussian'
+  activationFunction: 'Tanh',   // 'Sigmoid', 'NEATSigmoid', 'Tanh', 'ReLU', 'LeakyReLU', 'Gaussian'
 
   // Bias settings
   // bias: 1.0,                       // Bias value
@@ -107,9 +107,9 @@ const config = new Config({
   maxPerturb: 0.5,                 // Maximum perturbation value
 
   // Evolution parameters
-  populationSize: 250,             // Size of the population
-  generations: 10000,                // Number of generations
-  targetFitness: 0.95,             // Target fitness to achieve
+  populationSize: 500,             // Size of the population
+  generations: 1000,                // Number of generations
+  targetFitness: 1000,             // Target fitness to achieve
   survivalRate: 0.2,               // Proportion that survives each generation
   numOfElite: 15,                  // Number of elite individuals to retain
   dropOffAge: 15,                  // Maximum age before dropping off
@@ -353,7 +353,7 @@ function handleRespawns() {
   //respawn Peanut Butter if missing and timer passed
   if (pb?.length < 1 && millis() > PBRespawnTime) {
     pb.push(new PeanutButter(peanut, 24, 24));
-    PBRespawnTime = millis() + 60000;
+    PBRespawnTime = millis() + 5000;
   }
 
   if (pb?.length >= 1) {
@@ -379,7 +379,7 @@ function handleRespawns() {
   }
 
   //respawn treats 
- if (treats.length < 15) {
+ if (treats.length < 25) {
     treats.push(new Treat(treat, 20, 20));
   }
 
