@@ -1,183 +1,389 @@
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <script language="javascript" type="text/javascript" src="libraries/p5.js"></script>
-  <script language="javascript" src="libraries/p5.dom.js"></script>
-  <script language="javascript" src="libraries/p5.sound.js"></script>
-  <script language="javascript" src="libraries/Box2d.js"></script>
-  <script language="javascript" src="libraries/Crypto.json"></script>
-  <script language="javascript" src="libraries/NEAT-JavaScript-1.1.0.js"></script>
-  <script language="javascript" type="text/javascript" src="Map.js"></script> 
-  <script language="javascript" type="text/javascript" src="sketch.js"></script> 
-  <script language="javascript" type="text/javascript" src="Entity.js"></script> 
-  <script language="javascript" type="text/javascript" src="Pickup.js"></script> 
-  <!-- <script language="javascript" type="text/javascript" src="ConnectionGene.js"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="libraries/p5.js"
+    ></script>
+    <script language="javascript" src="libraries/p5.dom.js"></script>
+    <script language="javascript" src="libraries/p5.sound.js"></script>
+    <script language="javascript" src="libraries/Box2d.js"></script>
+    <script language="javascript" src="libraries/Crypto.json"></script>
+    <script
+      language="javascript"
+      src="libraries/NEAT-JavaScript-1.1.0.js"
+    ></script>
+    <script language="javascript" type="text/javascript" src="Map.js"></script>
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="sketch.js"
+    ></script>
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="Entity.js"
+    ></script>
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="Pickup.js"
+    ></script>
+    <!-- <script language="javascript" type="text/javascript" src="ConnectionGene.js"></script>
   <script language="javascript" type="text/javascript" src="ConnectionHistory.js"></script> -->
-  <!-- <script language="javascript" type="text/javascript" src="Node.js"></script> -->
-  <script language="javascript" type="text/javascript" src="Player.js"></script>
-  <script language="javascript" type="text/javascript" src="Treat.js"></script>
-  <script language="javascript" type="text/javascript" src="DogBed.js"></script>
-  <script language="javascript" type="text/javascript" src="Enemy.js"></script>
-  <script language="javascript" type="text/javascript" src="TennisBall.js"></script>
-  <script language="javascript" type="text/javascript" src="Wall.js"></script>
-  <script language="javascript" type="text/javascript" src="Block.js"></script>
-  <script language="javascript" type="text/javascript" src="Sprite.js"></script>
-  <script language="javascript" type="text/javascript" src="PeanutButter.js"></script>
-  <script language="javascript" type="text/javascript" src="Pool.js"></script>
-  <!-- <script language="javascript" type="text/javascript" src="Species.js"></script>
+    <!-- <script language="javascript" type="text/javascript" src="Node.js"></script> -->
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="Player.js"
+    ></script>
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="Treat.js"
+    ></script>
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="DogBed.js"
+    ></script>
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="Enemy.js"
+    ></script>
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="TennisBall.js"
+    ></script>
+    <script language="javascript" type="text/javascript" src="Wall.js"></script>
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="Block.js"
+    ></script>
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="Sprite.js"
+    ></script>
+    <script
+      language="javascript"
+      type="text/javascript"
+      src="PeanutButter.js"
+    ></script>
+    <script language="javascript" type="text/javascript" src="Pool.js"></script>
+    <script language="javascript" type="text/javascript" src="VisualizeGenome.js"></script>
+    <!-- <script language="javascript" type="text/javascript" src="Species.js"></script>
   <script language="javascript" type="text/javascript" src="Genome.js"></script> -->
-  <title>NEAT Therapy Dogs</title>
-</head>
-<body>
-  <style>
-    * {
-      margin: 0px;
-      padding: 10px;
-      box-sizing: border-box;
-    }
+    <title>NEAT Therapy Dogs</title>
+  </head>
+  <body>
+    <style>
+      * {
+        margin: 0px;
+        padding: 10px;
+        box-sizing: border-box;
+      }
 
-   body {
-      background-color: #19193c;
-      font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 0;
-      margin: 0;
-    }
+      body {
+        background-color: #19193c;
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+        margin: 0;
+      }
 
-    h2 {
-      text-align: center;
-      font-family: sans-serif;
-      font-size: 32px;
-      color: #6ab9c9;
-    }
+      h2 {
+        text-align: center;
+        font-family: sans-serif;
+        font-size: 32px;
+        color: #6ab9c9;
+      }
 
-    canvas {
-      display: block;
-      margin: 5px auto;
-    }
+      canvas {
+        display: block;
+        margin: 5px auto;
+      }
 
-    #gameInfo {
-      color: #eeeefd;
-      font-size: 25px;
-      background-color: #29284d;
-      border-top: 2px solid #57327c;
-      padding-top: 15px;
-      padding-left: 30px;
-      line-height: 1.5;
-      height: 180;
-      width: 400;
-      text-align: left;
-      font-family: monospace; 
-    }
+      #gameInfo {
+        color: #eeeefd;
+        font-size: 25px;
+        background-color: #29284d;
+        border-top: 2px solid #57327c;
+        padding-top: 15px;
+        padding-left: 30px;
+        line-height: 1.5;
+        height: 180;
+        width: 400;
+        text-align: left;
+        font-family: monospace;
+      }
 
-     #controlsInfo {
-      color: #eeeefd;
-      font-size: 20px;
-      background-color: #29284d;
-      border-top: 2px solid #57327c;
-      height: 180;
-      width: 400;
-      text-align: left;
-      font-family: monospace; 
-      line-height: 5px;
-    }
+      #controlsInfo {
+        color: #eeeefd;
+        font-size: 20px;
+        background-color: #29284d;
+        border-top: 2px solid #57327c;
+        height: 180;
+        width: 400;
+        text-align: left;
+        font-family: monospace;
+        line-height: 5px;
+      }
 
-    .container {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
+      .container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+      }
 
-    .accordion {
-      text-align: center;
-      font-family: sans-serif;
-      font-size: 25px;
-      color: #6ab9c9;
-      background-color: #57327c;
-      cursor: pointer;
-      padding: 10px;
-      width: 100%;
-      border: none;
-      outline: none;
-      transition: 0.4s;
-      margin-bottom: 20px;
-    }
+      .accordion {
+        text-align: center;
+        font-family: sans-serif;
+        font-size: 25px;
+        color: #6ab9c9;
+        background-color: #57327c;
+        cursor: pointer;
+        padding: 10px;
+        width: 100%;
+        border: none;
+        outline: none;
+        transition: 0.4s;
+        margin-bottom: 20px;
+      }
 
-    .accordion.selected {
-      outline: 3px solid #4cff4c;
-    }
+      .accordion.selected {
+        outline: 3px solid #4cff4c;
+      }
 
-    .accordion:hover {
-      background-color: #8264a0;
-    }
+      .accordion:hover {
+        background-color: #8264a0;
+      }
 
-    
-    .panel {
-      color: #eeeefd;
-      font-size: 20px;
-      background-color: #29284d;
-      padding: 10px;
-      width: fit-content;
-      text-align: left;
-      font-family: monospace; 
-      display: none;
-      overflow: hidden;
-      margin-top: -20px;
-      margin-bottom: 20px;
-    }
+      .panel {
+        color: #eeeefd;
+        font-size: 20px;
+        background-color: #29284d;
+        padding: 10px;
+        width: fit-content;
+        text-align: left;
+        font-family: monospace;
+        display: none;
+        overflow: hidden;
+        margin-top: -20px;
+        margin-bottom: 20px;
+      }
 
-  </style>
-  <main>
-    <div class="title">
-      <h2>Watch an AI learn to play a video game in real time!</h2>
-    </div>
-    <div id="canvasContainer">
-    </div> 
-    <div class="container">
-      <div id="gameInfo"></div>
-      <div id="controlsInfo">
-        <h3>Controls</h3>
-        <p><b>Start:</b> &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Play the game!</p>
-        <p><b>A:</b> &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Sprint</p>
-        <p><b>Left Stick:</b> &emsp;&emsp;&emsp;&emsp;Move</p>
-        <p><b>Right Stick:</b> &emsp;&emsp;&emsp;Navigate Info</p>
-        <p><b>B:</b> &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Select Info</p>
+      .brain-heading {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      h2.brain-h2 {
+        font-size: 1.2rem;
+      }
+
+      span.brain-gen,
+      .legend-item {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #6ab9c9;
+      }
+
+      span.dot {
+        display: flex;
+        height: 20px;
+        width: 20px;
+        flex-direction: row;
+        border-radius: 12px;
+        margin-right: 10px;
+      }
+
+      span.legend-item {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .brain-legend {
+        display: flex;
+        flex-direction: row;
+      }
+
+      html,
+      main {
+        padding: 0;
+      }
+
+    </style>
+    <main>
+      <div id="canvasContainer"></div>
+      <div class="container">
+        <div id="gameInfo"></div>
+        <div id="controlsInfo">
+          <h3>Controls</h3>
+          <p>
+            <b>Start:</b>
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Play the game!
+          </p>
+          <p>
+            <b>A:</b>
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Sprint
+          </p>
+          <p><b>Left Stick:</b> &emsp;&emsp;&emsp;&emsp;Move</p>
+          <p><b>Right Stick:</b> &emsp;&emsp;&emsp;Navigate Info</p>
+          <p>
+            <b>B:</b>
+            &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Select
+            Info
+          </p>
+        </div>
       </div>
-    </div>
-    
 
-    <button class="accordion"><b>Game Explanation +</b></button>
-    <div class="panel">
-        <p>Looks strange, doesn't it? Why are there so many dogs on screen? That's because there are actually 500 versions of the AI with slightly different brains playing the game at one time, each trying to get the highest score they can. The ones that do get to move on to the next round of training.</p>
-        <p>So what's this game? This is a custom video game made in-house that features the VT Therapy Dogs. You play as Epcot, Derek, or Josie as they explore the library, looking for treats and toys while avoiding getting distracted by one of the many sneaky squirrels on campus. The squirrels drop things like chocolate that the dogs need to avoid in order to get a high score, and if the dog runs into a squirrel, they lose focus and the game. The dogs can also get tired from all that running around, so there are also dog beds they can find to recharge. What do you do to recharge when your energy is feeling low? Rest is an important part of keeping your mind sharp and healthy.</p>
-    </div>
+      <div class="brain-container">
+        <div class="brain-heading">
+          <h2 class="brain-h2">Best Genome</h2>
+          <span class="brain-gen">Generation 4</span>
+        </div>
+        <div class="brain-canvas">
+          <canvas id="brain" width="1080" height="700"></canvas>
+        </div>
+        <div class="brain-legend">
+          <span class="legend-item"
+            ><span
+              class="dot"
+              style="background-color: rgb(111, 143, 169)"
+            ></span
+            >Input</span
+          ><span class="legend-item"
+            ><span
+              class="dot"
+              style="background-color: rgb(127, 161, 111)"
+            ></span
+            >Hidden</span
+          ><span class="legend-item"
+            ><span
+              class="dot"
+              style="background-color: rgb(217, 119, 87)"
+            ></span
+            >Output</span
+          ><span class="legend-item"
+            ><span class="dot" style="background-color: rgb(188, 75, 60)"></span
+            >Bias</span
+          >
+        </div>
+      </div>
 
-    <button class="accordion"><b>How does this work? +</b></button>
-    <div class="panel">
-      <p>How does this whole training thing work? Well, this AI uses a Neuroevolution of Augmenting Topologies algorithm, or NEAT for short. It sounds complicated, but it is really just an algorithm for mimicking the real-world process of Natural Selection. We give the AI a brain in the form of a matrix, which you might remember from algebra as a grid of numbers. A very simplified example might look like this:  </p> 
+      <button class="accordion"><b>Game Explanation +</b></button>
+      <div class="panel">
+        <p>
+          Looks strange, doesn't it? Why are there so many dogs on screen?
+          That's because there are actually 500 versions of the AI with slightly
+          different brains playing the game at one time, each trying to get the
+          highest score they can. The ones that do get to move on to the next
+          round of training.
+        </p>
+        <p>
+          So what's this game? This is a custom video game made in-house that
+          features the VT Therapy Dogs. You play as Epcot, Derek, or Josie as
+          they explore the library, looking for treats and toys while avoiding
+          getting distracted by one of the many sneaky squirrels on campus. The
+          squirrels drop things like chocolate that the dogs need to avoid in
+          order to get a high score, and if the dog runs into a squirrel, they
+          lose focus and the game. The dogs can also get tired from all that
+          running around, so there are also dog beds they can find to recharge.
+          What do you do to recharge when your energy is feeling low? Rest is an
+          important part of keeping your mind sharp and healthy.
+        </p>
+      </div>
+
+      <button class="accordion"><b>How does this work? +</b></button>
+      <div class="panel">
+        <p>
+          How does this whole training thing work? Well, this AI uses a
+          Neuroevolution of Augmenting Topologies algorithm, or NEAT for short.
+          It sounds complicated, but it is really just an algorithm for
+          mimicking the real-world process of Natural Selection. We give the AI
+          a brain in the form of a matrix, which you might remember from algebra
+          as a grid of numbers. A very simplified example might look like this:
+        </p>
         <pre>
                                               4 | 8 | 0
                                               5 | 3 | 8
                                               7 | 3 | 2
         </pre>
-      <p>At first the matrix is random, and each version of the AI gets a different brain.
-      <p>The AI also gets access to inputs and outputs. Inputs are things it knows about the world. Our AI knows how far away a treat is, how far away an enemy is, and whether they are about to run into a wall. Outputs are things it can do. For a game, these are essentially the buttons it can press on a controller. Our AI can move up, down, left, right, and hold down a "sprint" button to temporarily run faster.</p>
-      <p>All of the inputs are numbers, and 30 times a second we feed the numbers into the matrix, where the algorithm does some math and passes a value out the other side for each of the possible outputs. The output with the highest value is the action we take, and we sprint if the value for sprinting is above a certain threshold, or "confidence."</p>
-      <p>We throw a whole bunch of versions of our AI with different brains (500 per generation for our game) into the game world to see how they do. The ones that do the best by getting the highest scores, we make a copy of their brains and create slight, random adjustments to the numbers in the matrix, then send out a new generation of 500 to see how they do. Then we repeat the process over and over.</p>
-      <p>At first, they all move around randomly and are really bad at the game. But eventually some of them get lucky. One of their brains will have a tendency to take the input number for the distance to a treat and want to make that number as low as possible by taking the action that lowers that number (so move right if the treat is to the right to make the distance less). Then, because that individual version of the AI did well and scored points by collecting a treat, its brain goes on and is copied and serves as the basis for the next generation. So the next generation of brains is more likely to want to do the same thing, and over time, the AI gets better and better at the game.</p>
-      <p>The visualization below is an attempt to show how this brain functions, and it represents the brain of the AI that has the highest score this generation.</p>
-    </div>
-    
-     <button class="accordion"><b>Can I Play? +</b></button>
+        <p>
+          At first the matrix is random, and each version of the AI gets a
+          different brain.
+        </p>
+        <p>
+          The AI also gets access to inputs and outputs. Inputs are things it
+          knows about the world. Our AI knows how far away a treat is, how far
+          away an enemy is, and whether they are about to run into a wall.
+          Outputs are things it can do. For a game, these are essentially the
+          buttons it can press on a controller. Our AI can move up, down, left,
+          right, and hold down a "sprint" button to temporarily run faster.
+        </p>
+        <p>
+          All of the inputs are numbers, and 30 times a second we feed the
+          numbers into the matrix, where the algorithm does some math and passes
+          a value out the other side for each of the possible outputs. The
+          output with the highest value is the action we take, and we sprint if
+          the value for sprinting is above a certain threshold, or "confidence."
+        </p>
+        <p>
+          We throw a whole bunch of versions of our AI with different brains
+          (500 per generation for our game) into the game world to see how they
+          do. The ones that do the best by getting the highest scores, we make a
+          copy of their brains and create slight, random adjustments to the
+          numbers in the matrix, then send out a new generation of 500 to see
+          how they do. Then we repeat the process over and over.
+        </p>
+        <p>
+          At first, they all move around randomly and are really bad at the
+          game. But eventually some of them get lucky. One of their brains will
+          have a tendency to take the input number for the distance to a treat
+          and want to make that number as low as possible by taking the action
+          that lowers that number (so move right if the treat is to the right to
+          make the distance less). Then, because that individual version of the
+          AI did well and scored points by collecting a treat, its brain goes on
+          and is copied and serves as the basis for the next generation. So the
+          next generation of brains is more likely to want to do the same thing,
+          and over time, the AI gets better and better at the game.
+        </p>
+        <p>
+          The visualization below is an attempt to show how this brain
+          functions, and it represents the brain of the AI that has the highest
+          score this generation.
+        </p>
+      </div>
+
+      <button class="accordion"><b>Can I Play? +</b></button>
       <div class="panel">
-      <p>Think you can do better? Probably. If you want to try your hand at the game and see how your score stacks up against the best the AI can muster right now, grab the controller and hit "A" to start playing the game. Once you're done, compare your score to the top score the AI has gotten? How close were you?</p>
-      <p>But the AI will continue to improve over time, and if you come back tomorrow, you might not be able to beat it anymore. AI often eventually surpasses human capabilities at specialized tasks like this, so challenge it again in the future to see how you stack up then.</p>
-    </div>
-  </main>
-</body>
+        <p>
+          Think you can do better? Probably. If you want to try your hand at the
+          game and see how your score stacks up against the best the AI can
+          muster right now, grab the controller and hit "A" to start playing the
+          game. Once you're done, compare your score to the top score the AI has
+          gotten? How close were you?
+        </p>
+        <p>
+          But the AI will continue to improve over time, and if you come back
+          tomorrow, you might not be able to beat it anymore. AI often
+          eventually surpasses human capabilities at specialized tasks like
+          this, so challenge it again in the future to see how you stack up
+          then.
+        </p>
+      </div>
+    </main>
+  </body>
 </html>

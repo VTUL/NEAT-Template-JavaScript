@@ -25,11 +25,12 @@ class Entity {
 
     this.movesWithoutTreat = 0;
     this.movesTaken = 0;
+    this.fitnessPenalty = 0;
 
     this.registerLocation(this.currentLocation);
   }
 
-  move(direction) {
+  move(direction, increasePenalty) {
     // console.info("Type", this.type);
     // console.info("Id", this.uuid);
     // console.info("Location", this.currentLocation);
@@ -108,7 +109,7 @@ class Entity {
           } else {
             this.facing = direction;
             // console.log("Not a valid move in the 'a' direction.")
-            this.fitnessPenalty += 1;
+            this.fitnessPenalty++;
           }
           break;
         case "d":
@@ -128,7 +129,7 @@ class Entity {
           } else {
             this.facing = direction;
             // console.log("Not a valid move in the 'd' direction.")
-            this.fitnessPenalty += 1;
+            this.fitnessPenalty++;
           }
           break;
         case "w":
@@ -148,7 +149,7 @@ class Entity {
           } else {
             this.facing = direction;
             // console.log("Not a valid move in the 'w' direction.")
-            this.fitnessPenalty += 1;
+            this.fitnessPenalty++;
           }
           break;
         case "s":
@@ -168,7 +169,7 @@ class Entity {
           } else {
             this.facing = direction;
             // console.log("Not a valid move in the 's' direction.")
-            this.fitnessPenalty += 1;
+            this.fitnessPenalty++;
           }
           break;
         default:

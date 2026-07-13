@@ -63,6 +63,7 @@ let activeGamepadIndex = null;
 let accordionIndex = 0;
 let bWasPressed = false;
 let rightStickCooldown = 0;
+let brainCanvas;
 
 const MAX_MOVES_WITHOUT_TREAT = 35;
 
@@ -165,6 +166,7 @@ function setup() {
   frameRate(speed);
 
   let acc = document.getElementsByClassName("accordion");
+  brainCanvas = document.getElementById("brain");
   let i;
 
   for (i = 0; i < acc.length; i++) {
@@ -282,6 +284,7 @@ function draw() {
       population.evolve();
       console.log("population after evolve: ", population);
       resetGame(); //reset the game state for the next generation
+      visualizeGenome(population.getBestGenome(), brainCanvas)
     }
   }
   drawGrid(); 

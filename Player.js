@@ -90,8 +90,6 @@ class Player extends Entity {
     // this.distanceReward = 100;
     // this.pickupRewardModifier = 2000;
     // this.distance = 0;
-    this.fitnessPenalty = 0;
-    this.penaltyModifier = 100;
     // this.distanceModifier = 500;
 
     this.genomeInputs = 29; // 4 for walls, 5 for pickups 1 for enemies
@@ -427,7 +425,8 @@ class Player extends Entity {
   // }
 
   calculateFitness() {
-    this.brain.fitness = this.score + (this.movesTaken / 100);
+    this.brain.fitness = (this.score + (this.movesTaken / 10)) - (this.fitnessPenalty / 3);
+    // console.log(this.brain);
   }
 
   // rebirth() {
