@@ -69,7 +69,7 @@ const MAX_MOVES_WITHOUT_TREAT = 35;
 
 const config = new Config({
   // Basic network structure
-  inputSize: 29,                    // Number of input nodes
+  inputSize: 11,                    // Number of input nodes
   outputSize: 5,                   // Number of output nodes
 
   // Activation function (string-based selection)

@@ -1,81 +1,76 @@
 class Player extends Entity {
   constructor(brain) {
-
     const collisionCallback = (collisions) => {
       collisions.forEach((occupant) => {
-        if(occupant.type === 1) {
+        if (occupant.type === 1) {
           // console.log("Dog collided with Squirrel");
-          if(!this.isInvincible) {
+          if (!this.isInvincible) {
             this.dead = true;
           }
           return;
-        } else if(occupant.type === 2 || occupant.type === 3) {
-          if(occupant.type === 2) {
-            for(let i = 0; i <= treats.length; i++) {
+        } else if (occupant.type === 2 || occupant.type === 3) {
+          if (occupant.type === 2) {
+            for (let i = 0; i <= treats.length; i++) {
               if (treats[i]?.uuid === occupant.id) {
-                if(treats[i].idList.includes(this.uuid)) {
+                if (treats[i].idList.includes(this.uuid)) {
                   return;
                 } else {
                   //OG:this.score += occupant.type === 2 ? Treat.value : PeanutButter.value;
-                  this.score += Treat.value
+                  this.score += Treat.value;
                   this.movesWithoutTreat = 0;
                   treats[i].idList.push(this.uuid);
-                  if(humanPlaying) {
+                  if (humanPlaying) {
                     treats[i].deregisterLocation();
                     treats.splice(i, 1);
                   }
                 }
               }
             }
-          }
-          else if(occupant.type === 3) {
+          } else if (occupant.type === 3) {
             if (pb[0]?.uuid === occupant.id) {
-              if(pb[0].idList.includes(this.uuid)) {
+              if (pb[0].idList.includes(this.uuid)) {
                 return;
               } else {
                 this.score += PeanutButter.value;
                 this.movesWithoutTreat = 0;
                 pb[0].idList.push(this.uuid);
-                if(humanPlaying) {
+                if (humanPlaying) {
                   pb[0].deregisterLocation();
                   pb.splice(0, 1);
                 }
               }
             }
           }
-            
-          
-          
-        } else if(occupant.type === 4) {
+        } else if (occupant.type === 4) {
           if (beds[0]?.uuid === occupant.id) {
-            if(beds[0].idList.includes(this.uuid)) {
+            if (beds[0].idList.includes(this.uuid)) {
               return;
             } else {
               beds[0].idList.push(this.uuid);
               this.stamina = 100;
-              if(humanPlaying) {
-                  beds[0].deregisterLocation();
-                  beds.splice(0, 1);
-                }
+              if (humanPlaying) {
+                beds[0].deregisterLocation();
+                beds.splice(0, 1);
+              }
             }
           }
-        } else if(occupant.type === 5) {
+        } else if (occupant.type === 5) {
           if (balls[0]?.uuid === occupant.id) {
-            if(balls[0].idList.includes(this.uuid)) {
+            if (balls[0].idList.includes(this.uuid)) {
               return;
             } else {
               balls[0].idList.push(this.uuid);
               this.isInvincible = true;
               this.isInvinUntil = 10000 + millis();
-              if(humanPlaying) {
-                  balls[0].deregisterLocation();
-                  balls.splice(0, 1);
-                }
+              if (humanPlaying) {
+                balls[0].deregisterLocation();
+                balls.splice(0, 1);
+              }
             }
           }
         }
-      })
-    }
+      });
+    };
 
     super({ x: 9, y: 8 }, 40, 24, 5, 0, collisionCallback);
     this.vision = []; //the input array fed into the neuralNet
@@ -92,15 +87,15 @@ class Player extends Entity {
     // this.distance = 0;
     // this.distanceModifier = 500;
 
-    this.genomeInputs = 29; // 4 for walls, 5 for pickups 1 for enemies
+    this.genomeInputs = 11; // 4 for walls, 5 for pickups 1 for enemies
     this.genomeOutputs = 5; // Up, Right, Down, Left, Sprint
     this.brain = brain;
 
     this.isInvinUntil = 0;
-    
+
     // this.w = 40;
     // this.h = 24;
-    
+
     this.isInvincible = false;
 
     // this.lastScoreMillis = millis();
@@ -129,14 +124,12 @@ class Player extends Entity {
     this.spriteDown = [this.derekDown, this.epcotDown, this.josieDown];
     this.i = floor(random(3));
 
-    
-
     this.distanceTrackerX = this.x;
     this.distanceTrackerY = this.y;
 
-    this.r = getRandomInt(0, 255);
-    this.g = getRandomInt(0, 255);
-    this.b = getRandomInt(0, 255);
+    // this.r = getRandomInt(0, 255);
+    // this.g = getRandomInt(0, 255);
+    // this.b = getRandomInt(0, 255);
 
     this.stamina = 100;
     this.maxStamina = 100;
@@ -176,7 +169,7 @@ class Player extends Entity {
   }
 
   deadzone(v, dz = 0.25) {
-  return Math.abs(v) < dz ? 0 : v;
+    return Math.abs(v) < dz ? 0 : v;
   }
 
   update() {
@@ -185,7 +178,6 @@ class Player extends Entity {
     this.isInvincible = millis() < this.isInvinUntil;
 
     if (humanPlaying) {
-
       //KEYBOARD
       if (keyIsDown(87)) this.move("w"); // W
       if (keyIsDown(83)) this.move("s"); // S
@@ -223,15 +215,17 @@ class Player extends Entity {
 
       if (this.stamina <= 0) {
         this.stamina = 1;
-        this.isSprinting = false;      //stop sprinting
-        this.staminaCooldown = millis() + 3000; 
+        this.isSprinting = false; //stop sprinting
+        this.staminaCooldown = millis() + 3000;
       }
-
     } else {
       this.speed = this.baseSpeed;
 
       //added cooldown for stamina regen after sprinting
-      if (this.stamina < this.maxStamina && (!this.staminaCooldown || millis() > this.staminaCooldown)) {
+      if (
+        this.stamina < this.maxStamina &&
+        (!this.staminaCooldown || millis() > this.staminaCooldown)
+      ) {
         this.stamina += this.staminaRegenRate;
         if (this.stamina > this.maxStamina) this.stamina = this.maxStamina;
       }
@@ -240,49 +234,91 @@ class Player extends Entity {
 
   look() {
     this.vision = [];
-    //push walls to vision array
-    this.vision.push(this.checkWall(1));
-    this.vision.push(this.checkWall(2));
-    this.vision.push(this.checkWall(3));
-    this.vision.push(this.checkWall(4));
-
-    //push enemies to vision array
-    this.vision.push(this.checkOther(1, 1));
-    this.vision.push(this.checkOther(2, 1));
-    this.vision.push(this.checkOther(3, 1));
-    this.vision.push(this.checkOther(4, 1));
-    //push pickups to vision array
-    this.vision.push(this.checkOther(1, 2));
-    this.vision.push(this.checkOther(2, 2));
-    this.vision.push(this.checkOther(3, 2));
-    this.vision.push(this.checkOther(4, 2));
-    this.vision.push(this.checkOther(1, 3));
-    this.vision.push(this.checkOther(2, 3));
-    this.vision.push(this.checkOther(3, 3));
-    this.vision.push(this.checkOther(4, 3));
-    this.vision.push(this.checkOther(1, 4));
-    this.vision.push(this.checkOther(2, 4));
-    this.vision.push(this.checkOther(3, 4));
-    this.vision.push(this.checkOther(4, 4));
-    this.vision.push(this.checkOther(1, 5));
-    this.vision.push(this.checkOther(2, 5));
-    this.vision.push(this.checkOther(3, 5));
-    this.vision.push(this.checkOther(4, 5));
-    //push directionality of valid treat
-    this.vision.push(this.checkDownArea());
-    this.vision.push(this.checkRightArea());
+    //push whisker vision to array
+    this.vision.push(this.lookDirection(1));
+    this.vision.push(this.lookDirection(2));
+    this.vision.push(this.lookDirection(3));
+    this.vision.push(this.lookDirection(4));
+    this.vision.push(this.lookDirection(5));
+    //push direction to array
+    this.vision.push(this.facing === "w" ? 1 : 0);
+    this.vision.push(this.facing === "s" ? 1 : 0);
+    this.vision.push(this.facing === "d" ? 1 : 0);
     //sprinting to array
-    this.vision.push((this.stamina/100).toFixed(3));
+    this.vision.push((this.stamina / 100).toFixed(3));
     this.vision.push(this.speed === 5 ? 0 : 1);
     //push invincibility to array
     this.vision.push(this.isInvincible ? 1 : 0);
   }
 
-  checkWall(direction) {
-    for(let steps = 1; steps <= 17; steps++) {
+  // 1 = left, 2 = diag left, 3 = forward, 4 = diag right, 5 = right
+  lookDirection(direction) {
+    switch(direction) {
+      case 1:
+        if(this.facing === "a") {
+          return this.lookStraight(3);
+        } else if (this.facing === "w") {
+          return this.lookStraight(4);
+        } else if (this.facing === "s") {
+          return this.lookStraight(2);
+        } else {
+          return this.lookStraight(1);
+        }
+        break;
+      case 2:
+        if(this.facing === "a") {
+          return this.lookDiagonal(3);
+        } else if (this.facing === "w") {
+          return this.lookDiagonal(1);
+        } else if (this.facing === "s") {
+          return this.lookDiagonal(4);
+        } else {
+          return this.lookDiagonal(2);
+        }
+        break;
+      case 3:
+        if(this.facing === "a") {
+          return this.lookStraight(4);
+        } else if (this.facing === "w") {
+          return this.lookStraight(1);
+        } else if (this.facing === "s") {
+          return this.lookStraight(3);
+        } else {
+          return this.lookStraight(2);
+        }
+        break;
+      case 4:
+        if(this.facing === "a") {
+          return this.lookDiagonal(1);
+        } else if (this.facing === "w") {
+          return this.lookDiagonal(2);
+        } else if (this.facing === "s") {
+          return this.lookDiagonal(4);
+        } else {
+          return this.lookDiagonal(3);
+        }
+        break;
+      case 5:
+        if(this.facing === "a") {
+          return this.lookStraight(1);
+        } else if (this.facing === "w") {
+          return this.lookStraight(2);
+        } else if (this.facing === "s") {
+          return this.lookStraight(4);
+        } else {
+          return this.lookStraight(3);
+        }
+        break;
+    }
+  }
+
+  // 1 = up, 2 = right, 3 = down, 4 = left
+  lookStraight(direction) {
+    let distance;
+    for (let steps = 1; steps <= 17; steps++) {
       let tempX;
       let tempY;
-      switch(direction){
+      switch (direction) {
         case 1:
           tempX = 0;
           tempY = 0 - steps;
@@ -300,65 +336,157 @@ class Player extends Entity {
           tempY = 0;
           break;
       }
-      if (typeof mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX] === "undefined" || !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.valid) {
-        return (1/steps).toFixed(3);
-      }
+      // console.log("this.checkSpace: ", this.checkSpace(tempX, tempY, steps))
+      distance = this.checkSpace(tempX, tempY, steps);
+      if (typeof distance !== "undefined") return distance;
     }
+    return distance;
   }
 
-  checkOther(direction, target) {
-    for(let steps = 1; steps <= 19; steps++) {
+  checkSpace(tempX, tempY, steps){
+    if (
+        typeof mapGrid[this.currentLocation.y + tempY]?.[
+          this.currentLocation.x + tempX
+        ] === "undefined" ||
+        !mapGrid[this.currentLocation.y + tempY]?.[
+          this.currentLocation.x + tempX
+        ]?.valid || mapGrid[this.currentLocation.y + tempY]?.[
+          this.currentLocation.x + tempX
+        ]?.occupants.some((occupant) => occupant.type === 1)
+      ) {
+        // console.log("bad thing identified");
+        return -((1 / steps).toFixed(3));
+      } else if (
+        mapGrid[this.currentLocation.y + tempY]?.[
+          this.currentLocation.x + tempX
+        ]?.occupants.some((occupant) => occupant.type === 2) || mapGrid[this.currentLocation.y + tempY]?.[
+          this.currentLocation.x + tempX
+        ]?.occupants.some((occupant) => occupant.type === 3) || mapGrid[this.currentLocation.y + tempY]?.[
+          this.currentLocation.x + tempX
+        ]?.occupants.some((occupant) => occupant.type === 4) || mapGrid[this.currentLocation.y + tempY]?.[
+          this.currentLocation.x + tempX
+        ]?.occupants.some((occupant) => occupant.type === 5) &&
+        !mapGrid[this.currentLocation.y + tempY]?.[
+          this.currentLocation.x + tempX
+        ]?.occupants.some((occupant) =>
+          Pickup.inList(occupant.id, occupant.type, this.uuid),
+        )
+      ) {
+        // console.log("good thing identified");
+        return (1 / steps).toFixed(3);
+      }
+  }
+
+  // 1 = up/left, 2 = up/right, 3 = down/left, 4 = down/right
+  lookDiagonal(direction) {
+    let distance;
+    for (let steps = 1; steps <= 14; steps++) {
       let tempX;
       let tempY;
-      switch(direction){
+      switch (direction) {
         case 1:
-          tempX = 0;
+          tempX = 0 - steps;
           tempY = 0 - steps;
           break;
         case 2:
           tempX = steps;
-          tempY = 0;
+          tempY = 0 - steps;
           break;
         case 3:
-          tempX = 0;
+          tempX = 0 - steps;
           tempY = steps;
           break;
         case 4:
-          tempX = 0 - steps;
-          tempY = 0;
+          tempX = steps;
+          tempY = steps;
           break;
       }
-      if (typeof mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX] === "undefined" || !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.valid) {
-        return 0;
-      } else if (mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => occupant.type === target) && !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))){
-        return (1/steps).toFixed(3);
-      } 
-    }
+      distance = this.checkSpace(tempX, tempY, steps);
+      if (typeof distance !== "undefined") return distance;
   }
+}
 
-  checkDownArea() {
-    for(let rows = this.currentLocation.y + 1; rows <= gridRows; rows++) {
-      for(let steps = 1; steps <= gridColumns - 1; steps++) {
-        if(rows >= gridRows) {
-          return 0;
-        } else if (mapGrid[rows]?.[steps]?.occupants.some(occupant => occupant.type === 2) && !mapGrid[rows]?.[steps]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))) {
-          return 1;
-        }
-      }
-    }
-  }
+  // checkWall(direction) {
+  //   for(let steps = 1; steps <= 17; steps++) {
+  //     let tempX;
+  //     let tempY;
+  //     switch(direction){
+  //       case 1:
+  //         tempX = 0;
+  //         tempY = 0 - steps;
+  //         break;
+  //       case 2:
+  //         tempX = steps;
+  //         tempY = 0;
+  //         break;
+  //       case 3:
+  //         tempX = 0;
+  //         tempY = steps;
+  //         break;
+  //       case 4:
+  //         tempX = 0 - steps;
+  //         tempY = 0;
+  //         break;
+  //     }
+  //     if (typeof mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX] === "undefined" || !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.valid) {
+  //       return (1/steps).toFixed(3);
+  //     }
+  //   }
+  // }
 
-  checkRightArea() {
-    for(let columns = this.currentLocation.x + 1; columns <= gridColumns; columns++) {
-      for(let steps = 1; steps <= gridRows - 1; steps++) {
-        if(columns >= gridColumns) {
-          return 0;
-        } else if (mapGrid[steps]?.[columns]?.occupants.some(occupant => occupant.type === 2) && !mapGrid[steps]?.[columns]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))) {
-          return 1;
-        }
-        }
-    }
-  }
+  // checkOther(direction, target) {
+  //   for(let steps = 1; steps <= 19; steps++) {
+  //     let tempX;
+  //     let tempY;
+  //     switch(direction){
+  //       case 1:
+  //         tempX = 0;
+  //         tempY = 0 - steps;
+  //         break;
+  //       case 2:
+  //         tempX = steps;
+  //         tempY = 0;
+  //         break;
+  //       case 3:
+  //         tempX = 0;
+  //         tempY = steps;
+  //         break;
+  //       case 4:
+  //         tempX = 0 - steps;
+  //         tempY = 0;
+  //         break;
+  //     }
+  //     if (typeof mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX] === "undefined" || !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.valid) {
+  //       return 0;
+  //     } else if (mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => occupant.type === target) && !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))){
+  //       return (1/steps).toFixed(3);
+  //     }
+  //   }
+  // }
+
+  // checkDownArea() {
+  //   for(let rows = this.currentLocation.y + 1; rows <= gridRows; rows++) {
+  //     for(let steps = 1; steps <= gridColumns - 1; steps++) {
+  //       if(rows >= gridRows) {
+  //         return 0;
+  //       } else if (mapGrid[rows]?.[steps]?.occupants.some(occupant => occupant.type === 2) && !mapGrid[rows]?.[steps]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))) {
+  //         return 1;
+  //       }
+  //     }
+  //   }
+  // }
+
+  // checkRightArea() {
+  //   for(let columns = this.currentLocation.x + 1; columns <= gridColumns; columns++) {
+  //     for(let steps = 1; steps <= gridRows - 1; steps++) {
+  //       if(columns >= gridColumns) {
+  //         return 0;
+  //       } else if (mapGrid[steps]?.[columns]?.occupants.some(occupant => occupant.type === 2) && !mapGrid[steps]?.[columns]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))) {
+  //         return 1;
+  //       }
+  //       }
+  //   }
+  // }
 
   think() {
     let max = 0;
@@ -380,13 +508,17 @@ class Player extends Entity {
       }
     }
 
-    if(this.decision[4] > 0.5) {this.isSprinting = true} else {this.isSprinting = false};
+    if (this.decision[4] > 0.5) {
+      this.isSprinting = true;
+    } else {
+      this.isSprinting = false;
+    }
 
     if (this.isReadytoMove) {
       this.movesWithoutTreat++;
-      if(this.movesWithoutTreat > MAX_MOVES_WITHOUT_TREAT) {
-      this.dead = true;
-      return;
+      if (this.movesWithoutTreat > MAX_MOVES_WITHOUT_TREAT) {
+        this.dead = true;
+        return;
       }
     }
     this.move(directions[maxIndex]);
@@ -425,7 +557,8 @@ class Player extends Entity {
   // }
 
   calculateFitness() {
-    this.brain.fitness = (this.score + (this.movesTaken / 10)) - (this.fitnessPenalty / 3);
+    this.brain.fitness =
+      this.score + this.movesTaken / 10 - this.fitnessPenalty / 3;
     // console.log(this.brain);
   }
 
@@ -444,5 +577,4 @@ class Player extends Entity {
   //   child.brain.generateNetwork();
   //   return child;
   // }
-
 }
