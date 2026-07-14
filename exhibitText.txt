@@ -20,3 +20,12 @@ How does this work?
 Can I Play?
   Think you can do better? Probably. If you want to try your hand at the game and see how your score stacks up against the best the AI can muster right now, grab the controller and hit "A" to start playing the game. Once you're done, compare your score to the top score the AI has        gotten? How close were you?
   But the AI will continue to improve over time, and if you come back tomorrow, you might not be able to beat it anymore. AI often eventually surpasses human capabilities at specialized tasks like this, so challenge it again in the future to see how you stack up then.
+
+
+Controls
+
+Start: Play the game!
+A: Sprint
+Left Stick: Move
+Right Stick: Navigate Info
+B: Select Info

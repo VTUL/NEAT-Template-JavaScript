@@ -543,22 +543,23 @@ function drawToScreen() {
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //writes info about the current player
 function writeInfo() {
-  let info = "";
+  let info1 = "";
+  let info2 = "";
 
   if (showBestEachGen) {
-    info += "Score: " + genPlayerTemp.score + "<br>";
-    info += "Generation: " + (population.generation + 1) + "<br>";
+    info1 += "Score: " + genPlayerTemp.score + "<br>";
+    info2 += "Generation: " + (population.generation + 1) + "<br>";
   } else if (humanPlaying) {
-    info += "Score: " + humanPlayer.score + "<br>";
+    info1 += "Score: " + humanPlayer.score + "<br>";
   } else if (runBest) {
-    info += "Score: " + population.bestPlayer.score + "<br>";
-    info += "Gen: " + population.generation + "<br>";
+    info1 += "Score: " + population.bestPlayer.score + "<br>";
+    info2 += "Generation: " + population.generation + "<br>";
   } else {
     if (showBest) {
-      info += "Score: " + population.genomes[0].score + "<br>";
-      info += "Generation: " + population.generation + "<br>";
-      info += "Species: " + population.species.length + "<br>";
-      info += "Global Best Score: " + population.bestScore + "<br>";
+      info1 += "Score: " + population.genomes[0].score + "<br>";
+      info2 += "Generation: " + population.generation + "<br>";
+      info2 += "Species: " + population.species.length + "<br>";
+      info1 += "Global Best Score: " + population.bestScore + "<br>";
     }
     else{
       //added this code because population.players[0].score is measured by fitness scores, not actual game score 
@@ -569,18 +570,18 @@ function writeInfo() {
         }
       }
       //when all runs visible 
-      info += "Best Score this Gen: " + bestScoreThisGen + "<br>";
-      info += "Generation: " + population.generation + "<br>";
-      info += "Species: " + population.species.length + "<br>";
-      info += "Global Best Score: " + population.globalBestScore + "<br>";
+      info1 += "Best Score this Gen: " + bestScoreThisGen + "<br>";
+      info2 += "Generation: " + population.generation + "<br>";
+      info2 += "Species: " + population.species.length + "<br>";
+      info1 += "Global Best Score: " + population.globalBestScore + "<br>";
     }
   }
 
   //write the info to the HTML div
-  let infoDiv = document.getElementById("gameInfo");
-  if (infoDiv) {
-    infoDiv.innerHTML = info;
-  }
+  let infoDiv1 = document.getElementById("gameInfo1");
+  let infoDiv2 = document.getElementById("gameInfo2");
+  if (infoDiv1) infoDiv1.innerHTML = info1;
+  if (infoDiv2) infoDiv2.innerHTML = info2
 }
 
 //--------------------------------------------------------------------------------------------------------------------------------------------------
