@@ -45,14 +45,14 @@ function visualizeGenome(genome, canvas) {
     genome.connectionGenes.forEach(conn => {
         // Skip disabled connections
         if (conn.enabled === false) return; 
-        console.log("conn.outNode: ", conn.outNode)
+        // console.log("conn.outNode: ", conn.outNode)
         const fromPos = positions[conn.outNode.id];
         const toPos = positions[conn.inNode.id];
-        console.log("fromPos: ", fromPos);
-        console.log("toPos: ", toPos);
+        // console.log("fromPos: ", fromPos);
+        // console.log("toPos: ", toPos);
         if (!fromPos || !toPos) return;
 
-        console.log("fromPos: ", fromPos);
+        // console.log("fromPos: ", fromPos);
         ctx.beginPath();
         ctx.moveTo(fromPos.x, fromPos.y);
         ctx.lineTo(toPos.x, toPos.y);
@@ -60,7 +60,7 @@ function visualizeGenome(genome, canvas) {
         // Color: Green for positive weights, Red for negative weights
         ctx.strokeStyle = conn.weight >= 0 ? 'rgba(46, 204, 113, 0.7)' : 'rgba(231, 76, 60, 0.7)';
 
-        console.log("conn.weight: ", conn.weight)
+        // console.log("conn.weight: ", conn.weight)
         // Thickness scales with weight magnitude
         ctx.lineWidth = Math.min(Math.abs(conn.weight) * 1.5, 5); 
         ctx.stroke();
@@ -76,9 +76,9 @@ function visualizeGenome(genome, canvas) {
         ctx.arc(pos.x, pos.y, nodeRadius, 0, 2 * Math.PI);
         
         // Color based on node type
-        if (node.nodeType === 'INPUT') ctx.fillStyle = '#3498db';      // Blue
-        else if (node.nodeType === 'OUTPUT') ctx.fillStyle = '#e67e22'; // Orange
-        else ctx.fillStyle = '#95a5a6';                             // Gray (Hidden)
+        if (node.nodeType === 'INPUT') ctx.fillStyle = '#861F41';
+        else if (node.nodeType === 'OUTPUT') ctx.fillStyle = '#CA4F00';
+        else ctx.fillStyle = '#D7D2CB';                             // Gray (Hidden)
         
         ctx.fill();
         

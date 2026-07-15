@@ -1,6 +1,6 @@
 let nextConnectionNo = 1000;
 let population;
-let speed = 30;
+let speed = 1;
 
 let mapGrid = JSON.parse(JSON.stringify(mapGridOriginal));
 
@@ -69,7 +69,7 @@ const MAX_MOVES_WITHOUT_TREAT = 35;
 
 const config = new Config({
   // Basic network structure
-  inputSize: 29,                    // Number of input nodes
+  inputSize: 23,                    // Number of input nodes
   outputSize: 5,                   // Number of output nodes
 
   // Activation function (string-based selection)
@@ -108,7 +108,7 @@ const config = new Config({
   maxPerturb: 0.5,                 // Maximum perturbation value
 
   // Evolution parameters
-  populationSize: 500,             // Size of the population
+  populationSize: 1,             // Size of the population
   generations: 1000,                // Number of generations
   targetFitness: 1000,             // Target fitness to achieve
   survivalRate: 0.2,               // Proportion that survives each generation

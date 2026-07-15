@@ -81,18 +81,12 @@ class Player extends Entity {
     this.vision = []; //the input array fed into the neuralNet
     this.decision = []; //the out put of the NN
     this.unadjustedFitness;
-    // this.lifespan = 0; //how long the player lived for this.fitness
     this.bestScore = 0; //stores the this.score achieved used for replay
     this.dead = false;
     this.score = 0;
     this.gen = 0;
-    // this.distanceInterval = 20;
-    // this.distanceReward = 100;
-    // this.pickupRewardModifier = 2000;
-    // this.distance = 0;
-    // this.distanceModifier = 500;
 
-    this.genomeInputs = 29; // 4 for walls, 5 for pickups 1 for enemies
+    this.genomeInputs = 23;
     this.genomeOutputs = 5; // Up, Right, Down, Left, Sprint
     this.brain = brain;
 
@@ -264,13 +258,13 @@ class Player extends Entity {
     this.vision.push(this.checkOther(2, 4));
     this.vision.push(this.checkOther(3, 4));
     this.vision.push(this.checkOther(4, 4));
-    this.vision.push(this.checkOther(1, 5));
-    this.vision.push(this.checkOther(2, 5));
-    this.vision.push(this.checkOther(3, 5));
-    this.vision.push(this.checkOther(4, 5));
+    // this.vision.push(this.checkOther(1, 5));
+    // this.vision.push(this.checkOther(2, 5));
+    // this.vision.push(this.checkOther(3, 5));
+    // this.vision.push(this.checkOther(4, 5));
     //push directionality of valid treat
-    this.vision.push(this.checkDownArea());
-    this.vision.push(this.checkRightArea());
+    // this.vision.push(this.checkDownArea());
+    // this.vision.push(this.checkRightArea());
     //sprinting to array
     this.vision.push((this.stamina/100).toFixed(3));
     this.vision.push(this.speed === 5 ? 0 : 1);
@@ -330,35 +324,37 @@ class Player extends Entity {
       }
       if (typeof mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX] === "undefined" || !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.valid) {
         return 0;
+      } else if (target === 4 && mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => occupant.type === 4) || mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => occupant.type === 5) && !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))) {
+        return (1/steps).toFixed(3);
       } else if (mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => occupant.type === target) && !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))){
         return (1/steps).toFixed(3);
       } 
     }
   }
 
-  checkDownArea() {
-    for(let rows = this.currentLocation.y + 1; rows <= gridRows; rows++) {
-      for(let steps = 1; steps <= gridColumns - 1; steps++) {
-        if(rows >= gridRows) {
-          return 0;
-        } else if (mapGrid[rows]?.[steps]?.occupants.some(occupant => occupant.type === 2) && !mapGrid[rows]?.[steps]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))) {
-          return 1;
-        }
-      }
-    }
-  }
+  // checkDownArea() {
+  //   for(let rows = this.currentLocation.y + 1; rows <= gridRows; rows++) {
+  //     for(let steps = 1; steps <= gridColumns - 1; steps++) {
+  //       if(rows >= gridRows) {
+  //         return 0;
+  //       } else if (mapGrid[rows]?.[steps]?.occupants.some(occupant => occupant.type === 2) && !mapGrid[rows]?.[steps]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))) {
+  //         return 1;
+  //       }
+  //     }
+  //   }
+  // }
 
-  checkRightArea() {
-    for(let columns = this.currentLocation.x + 1; columns <= gridColumns; columns++) {
-      for(let steps = 1; steps <= gridRows - 1; steps++) {
-        if(columns >= gridColumns) {
-          return 0;
-        } else if (mapGrid[steps]?.[columns]?.occupants.some(occupant => occupant.type === 2) && !mapGrid[steps]?.[columns]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))) {
-          return 1;
-        }
-        }
-    }
-  }
+  // checkRightArea() {
+  //   for(let columns = this.currentLocation.x + 1; columns <= gridColumns; columns++) {
+  //     for(let steps = 1; steps <= gridRows - 1; steps++) {
+  //       if(columns >= gridColumns) {
+  //         return 0;
+  //       } else if (mapGrid[steps]?.[columns]?.occupants.some(occupant => occupant.type === 2) && !mapGrid[steps]?.[columns]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))) {
+  //         return 1;
+  //       }
+  //       }
+  //   }
+  // }
 
   think() {
     let max = 0;
@@ -370,7 +366,32 @@ class Player extends Entity {
 
     //movement decision
     let directions = ["w", "d", "s", "a"];
-    // console.log(`Player ${this.uuid} vision: ${this.vision}`)
+
+    console.log(`\nPlayer vision: \n`)
+    console.log(`Wall up: ${this.vision[0]} \n`)
+    console.log(`Wall right: ${this.vision[1]} \n`)
+    console.log(`Wall down: ${this.vision[2]} \n`)
+    console.log(`Wall left: ${this.vision[3]} \n`)
+    console.log(`Enemies up: ${this.vision[4]} \n`)
+    console.log(`Enemies right: ${this.vision[5]} \n`)
+    console.log(`Enemies down: ${this.vision[6]} \n`)
+    console.log(`Enemies left: ${this.vision[7]} \n`)
+    console.log(`Treats up: ${this.vision[8]} \n`)
+    console.log(`Treats right: ${this.vision[9]} \n`)
+    console.log(`Treats down: ${this.vision[10]} \n`)
+    console.log(`Treats left: ${this.vision[11]} \n`)
+    console.log(`PB up: ${this.vision[12]} \n`)
+    console.log(`PB right: ${this.vision[13]} \n`)
+    console.log(`PB down: ${this.vision[14]} \n`)
+    console.log(`PB left: ${this.vision[15]} \n`)
+    console.log(`Powerups up: ${this.vision[16]} \n`)
+    console.log(`Powerups right: ${this.vision[17]} \n`)
+    console.log(`Powerups down: ${this.vision[18]} \n`)
+    console.log(`Powerups left: ${this.vision[19]} \n`)
+    console.log(`Stamina: ${this.vision[20]} \n`)
+    console.log(`Speed: ${this.vision[21]} \n`)
+    console.log(`isInvincible: ${this.vision[22]} \n`)
+
     this.decision = this.brain.propagate(this.vision);
 
     for (let i = 0; i < 4; i++) {

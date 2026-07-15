@@ -16,8 +16,13 @@ class Pool extends Population {
   updateAlive() {
       for (var i = 0; i < this.players.length; i++) {
         if (!this.players[i].dead) {
-          this.players[i].look(); //get inputs for brain
-          this.players[i].think(); //use outputs from neural network
+          if(this.players[i].isReadytoMove) {
+            this.players[i].look(); //get inputs for brain
+            this.players[i].think(); 
+          } else {
+            this.players[i].move();
+          }
+          //use outputs from neural network
           this.players[i].update(); //move the player according to the outputs from the neural network
           if (!showNothing && (!showBest || i == 0)) {
             this.players[i].show();

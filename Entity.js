@@ -30,7 +30,7 @@ class Entity {
     this.registerLocation(this.currentLocation);
   }
 
-  move(direction, increasePenalty) {
+  move(direction = 'a', increasePenalty = ()=>{}) {
     // console.info("Type", this.type);
     // console.info("Id", this.uuid);
     // console.info("Location", this.currentLocation);
