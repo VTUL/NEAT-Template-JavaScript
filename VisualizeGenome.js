@@ -1,3 +1,34 @@
+const nodeMap = {
+    0: "Look Up for Wall",
+    1: "Look Right for Wall",
+    2: "Look Down for Wall",
+    3: "Look Left for Wall",
+    4: "Look Up for Squirrels",
+    5: "Look Right for Squirrels",
+    6: "Look Down for Squirrels",
+    7: "Look Left for Squirrels",
+    8: "Look Up for Treats",
+    9: "Look Right for Treats",
+    10: "Look Down for Treats",
+    11: "Look Left for Treats",
+    12: "Look Up for PB",
+    13: "Look Right for PB",
+    14: "Look Down for PB",
+    15: "Look Left for PB",
+    16: "Look Up for Powerup",
+    17: "Look Right for Powerup",
+    18: "Look Down for Powerup",
+    19: "Look Left for Powerup",
+    20: "Stamina Available",
+    21: "Speed",
+    22: "Whether Invincible",
+    23: "Move Up",
+    24: "Move Right",
+    25: "Move Down",
+    26: "Move Left",
+    27: "Sprint"
+};
+
 function visualizeGenome(genome, canvas) {
     const ctx = canvas.getContext('2d');
     
@@ -20,20 +51,21 @@ function visualizeGenome(genome, canvas) {
 
     // 3. Calculate spatial positions (X, Y) for every node
     const positions = {};
-    const padding = 15;
-    const usableWidth = canvas.width - padding * 2;
-    const usableHeight = canvas.height - padding * 2;
+    const paddingWidth = 200;
+    const paddingHeight = 20;
+    const usableWidth = canvas.width - paddingWidth * 2;
+    const usableHeight = canvas.height - paddingHeight * 2;
 
     Object.keys(layers).forEach(layerStr => {
         const layerIdx = parseInt(layerStr);
         const layerNodes = layers[layerIdx];
         
         // X coordinate based on layer depth
-        const x = padding + (layerIdx / maxLayer) * usableWidth;
+        const x = paddingWidth + (layerIdx / maxLayer) * usableWidth;
         
         layerNodes.forEach((node, index) => {
             // Y coordinate spaced evenly within the layer
-            const y = padding + (layerNodes.length > 1 
+            const y = paddingHeight + (layerNodes.length > 1 
                 ? (index / (layerNodes.length - 1)) * usableHeight 
                 : usableHeight / 2);
             
@@ -58,7 +90,7 @@ function visualizeGenome(genome, canvas) {
         ctx.lineTo(toPos.x, toPos.y);
 
         // Color: Green for positive weights, Red for negative weights
-        ctx.strokeStyle = conn.weight >= 0 ? 'rgba(46, 204, 113, 0.7)' : 'rgba(231, 76, 60, 0.7)';
+        ctx.strokeStyle = conn.weight >= 0 ? '#2CD5C4' : '#CE0058';
 
         // console.log("conn.weight: ", conn.weight)
         // Thickness scales with weight magnitude
@@ -84,15 +116,24 @@ function visualizeGenome(genome, canvas) {
         
         // Draw border (darker if node has a high bias)
         ctx.lineWidth = 2;
-        ctx.strokeStyle = '#2c3e50';
+        ctx.strokeStyle = '#ffffff';
         ctx.stroke();
 
         // Label node ID inside or near the node
         ctx.fillStyle = '#ffffff';
-        ctx.font = '10px sans-serif';
-        ctx.textAlign = 'center';
+        ctx.font = '16px sans-serif';
         ctx.textBaseline = 'middle';
-        ctx.fillText(node.id, pos.x, pos.y);
+        
+        if (node.nodeType === 'INPUT') {
+            ctx.textAlign = 'right';
+            ctx.fillText(nodeMap[node.id], pos.x - 30, pos.y)
+        } else if(node.nodeType === 'OUTPUT') {
+            ctx.textAlign = 'left';
+            ctx.fillText(nodeMap[node.id], pos.x + 30, pos.y)
+        } else {
+            ctx.textAlign = 'right';
+            ctx.fillText('Hidden Node', pos.x - 30 , pos.y)
+        }
     });
 }
 

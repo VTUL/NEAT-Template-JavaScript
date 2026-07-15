@@ -1,6 +1,6 @@
 let nextConnectionNo = 1000;
 let population;
-let speed = 1;
+let speed = 30;
 
 let mapGrid = JSON.parse(JSON.stringify(mapGridOriginal));
 
@@ -108,7 +108,7 @@ const config = new Config({
   maxPerturb: 0.5,                 // Maximum perturbation value
 
   // Evolution parameters
-  populationSize: 1,             // Size of the population
+  populationSize: 500,             // Size of the population
   generations: 1000,                // Number of generations
   targetFitness: 1000,             // Target fitness to achieve
   survivalRate: 0.2,               // Proportion that survives each generation
@@ -287,7 +287,7 @@ function draw() {
       visualizeGenome(population.getBestGenome(), brainCanvas)
     }
   }
-  drawGrid(); 
+  // drawGrid(); 
 
   if (humanPlaying && humanPlayer && humanPlayer.stamina !== undefined) {
     drawStaminaBar(humanPlayer);
