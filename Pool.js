@@ -55,8 +55,8 @@ class Pool extends Population {
 
     if (tempBest.score >= this.bestScore) {
       this.genPlayers.push(tempBest.cloneForReplay());
-      console.log("old best: " + this.bestScore);
-      console.log("new best: " + tempBest.score);
+      // console.log("old best: " + this.bestScore);
+      // console.log("new best: " + tempBest.score);
       this.bestScore = tempBest.score;
       this.bestPlayer = tempBest.cloneForReplay();
     }
