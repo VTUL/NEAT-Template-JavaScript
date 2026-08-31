@@ -165,40 +165,8 @@ function setup() {
   introTime = millis() + 3000; 
   frameRate(speed);
 
-  let acc = document.getElementsByClassName("accordion");
   brainCanvas = document.getElementById("brain");
-  let i;
-
-  for (i = 0; i < acc.length; i++) {
-    acc[i].addEventListener("click", function() {
-      /* Toggle between adding and removing the "active" class,
-      to highlight the button that controls the panel */
-      this.classList.toggle("active");
-
-      /* Toggle between hiding and showing the active panel */
-      let panel = this.nextElementSibling;
-      if (panel.style.display === "block") {
-        panel.style.display = "none";
-      } else {
-        panel.style.display = "block";
-      }
-    });
-  }
-
 }
-
-function toggleAccordion(index) {
-  const acc = document.getElementsByClassName("accordion");
-  const btn = acc[index];
-  if (!btn) return;
-
-  btn.classList.toggle("active");
-
-  const panel = btn.nextElementSibling;
-  panel.style.display =
-    panel.style.display === "block" ? "none" : "block";
-}
-
 
 window.addEventListener("gamepadconnected", (e) => {
   activeGamepadIndex = e.gamepad.index;

@@ -51,8 +51,8 @@ function visualizeGenome(genome, canvas) {
 
     // 3. Calculate spatial positions (X, Y) for every node
     const positions = {};
-    const paddingWidth = 200;
-    const paddingHeight = 20;
+    const paddingWidth = 300;
+    const paddingHeight = 100;
     const usableWidth = canvas.width - paddingWidth * 2;
     const usableHeight = canvas.height - paddingHeight * 2;
 
@@ -121,7 +121,7 @@ function visualizeGenome(genome, canvas) {
 
         // Label node ID inside or near the node
         ctx.fillStyle = '#ffffff';
-        ctx.font = '16px sans-serif';
+        ctx.font = '24px sans-serif';
         ctx.textBaseline = 'middle';
         
         if (node.nodeType === 'INPUT') {

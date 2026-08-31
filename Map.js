@@ -1,8 +1,8 @@
-const screenWidth = 1080;
-const screenHeight = 900;
+const screenWidth = 1800;
+const screenHeight = 1500;
 
-const gridWidth = 60;
-const gridHeight = 60;
+const gridWidth = 100;
+const gridHeight = 100;
 
 const gridColumns = 19;
 const gridRows = 16;
