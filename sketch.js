@@ -26,6 +26,7 @@ let enemyRespawnTime = 0;
 let deathMessageTime = 0;
 let introTime = 0;
 let pb = [];
+let bestScoreThisGen = 0;
 
 //images
 let bg;
@@ -450,70 +451,29 @@ function drawGrid() {
 function drawToScreen() {
   if (!showNothing) {
     //pretty stuff
-    // drawBrain();
     writeInfo();
   }
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// function drawBrain() { //show the brain of whatever genome is currently showing
-//   let startX = 800; //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-//   let startY = 10;
-//   let w = 400;
-//   let h = 90;
-
-//   if (runBest) {
-//     population.bestPlayer.brain.drawGenome(startX, startY, w, h);
-//   } else
-//   if (humanPlaying) {
-//     showBrain = false;
-//   } else if (showBestEachGen) {
-//     genPlayerTemp.brain.drawGenome(startX, startY, w, h);
-//   } else {
-//     population.players[0].brain.drawGenome(startX, startY, w, h);
-//   }
-
-//   //write the info to the HTML div
-//   /*let canvas2 = document.getElementById("canvas2");
-//   if (canvas2) {
-//     canvas2.innerHTML = brain;*/
-// }
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //writes info about the current player
 function writeInfo() {
-  let info1 = "";
-  let info2 = "";
-
-  if (showBestEachGen) {
-    info1 += "Score: " + genPlayerTemp.score + "<br>";
-    info2 += "Generation: " + (population.generation + 1) + "<br>";
-  } else if (humanPlaying) {
-    info1 += "Score: " + humanPlayer.score + "<br>";
-  } else if (runBest) {
-    info1 += "Score: " + population.bestPlayer.score + "<br>";
-    info2 += "Generation: " + population.generation + "<br>";
-  } else {
-    if (showBest) {
-      info1 += "Score: " + population.genomes[0].score + "<br>";
-      info2 += "Generation: " + population.generation + "<br>";
-      info2 += "Species: " + population.species.length + "<br>";
-      info1 += "Global Best Score: " + population.bestScore + "<br>";
-    }
-    else{
-      //added this code because population.players[0].score is measured by fitness scores, not actual game score 
-      let bestScoreThisGen = 0;
-      for (let i = 0; i < population.players.length; i++) {
-        if (population.players[i].score > bestScoreThisGen) {
-            bestScoreThisGen = population.players[i].score;
-        }
-      }
-      //when all runs visible 
-      info1 += "Best Score this Gen: " + bestScoreThisGen + "<br>";
-      info2 += "Generation: " + population.generation + "<br>";
-      info2 += "Species: " + population.species.length + "<br>";
-      info1 += "Global Best Score: " + population.globalBestScore + "<br>";
+  let currentBestScore = bestScoreThisGen;
+  for (let i = 0; i < population.players.length; i++) {
+    if (population.players[i].score > bestScoreThisGen) {
+        bestScoreThisGen = population.players[i].score;
     }
   }
 
+  if (currentBestScore >= bestScoreThisGen) return;
+
+  let info1 = "";
+  let info2 = "";
+  //when all runs visible 
+  info1 += "Best Score this Gen: " + bestScoreThisGen + "<br>";
+  info2 += "Generation: " + (population.generation + 1) + "<br>";
+  info2 += "Species: " + population.species.length + "<br>";
+  info1 += "Global Best Score: " + population.globalBestScore + "<br>";
+    
   //write the info to the HTML div
   let infoDiv1 = document.getElementById("gameInfo1");
   let infoDiv2 = document.getElementById("gameInfo2");
@@ -681,6 +641,8 @@ function resetGame() {
   // PeanutButter.resetSpawns();
 
   mapGrid = JSON.parse(JSON.stringify(mapGridOriginal));
+
+  bestScoreThisGen = 0;
 
   treats = [];
   enemies = [];

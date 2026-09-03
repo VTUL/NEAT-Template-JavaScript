@@ -110,7 +110,8 @@ function visualizeGenome(genome, canvas) {
         // Color based on node type
         if (node.nodeType === 'INPUT') ctx.fillStyle = '#861F41';
         else if (node.nodeType === 'OUTPUT') ctx.fillStyle = '#CA4F00';
-        else ctx.fillStyle = '#D7D2CB';                             // Gray (Hidden)
+        else if (node.nodeType === 'HIDDEN') ctx.fillStyle = '#D7D2CB';
+        else if (node.nodeType === 'BIAS') ctx.fillStyle = '#508590';                             
         
         ctx.fill();
         
@@ -130,9 +131,6 @@ function visualizeGenome(genome, canvas) {
         } else if(node.nodeType === 'OUTPUT') {
             ctx.textAlign = 'left';
             ctx.fillText(nodeMap[node.id], pos.x + 30, pos.y)
-        } else {
-            ctx.textAlign = 'right';
-            ctx.fillText('Hidden Node', pos.x - 30 , pos.y)
         }
     });
 }
