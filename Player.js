@@ -1,129 +1,124 @@
-class Player extends Entity {
-  constructor(brain) {
+const PLAYER_MOVE_ORDER = ['w', 'd', 's', 'a'];
+const SCAN_DX = [0, 0, 1, 0, -1];
+const SCAN_DY = [0, -1, 0, 1, 0];
+const VISION_SIZE = 23;
+const PLAYER_START = Object.freeze({ x: 9, y: 8 });
 
+class Player extends Entity {
+  constructor(brain = null) {
     const collisionCallback = (collisions) => {
-      collisions.forEach((occupant) => {
-        if(occupant.type === 1) {
-          // console.log("Dog collided with Squirrel");
-          if(!this.isInvincible) {
-            this.dead = true;
-          }
-          return;
-        } else if(occupant.type === 2 || occupant.type === 3) {
-          if(occupant.type === 2) {
-            for(let i = 0; i <= treats.length; i++) {
-              if (treats[i]?.uuid === occupant.id) {
-                if(treats[i].idList.includes(this.uuid)) {
-                  return;
-                } else {
-                  //OG:this.score += occupant.type === 2 ? Treat.value : PeanutButter.value;
-                  this.score += Treat.value
-                  this.movesWithoutTreat = 0;
-                  treats[i].idList.push(this.uuid);
-                  if(humanPlaying) {
-                    treats[i].deregisterLocation();
-                    treats.splice(i, 1);
-                  }
-                }
+      if (!collisions?.length) return;
+
+      for (let i = 0; i < collisions.length; i++) {
+        const occupant = collisions[i];
+
+        switch (occupant.type) {
+          case 1:
+            if (!this.isInvincible) this.dead = true;
+            break;
+
+          case 2: {
+            for (let j = treats.length - 1; j >= 0; j--) {
+              const treatObj = treats[j];
+              if (!treatObj || treatObj.uuid !== occupant.id) continue;
+              if (treatObj.idList.includes(this.uuid)) break;
+
+              this.score += Treat.value;
+              this.movesWithoutTreat = 0;
+              treatObj.idList.push(this.uuid);
+              if (humanPlaying) {
+                treatObj.deregisterLocation();
+                treats.splice(j, 1);
               }
+              break;
             }
+            break;
           }
-          else if(occupant.type === 3) {
-            if (pb[0]?.uuid === occupant.id) {
-              if(pb[0].idList.includes(this.uuid)) {
-                return;
-              } else {
-                this.score += PeanutButter.value;
-                this.movesWithoutTreat = 0;
-                pb[0].idList.push(this.uuid);
-                if(humanPlaying) {
-                  pb[0].deregisterLocation();
-                  pb.splice(0, 1);
-                }
-              }
+
+          case 3: {
+            const pickup = pb[0];
+            if (!pickup || pickup.uuid !== occupant.id || pickup.idList.includes(this.uuid)) break;
+
+            this.score += PeanutButter.value;
+            this.movesWithoutTreat = 0;
+            pickup.idList.push(this.uuid);
+            if (humanPlaying) {
+              pickup.deregisterLocation();
+              pb.splice(0, 1);
             }
+            break;
           }
-            
-          
-          
-        } else if(occupant.type === 4) {
-          if (beds[0]?.uuid === occupant.id) {
-            if(beds[0].idList.includes(this.uuid)) {
-              return;
-            } else {
-              beds[0].idList.push(this.uuid);
-              this.stamina = 100;
-              if(humanPlaying) {
-                  beds[0].deregisterLocation();
-                  beds.splice(0, 1);
-                }
+
+          case 4: {
+            const pickup = beds[0];
+            if (!pickup || pickup.uuid !== occupant.id || pickup.idList.includes(this.uuid)) break;
+
+            pickup.idList.push(this.uuid);
+            this.stamina = this.maxStamina;
+            if (humanPlaying) {
+              pickup.deregisterLocation();
+              beds.splice(0, 1);
             }
+            break;
           }
-        } else if(occupant.type === 5) {
-          if (balls[0]?.uuid === occupant.id) {
-            if(balls[0].idList.includes(this.uuid)) {
-              return;
-            } else {
-              balls[0].idList.push(this.uuid);
-              this.isInvincible = true;
-              this.isInvinUntil = 10000 + millis();
-              if(humanPlaying) {
-                  balls[0].deregisterLocation();
-                  balls.splice(0, 1);
-                }
+
+          case 5: {
+            const pickup = balls[0];
+            if (!pickup || pickup.uuid !== occupant.id || pickup.idList.includes(this.uuid)) break;
+
+            pickup.idList.push(this.uuid);
+            this.isInvincible = true;
+            this.isInvinUntil = millis() + 10000;
+            if (humanPlaying) {
+              pickup.deregisterLocation();
+              balls.splice(0, 1);
             }
+            break;
           }
         }
-      })
-    }
+      }
+    };
 
-    super({ x: 9, y: 8 }, 40, 24, 5, 0, collisionCallback);
-    this.vision = []; //the input array fed into the neuralNet
-    this.decision = []; //the out put of the NN
-    this.unadjustedFitness;
-    this.bestScore = 0; //stores the this.score achieved used for replay
+    super({ x: PLAYER_START.x, y: PLAYER_START.y }, 40, 24, 5, 0, collisionCallback);
+
+    this.genomeInputs = VISION_SIZE;
+    this.genomeOutputs = 5;
+    this.brain = brain;
+
+    this.vision = new Array(VISION_SIZE).fill(0);
+    this.decision = [];
+    this.unadjustedFitness = 0;
+    this.bestScore = 0;
     this.dead = false;
     this.score = 0;
     this.gen = 0;
 
-    this.genomeInputs = 23;
-    this.genomeOutputs = 5; // Up, Right, Down, Left, Sprint
-    this.brain = brain;
-
     this.isInvinUntil = 0;
-    
-    // this.w = 40;
-    // this.h = 24;
-    
     this.isInvincible = false;
 
-    // this.lastScoreMillis = millis();
-    // this.previousX = this.x;
-    // this.previousY = this.y;
-    // this.lastMeaningfulMoveTime = millis();
-    // this.minMeaningfulDistance = 40; //mess with
-    // this.decisionCount = 15;
-
-    //sprite variables
-    this.derekRight = new Sprite(derekRight, 86, 46, 4);
-    this.derekLeft = new Sprite(derekLeft, 86, 46, 4);
-    this.derekUp = new Sprite(derekUp, 40, 100, 4);
-    this.derekDown = new Sprite(derekDown, 40, 100, 4);
-    this.epcotRight = new Sprite(epcotRight, 86, 46, 4);
-    this.epcotLeft = new Sprite(epcotLeft, 86, 46, 4);
-    this.epcotUp = new Sprite(epcotUp, 40, 100, 4);
-    this.epcotDown = new Sprite(epcotDown, 40, 100, 4);
-    this.josieRight = new Sprite(josieRight, 86, 46, 4);
-    this.josieLeft = new Sprite(josieLeft, 86, 46, 4);
-    this.josieUp = new Sprite(josieUp, 40, 100, 4);
-    this.josieDown = new Sprite(josieDown, 40, 100, 4);
-    this.spriteLeft = [this.derekLeft, this.epcotLeft, this.josieLeft];
-    this.spriteRight = [this.derekRight, this.epcotRight, this.josieRight];
-    this.spriteUp = [this.derekUp, this.epcotUp, this.josieUp];
-    this.spriteDown = [this.derekDown, this.epcotDown, this.josieDown];
+    // Each player keeps its own Sprite instances so animation timing does not
+    // depend on how many players are drawing.
+    this.spriteLeft = [
+      new Sprite(derekLeft, 86, 46, 4),
+      new Sprite(epcotLeft, 86, 46, 4),
+      new Sprite(josieLeft, 86, 46, 4),
+    ];
+    this.spriteRight = [
+      new Sprite(derekRight, 86, 46, 4),
+      new Sprite(epcotRight, 86, 46, 4),
+      new Sprite(josieRight, 86, 46, 4),
+    ];
+    this.spriteUp = [
+      new Sprite(derekUp, 40, 100, 4),
+      new Sprite(epcotUp, 40, 100, 4),
+      new Sprite(josieUp, 40, 100, 4),
+    ];
+    this.spriteDown = [
+      new Sprite(derekDown, 40, 100, 4),
+      new Sprite(epcotDown, 40, 100, 4),
+      new Sprite(josieDown, 40, 100, 4),
+    ];
     this.i = floor(random(3));
-
-    
 
     this.distanceTrackerX = this.x;
     this.distanceTrackerY = this.y;
@@ -134,336 +129,205 @@ class Player extends Entity {
 
     this.stamina = 100;
     this.maxStamina = 100;
-    this.staminaDrainRate = 0.8; //per frame when sprinting
-    this.staminaRegenRate = this.maxStamina / (30 * 60); //regen over 30 seconds at 60 fps
+    this.staminaDrainRate = 0.8;
+    this.staminaRegenRate = this.maxStamina / (30 * 60);
     this.isSprinting = false;
+    this.staminaCooldown = 0;
+  }
+
+  reset(brain = this.brain, spawnLocation = PLAYER_START) {
+    this.brain = brain ?? this.brain;
+
+    const spawnX = spawnLocation?.x ?? PLAYER_START.x;
+    const spawnY = spawnLocation?.y ?? PLAYER_START.y;
+
+    this.deregisterLocation(this.currentLocation);
+    this.currentLocation = { x: spawnX, y: spawnY };
+    this.nextLocation = null;
+    this.nextX = spawnX;
+    this.nextY = spawnY;
+    this.x = spawnX * gridWidth;
+    this.y = spawnY * gridHeight;
+
+    this.facing = null;
+    this.lastDec = null;
+    this.isReadytoMove = true;
+    this.dead = false;
+    this.score = 0;
+    this.bestScore = 0;
+    this.gen = 0;
+    this.movesWithoutTreat = 0;
+    this.movesTaken = 0;
+    this.fitnessPenalty = 0;
+    this.isInvinUntil = 0;
+    this.isInvincible = false;
+    this.stamina = this.maxStamina;
+    this.speed = this.baseSpeed;
+    this.isSprinting = false;
+    this.distanceTrackerX = this.x;
+    this.distanceTrackerY = this.y;
+
+    if (this.vision.length !== VISION_SIZE) this.vision = new Array(VISION_SIZE).fill(0);
+    else this.vision.fill(0);
+    this.decision.length = 0;
+
+    this.registerLocation(this.currentLocation);
+    return this;
   }
 
   show() {
-    //draw the player sprite
     push();
+    if (this.isInvincible) tint(0, 255, 0);
+    else noTint();
 
-    if (this.isInvincible) {
-      tint(0, 255, 0);
-    } else {
-      noTint();
-    }
+    const sprites =
+      this.facing === 'w' ? this.spriteUp :
+      this.facing === 's' ? this.spriteDown :
+      this.facing === 'd' ? this.spriteRight :
+      this.spriteLeft;
 
-    //different sprites for different directions
-    if (this.facing === "w") {
-      this.spriteUp[this.i].draw(this.x, this.y);
-    } else if (this.facing === "s") {
-      this.spriteDown[this.i].draw(this.x, this.y);
-    } else if (this.facing === "d") {
-      this.spriteRight[this.i].draw(this.x, this.y);
-    } else {
-      this.spriteLeft[this.i].draw(this.x, this.y);
-    }
-
+    sprites[this.i].draw(this.x, this.y);
     pop();
-
-    //collision box
-    // noFill();
-    // strokeWeight(4);
-    // stroke(this.r, this.g, this.b);
-    // rect(this.x - this.w, this.y - this.h, this.w*2, this.h*2);
   }
 
   deadzone(v, dz = 0.25) {
-  return Math.abs(v) < dz ? 0 : v;
+    return Math.abs(v) < dz ? 0 : v;
   }
 
   update() {
     if (this.dead) return;
 
-    this.isInvincible = millis() < this.isInvinUntil;
+    const now = millis();
+    this.isInvincible = now < this.isInvinUntil;
 
     if (humanPlaying) {
+      let wantsSprint = keyIsDown(SHIFT) && this.stamina > 0;
+      const pads = navigator.getGamepads?.();
+      const gp = pads?.[activeGamepadIndex ?? 0] ?? null;
 
-      //KEYBOARD
-      if (keyIsDown(87)) this.move("w"); // W
-      if (keyIsDown(83)) this.move("s"); // S
-      if (keyIsDown(65)) this.move("a"); // A
-      if (keyIsDown(68)) this.move("d"); // D
-
-      //GAMEPAD - left stick for movement, A button for sprinting
-      const gp = navigator.getGamepads()[activeGamepadIndex ?? 0];
       if (gp) {
-        let lx = this.deadzone(gp.axes[0]);
-        let ly = this.deadzone(gp.axes[1]);
+        const lx = this.deadzone(gp.axes?.[0] ?? 0);
+        const ly = this.deadzone(gp.axes?.[1] ?? 0);
 
-        if (ly < 0) this.move("w");
-        if (ly > 0) this.move("s");
+        if (ly < 0) this.move('w');
+        else if (ly > 0) this.move('s');
+        if (lx < 0) this.move('a');
+        else if (lx > 0) this.move('d');
 
-        if (lx < 0) this.move("a");
-        if (lx > 0) this.move("d");
-
-        //sprint (button 0 = A)
-        if ((gp.buttons[0]?.pressed || keyIsDown(SHIFT)) && this.stamina > 0) {
-          this.isSprinting = true;
-        } else {
-          this.isSprinting = false;
-        }
+        wantsSprint = wantsSprint || !!gp.buttons?.[0]?.pressed;
       } else {
-        //keyboard
-        this.isSprinting = keyIsDown(SHIFT) && this.stamina > 0;
+        if (keyIsDown(87)) this.move('w');
+        if (keyIsDown(83)) this.move('s');
+        if (keyIsDown(65)) this.move('a');
+        if (keyIsDown(68)) this.move('d');
       }
+
+      this.isSprinting = wantsSprint;
     }
 
-    //sprint logic
     if (this.isSprinting && this.stamina > 1) {
       this.speed = this.boostedSpeed;
       this.stamina -= this.staminaDrainRate;
-
       if (this.stamina <= 0) {
         this.stamina = 1;
-        this.isSprinting = false;      //stop sprinting
-        this.staminaCooldown = millis() + 3000; 
+        this.isSprinting = false;
+        this.staminaCooldown = now + 3000;
       }
-
     } else {
       this.speed = this.baseSpeed;
-
-      //added cooldown for stamina regen after sprinting
-      if (this.stamina < this.maxStamina && (!this.staminaCooldown || millis() > this.staminaCooldown)) {
-        this.stamina += this.staminaRegenRate;
-        if (this.stamina > this.maxStamina) this.stamina = this.maxStamina;
+      if (this.stamina < this.maxStamina && (!this.staminaCooldown || now > this.staminaCooldown)) {
+        this.stamina = Math.min(this.maxStamina, this.stamina + this.staminaRegenRate);
       }
     }
   }
 
   look() {
-    this.vision = [];
-    //push walls to vision array
-    this.vision.push(this.checkWall(1));
-    this.vision.push(this.checkWall(2));
-    this.vision.push(this.checkWall(3));
-    this.vision.push(this.checkWall(4));
+    const vision = this.vision;
+    vision[0] = this.checkWall(1);
+    vision[1] = this.checkWall(2);
+    vision[2] = this.checkWall(3);
+    vision[3] = this.checkWall(4);
+    vision[4] = this.checkOther(1, 1);
+    vision[5] = this.checkOther(2, 1);
+    vision[6] = this.checkOther(3, 1);
+    vision[7] = this.checkOther(4, 1);
+    vision[8] = this.checkOther(1, 2);
+    vision[9] = this.checkOther(2, 2);
+    vision[10] = this.checkOther(3, 2);
+    vision[11] = this.checkOther(4, 2);
+    vision[12] = this.checkOther(1, 3);
+    vision[13] = this.checkOther(2, 3);
+    vision[14] = this.checkOther(3, 3);
+    vision[15] = this.checkOther(4, 3);
+    vision[16] = this.checkOther(1, 4);
+    vision[17] = this.checkOther(2, 4);
+    vision[18] = this.checkOther(3, 4);
+    vision[19] = this.checkOther(4, 4);
+    vision[20] = this.stamina/100;
+    vision[21] = this.speed === 5 ? 0 : 1;
+    vision[22] = this.isInvincible ? 1 : 0;
+    return vision;
+  }
 
-    //push enemies to vision array
-    this.vision.push(this.checkOther(1, 1));
-    this.vision.push(this.checkOther(2, 1));
-    this.vision.push(this.checkOther(3, 1));
-    this.vision.push(this.checkOther(4, 1));
-    //push pickups to vision array
-    this.vision.push(this.checkOther(1, 2));
-    this.vision.push(this.checkOther(2, 2));
-    this.vision.push(this.checkOther(3, 2));
-    this.vision.push(this.checkOther(4, 2));
-    this.vision.push(this.checkOther(1, 3));
-    this.vision.push(this.checkOther(2, 3));
-    this.vision.push(this.checkOther(3, 3));
-    this.vision.push(this.checkOther(4, 3));
-    this.vision.push(this.checkOther(1, 4));
-    this.vision.push(this.checkOther(2, 4));
-    this.vision.push(this.checkOther(3, 4));
-    this.vision.push(this.checkOther(4, 4));
-    // this.vision.push(this.checkOther(1, 5));
-    // this.vision.push(this.checkOther(2, 5));
-    // this.vision.push(this.checkOther(3, 5));
-    // this.vision.push(this.checkOther(4, 5));
-    //push directionality of valid treat
-    // this.vision.push(this.checkDownArea());
-    // this.vision.push(this.checkRightArea());
-    //sprinting to array
-    this.vision.push((this.stamina/100).toFixed(3));
-    this.vision.push(this.speed === 5 ? 0 : 1);
-    //push invincibility to array
-    this.vision.push(this.isInvincible ? 1 : 0);
+  _scan(direction, maxSteps, targetType = null) {
+    const dx = SCAN_DX[direction];
+    const dy = SCAN_DY[direction];
+    const startX = this.currentLocation.x;
+    const startY = this.currentLocation.y;
+
+    for (let steps = 1; steps <= maxSteps; steps++) {
+      const cell = mapGrid[startY + dy * steps]?.[startX + dx * steps];
+      if (!cell?.valid) return 1 / steps;
+      if (targetType === null) continue;
+
+      const occupants = cell.occupants;
+      if (!occupants?.length) continue;
+
+      for (let i = 0; i < occupants.length; i++) {
+        const occ = occupants[i];
+        if (occ.type === targetType && !Pickup.inList(occ.id, occ.type, this.uuid)) {
+          return 1 / steps;
+        }
+      }
+    }
+
+    return 0;
   }
 
   checkWall(direction) {
-    for(let steps = 1; steps <= 17; steps++) {
-      let tempX;
-      let tempY;
-      switch(direction){
-        case 1:
-          tempX = 0;
-          tempY = 0 - steps;
-          break;
-        case 2:
-          tempX = steps;
-          tempY = 0;
-          break;
-        case 3:
-          tempX = 0;
-          tempY = steps;
-          break;
-        case 4:
-          tempX = 0 - steps;
-          tempY = 0;
-          break;
-      }
-      if (typeof mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX] === "undefined" || !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.valid) {
-        return (1/steps).toFixed(3);
-      }
-    }
+    return this._scan(direction, 17);
   }
 
   checkOther(direction, target) {
-    for(let steps = 1; steps <= 19; steps++) {
-      let tempX;
-      let tempY;
-      switch(direction){
-        case 1:
-          tempX = 0;
-          tempY = 0 - steps;
-          break;
-        case 2:
-          tempX = steps;
-          tempY = 0;
-          break;
-        case 3:
-          tempX = 0;
-          tempY = steps;
-          break;
-        case 4:
-          tempX = 0 - steps;
-          tempY = 0;
-          break;
-      }
-      if (typeof mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX] === "undefined" || !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.valid) {
-        return 0;
-      } else if (target === 4 && mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => occupant.type === 4) || mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => occupant.type === 5) && !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))) {
-        return (1/steps).toFixed(3);
-      } else if (mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => occupant.type === target) && !mapGrid[this.currentLocation.y + tempY]?.[this.currentLocation.x + tempX]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))){
-        return (1/steps).toFixed(3);
-      } 
-    }
+    return this._scan(direction, 19, target);
   }
 
-  // checkDownArea() {
-  //   for(let rows = this.currentLocation.y + 1; rows <= gridRows; rows++) {
-  //     for(let steps = 1; steps <= gridColumns - 1; steps++) {
-  //       if(rows >= gridRows) {
-  //         return 0;
-  //       } else if (mapGrid[rows]?.[steps]?.occupants.some(occupant => occupant.type === 2) && !mapGrid[rows]?.[steps]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))) {
-  //         return 1;
-  //       }
-  //     }
-  //   }
-  // }
-
-  // checkRightArea() {
-  //   for(let columns = this.currentLocation.x + 1; columns <= gridColumns; columns++) {
-  //     for(let steps = 1; steps <= gridRows - 1; steps++) {
-  //       if(columns >= gridColumns) {
-  //         return 0;
-  //       } else if (mapGrid[steps]?.[columns]?.occupants.some(occupant => occupant.type === 2) && !mapGrid[steps]?.[columns]?.occupants.some(occupant => Pickup.inList(occupant.id, occupant.type, this.uuid))) {
-  //         return 1;
-  //       }
-  //       }
-  //   }
-  // }
-
   think() {
-    let max = 0;
+    const decision = this.brain.propagate(this.vision);
     let maxIndex = 0;
-    // console.info("Vision - tUp: ", this.vision[8]);
-    // console.info("Vision - tRight: ", this.vision[25]);
-    // console.info("Vision - tDown: ", this.vision[24]);
-    // console.info("Vision - tLeft: ", this.vision[11]);
+    let max = decision[0] ?? -Infinity;
 
-    //movement decision
-    let directions = ["w", "d", "s", "a"];
-
-    // console.log(`\nPlayer vision: \n`)
-    // console.log(`Wall up: ${this.vision[0]} \n`)
-    // console.log(`Wall right: ${this.vision[1]} \n`)
-    // console.log(`Wall down: ${this.vision[2]} \n`)
-    // console.log(`Wall left: ${this.vision[3]} \n`)
-    // console.log(`Enemies up: ${this.vision[4]} \n`)
-    // console.log(`Enemies right: ${this.vision[5]} \n`)
-    // console.log(`Enemies down: ${this.vision[6]} \n`)
-    // console.log(`Enemies left: ${this.vision[7]} \n`)
-    // console.log(`Treats up: ${this.vision[8]} \n`)
-    // console.log(`Treats right: ${this.vision[9]} \n`)
-    // console.log(`Treats down: ${this.vision[10]} \n`)
-    // console.log(`Treats left: ${this.vision[11]} \n`)
-    // console.log(`PB up: ${this.vision[12]} \n`)
-    // console.log(`PB right: ${this.vision[13]} \n`)
-    // console.log(`PB down: ${this.vision[14]} \n`)
-    // console.log(`PB left: ${this.vision[15]} \n`)
-    // console.log(`Powerups up: ${this.vision[16]} \n`)
-    // console.log(`Powerups right: ${this.vision[17]} \n`)
-    // console.log(`Powerups down: ${this.vision[18]} \n`)
-    // console.log(`Powerups left: ${this.vision[19]} \n`)
-    // console.log(`Stamina: ${this.vision[20]} \n`)
-    // console.log(`Speed: ${this.vision[21]} \n`)
-    // console.log(`isInvincible: ${this.vision[22]} \n`)
-
-    this.decision = this.brain.propagate(this.vision);
-
-    for (let i = 0; i < 4; i++) {
-      if (this.decision[i] > max) {
-        max = this.decision[i];
+    for (let i = 1; i < 4; i++) {
+      if ((decision[i] ?? -Infinity) > max) {
+        max = decision[i];
         maxIndex = i;
       }
     }
 
-    if(this.decision[4] > 0.5) {this.isSprinting = true} else {this.isSprinting = false};
+    this.isSprinting = (decision[4] ?? 0) > 0.5;
 
     if (this.isReadytoMove) {
       this.movesWithoutTreat++;
-      if(this.movesWithoutTreat > MAX_MOVES_WITHOUT_TREAT) {
-      this.dead = true;
-      return;
+      if (this.movesWithoutTreat > MAX_MOVES_WITHOUT_TREAT) {
+        this.dead = true;
+        return;
       }
     }
-    this.move(directions[maxIndex]);
+
+    this.move(PLAYER_MOVE_ORDER[maxIndex]);
   }
-
-  //---------------------------------------------------------------------------------------------------------------------------------------------------------
-  //returns a clone of this player with the same brian
-  // clone() {
-  //   var clone = new Player();
-  //   clone.brain = this.brain.clone();
-  //   clone.fitness = this.fitness;
-  //   clone.brain.generateNetwork();
-  //   clone.gen = this.gen;
-  //   clone.bestScore = this.score;
-  //   clone.stamina = this.stamina;
-  //   clone.maxStamina = this.maxStamina;
-  //   return clone;
-  // }
-
-  //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  //since there is some randomness in games sometimes when we want to replay the game we need to remove that randomness
-  //this fuction does that
-
-  // cloneForReplay() {
-  //   var clone = new Player();
-  //   clone.brain = this.brain.clone();
-  //   clone.fitness = this.fitness;
-  //   clone.brain.generateNetwork();
-  //   clone.gen = this.gen;
-  //   clone.bestScore = this.score;
-  //   clone.stamina = this.stamina;
-  //   clone.maxStamina = this.maxStamina;
-
-  //   //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<replace
-  //   return clone;
-  // }
 
   calculateFitness() {
     this.brain.fitness = (this.score + (this.movesTaken / 10)) - (this.fitnessPenalty / 3);
-    // console.log(this.brain);
   }
-
-  // rebirth() {
-  //   this.dead = false;
-  //   this.movesWithoutTreat = 0;
-  //   this.x = 9;
-  //   this.y = 8;
-  //   this.stamina = 100;
-  //   this.isSprinting = false;
-  // }
-
-  // crossover(parent2) {
-  //   var child = new Player();
-  //   child.brain = this.brain.crossover(parent2.brain);
-  //   child.brain.generateNetwork();
-  //   return child;
-  // }
-
 }

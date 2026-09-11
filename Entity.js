@@ -1,199 +1,130 @@
+const MOVE_DELTAS = Object.freeze({
+  a: [-1, 0],
+  d: [1, 0],
+  w: [0, -1],
+  s: [0, 1],
+});
+
 class Entity {
-  constructor(currentLocation, w, h, speed, type, collisionCallback) {
+  constructor(currentLocation, w, h, speed, type, collisionCallback = () => {}) {
     this.isReadytoMove = true;
     this.currentLocation = currentLocation;
-    this.w = w
+    this.nextLocation = null;
+    this.nextX = currentLocation.x;
+    this.nextY = currentLocation.y;
+    this.w = w;
     this.h = h;
-    this.nextLocation = {};
     this.type = type;
     this.collisionCallback = collisionCallback;
 
-    this.x =
-      (this.currentLocation.x * gridWidth);
-    this.y =
-      (this.currentLocation.y * gridHeight);
+    this.x = currentLocation.x * gridWidth;
+    this.y = currentLocation.y * gridHeight;
 
-    this.facing;
-
+    this.facing = null;
     this.baseSpeed = speed;
     this.boostedSpeed = 10;
-    this.speed = this.baseSpeed;
+    this.speed = speed;
 
     this.uuid = crypto.randomUUID();
 
-    this.lastDec;
-
+    this.lastDec = null;
     this.movesWithoutTreat = 0;
     this.movesTaken = 0;
     this.fitnessPenalty = 0;
 
-    this.registerLocation(this.currentLocation);
+    this.registerLocation(currentLocation);
   }
 
-  move(direction = 'a', increasePenalty = ()=>{}) {
-    // console.info("Type", this.type);
-    // console.info("Id", this.uuid);
-    // console.info("Location", this.currentLocation);
-    // // console.info("direction", direction);
+  move(direction = 'a', increasePenalty = () => {}) {
     if (!this.isReadytoMove) {
-      // console.info("not ready to move");
-      // console.info("X coordinates", this.getX(this.nextLocation))
-      switch (this.lastDec) {
-        case "a":
-          if (this.x - this.speed <= this.getX(this.nextLocation)) {
-            this.x = this.getX(this.nextLocation);
-            this.isReadytoMove = true;
-            this.deregisterLocation(this.currentLocation);
-            this.currentLocation = this.nextLocation;
-            this.registerLocation(this.currentLocation);
-            this.nextLocation = {};
-          } else {
-            this.x = this.x - this.speed;
-          }
-          break;
-        case "d":
-          if (this.x + this.speed >= this.getX(this.nextLocation)) {
-            this.x = this.getX(this.nextLocation);
-            this.isReadytoMove = true;
-            this.deregisterLocation(this.currentLocation);
-            this.currentLocation = this.nextLocation;
-            this.registerLocation(this.currentLocation);
-            this.nextLocation = {};
-          } else {
-            this.x = this.x + this.speed;
-          }
-          break;
-        case "w":
-          if (this.y - this.speed <= this.getY(this.nextLocation)) {
-            this.y = this.getY(this.nextLocation);
-            this.isReadytoMove = true;
-            this.deregisterLocation(this.currentLocation);
-            this.currentLocation = this.nextLocation;
-            this.registerLocation(this.currentLocation);
-            this.nextLocation = {};
-          } else {
-            this.y = this.y - this.speed;
-          }
-          break;
-        case "s":
-          if (this.y + this.speed >= this.getY(this.nextLocation)) {
-            this.y = this.getY(this.nextLocation);
-            this.isReadytoMove = true;
-            this.deregisterLocation(this.currentLocation);
-            this.currentLocation = this.nextLocation;
-            this.registerLocation(this.currentLocation);
-            this.nextLocation = {};
-          } else {
-            this.y = this.y + this.speed;
-          }
-          break;
-      }
-    } else {
-      // console.info("ready to move");
-      // console.info("direction", direction);
-      switch (direction) {
-        case "a":
-          if (typeof mapGrid[this.currentLocation.y]?.[this.currentLocation.x - 1] !== "undefined" && mapGrid[this.currentLocation.y]?.[this.currentLocation.x - 1]?.valid) {
-            this.movesTaken++;
-            this.facing = direction;
-            this.nextLocation = {
-              x: this.currentLocation.x - 1,
-              y: this.currentLocation.y,
-            };
-            let collisions = this.checkCollision(this.nextLocation);
-            if(collisions) {
-              this.collisionCallback(collisions);
-            }
-            this.lastDec = "a";
-            this.isReadytoMove = false;
-          } else {
-            this.facing = direction;
-            // console.log("Not a valid move in the 'a' direction.")
-            this.fitnessPenalty++;
-          }
-          break;
-        case "d":
-          if (typeof mapGrid[this.currentLocation.y]?.[this.currentLocation.x + 1] !== "undefined" && mapGrid[this.currentLocation.y]?.[this.currentLocation.x + 1]?.valid) {
-            this.movesTaken++;
-            this.facing = direction;
-            this.nextLocation = {
-              x: this.currentLocation.x + 1,
-              y: this.currentLocation.y,
-            };
-            let collisions = this.checkCollision(this.nextLocation);
-            if(collisions) {
-              this.collisionCallback(collisions);
-            }
-            this.lastDec = "d";
-            this.isReadytoMove = false;
-          } else {
-            this.facing = direction;
-            // console.log("Not a valid move in the 'd' direction.")
-            this.fitnessPenalty++;
-          }
-          break;
-        case "w":
-          if (typeof mapGrid[this.currentLocation.y - 1]?.[this.currentLocation.x] !== "undefined" && mapGrid[this.currentLocation.y - 1]?.[this.currentLocation.x]?.valid) {
-            this.movesTaken++;
-            this.facing = direction;
-            this.nextLocation = {
-              x: this.currentLocation.x,
-              y: this.currentLocation.y - 1,
-            };
-            let collisions = this.checkCollision(this.nextLocation);
-            if(collisions) {
-              this.collisionCallback(collisions);
-            }
-            this.lastDec = "w";
-            this.isReadytoMove = false;
-          } else {
-            this.facing = direction;
-            // console.log("Not a valid move in the 'w' direction.")
-            this.fitnessPenalty++;
-          }
-          break;
-        case "s":
-          if (typeof mapGrid[this.currentLocation.y + 1]?.[this.currentLocation.x] !== "undefined" && mapGrid[this.currentLocation.y + 1]?.[this.currentLocation.x]?.valid) {
-            this.movesTaken++;
-            this.facing = direction;
-            this.nextLocation = {
-              x: this.currentLocation.x,
-              y: this.currentLocation.y + 1,
-            };
-            let collisions = this.checkCollision(this.nextLocation);
-            if(collisions) {
-              this.collisionCallback(collisions);
-            }
-            this.lastDec = "s";
-            this.isReadytoMove = false;
-          } else {
-            this.facing = direction;
-            // console.log("Not a valid move in the 's' direction.")
-            this.fitnessPenalty++;
-          }
-          break;
-        default:
-          console.error("No valid directions given");
-      }
+      this._continueMove();
+      return;
+    }
+
+    const delta = MOVE_DELTAS[direction];
+    if (!delta) {
+      console.error('No valid directions given');
+      return;
+    }
+
+    const nx = this.currentLocation.x + delta[0];
+    const ny = this.currentLocation.y + delta[1];
+    const cell = mapGrid[ny]?.[nx];
+
+    this.facing = direction;
+
+    if (!cell?.valid) {
+      this.fitnessPenalty++;
+      increasePenalty();
+      return;
+    }
+
+    this.movesTaken++;
+    this.nextX = nx;
+    this.nextY = ny;
+    this.nextLocation = { x: nx, y: ny };
+
+    const occupants = cell.occupants;
+    if (occupants?.length) this.collisionCallback(occupants);
+
+    this.lastDec = direction;
+    this.isReadytoMove = false;
+  }
+
+  _continueMove() {
+    if (!this.nextLocation) return;
+
+    const targetX = this.nextX * gridWidth;
+    const targetY = this.nextY * gridHeight;
+    const step = this.speed;
+
+    switch (this.lastDec) {
+      case 'a':
+        this.x = this.x - step <= targetX ? targetX : this.x - step;
+        break;
+      case 'd':
+        this.x = this.x + step >= targetX ? targetX : this.x + step;
+        break;
+      case 'w':
+        this.y = this.y - step <= targetY ? targetY : this.y - step;
+        break;
+      case 's':
+        this.y = this.y + step >= targetY ? targetY : this.y + step;
+        break;
+      default:
+        return;
+    }
+
+    if (this.x === targetX && this.y === targetY) {
+      this.deregisterLocation(this.currentLocation);
+      this.currentLocation = this.nextLocation;
+      this.registerLocation(this.currentLocation);
+      this.nextLocation = null;
+      this.isReadytoMove = true;
     }
   }
 
   checkCollision(location) {
-    if(mapGrid[location.y][location.x].occupants.length === 0) {
-      return false;      
-    } else {
-      return mapGrid[location.y][location.x].occupants;
-    }
+    const occupants = mapGrid[location.y]?.[location.x]?.occupants;
+    return occupants?.length ? occupants : false;
   }
 
   registerLocation(location) {
-    mapGrid[location.y]?.[location.x]?.occupants.push({type: this.type, id: this.uuid})
+    const cell = mapGrid[location.y]?.[location.x];
+    if (!cell?.occupants) return;
+    cell.occupants.push({ type: this.type, id: this.uuid });
   }
 
   deregisterLocation(location) {
-    mapGrid[location.y][location.x].occupants = mapGrid[location.y][location.x].occupants.filter(value => { 
-      return value.id !== this.uuid;
-    })
+    const occupants = mapGrid[location.y]?.[location.x]?.occupants;
+    if (!occupants?.length) return;
+
+    for (let i = occupants.length - 1; i >= 0; i--) {
+      if (occupants[i].id !== this.uuid) continue;
+      occupants[i] = occupants[occupants.length - 1];
+      occupants.pop();
+      return;
+    }
   }
 
   getX(location) {

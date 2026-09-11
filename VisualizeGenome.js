@@ -1,189 +1,221 @@
-const nodeMap = {
-    0: "Look Up for Wall",
-    1: "Look Right for Wall",
-    2: "Look Down for Wall",
-    3: "Look Left for Wall",
-    4: "Look Up for Squirrels",
-    5: "Look Right for Squirrels",
-    6: "Look Down for Squirrels",
-    7: "Look Left for Squirrels",
-    8: "Look Up for Treats",
-    9: "Look Right for Treats",
-    10: "Look Down for Treats",
-    11: "Look Left for Treats",
-    12: "Look Up for PB",
-    13: "Look Right for PB",
-    14: "Look Down for PB",
-    15: "Look Left for PB",
-    16: "Look Up for Powerup",
-    17: "Look Right for Powerup",
-    18: "Look Down for Powerup",
-    19: "Look Left for Powerup",
-    20: "Stamina Available",
-    21: "Speed",
-    22: "Whether Invincible",
-    23: "Move Up",
-    24: "Move Right",
-    25: "Move Down",
-    26: "Move Left",
-    27: "Sprint"
-};
+const INPUT_LABELS = [
+  "Look Up for Wall",
+  "Look Right for Wall",
+  "Look Down for Wall",
+  "Look Left for Wall",
+  "Look Up for Squirrels",
+  "Look Right for Squirrels",
+  "Look Down for Squirrels",
+  "Look Left for Squirrels",
+  "Look Up for Treats",
+  "Look Right for Treats",
+  "Look Down for Treats",
+  "Look Left for Treats",
+  "Look Up for PB",
+  "Look Right for PB",
+  "Look Down for PB",
+  "Look Left for PB",
+  "Look Up for Powerup",
+  "Look Right for Powerup",
+  "Look Down for Powerup",
+  "Look Left for Powerup",
+  "Stamina Available",
+  "Speed",
+  "Whether Invincible",
+];
+
+const OUTPUT_LABELS = [
+  "Move Up",
+  "Move Right",
+  "Move Down",
+  "Move Left",
+  "Sprint",
+];
 
 function visualizeGenome(genome, canvas) {
-    const ctx = canvas.getContext('2d');
-    
-    // 1. Clear previous visualization
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    if (!genome || !genome.nodeGenes || !genome.connectionGenes) return;
+  if (!canvas || !genome?.nodeGenes || !genome?.connectionGenes) return;
 
-    // 2. Assign layers to nodes for layout structure
-    const nodeLayers = assignLayers(genome);
-    const maxLayer = Math.max(...Object.values(nodeLayers), 1);
-    
-    // Group nodes by their layer index
-    const layers = {};
-    genome.nodeGenes.forEach(node => {
-        const l = nodeLayers[node.id] || 0;
-        if (!layers[l]) layers[l] = [];
-        layers[l].push(node);
-    });
+  const ctx = canvas.getContext("2d");
+  const { width, height } = canvas;
+  ctx.clearRect(0, 0, width, height);
 
-    // 3. Calculate spatial positions (X, Y) for every node
-    const positions = {};
-    const paddingWidth = 300;
-    const paddingHeight = 100;
-    const usableWidth = canvas.width - paddingWidth * 2;
-    const usableHeight = canvas.height - paddingHeight * 2;
+  const nodeById = new Map();
+  for (let i = 0; i < genome.nodeGenes.length; i++) {
+    const node = genome.nodeGenes[i];
+    nodeById.set(node.id, node);
+  }
 
-    Object.keys(layers).forEach(layerStr => {
-        const layerIdx = parseInt(layerStr);
-        const layerNodes = layers[layerIdx];
-        
-        // X coordinate based on layer depth
-        const x = paddingWidth + (layerIdx / maxLayer) * usableWidth;
-        
-        layerNodes.forEach((node, index) => {
-            // Y coordinate spaced evenly within the layer
-            const y = paddingHeight + (layerNodes.length > 1 
-                ? (index / (layerNodes.length - 1)) * usableHeight 
-                : usableHeight / 2);
-            
-            positions[node.id] = { x, y };
-        });
-    });
+  const layers = assignLayers(genome);
+  let maxLayer = 0;
+  for (const layer of layers.values()) if (layer > maxLayer) maxLayer = layer;
 
-    // 4. Draw Connections (Genes)
-    genome.connectionGenes.forEach(conn => {
-        // Skip disabled connections
-        if (conn.enabled === false) return; 
-        // console.log("conn.outNode: ", conn.outNode)
-        const fromPos = positions[conn.outNode.id];
-        const toPos = positions[conn.inNode.id];
-        // console.log("fromPos: ", fromPos);
-        // console.log("toPos: ", toPos);
-        if (!fromPos || !toPos) return;
+  const grouped = Array.from({ length: maxLayer + 1 }, () => []);
+  for (let i = 0; i < genome.nodeGenes.length; i++) {
+    const node = genome.nodeGenes[i];
+    const layer = Math.max(0, Math.min(maxLayer, layers.get(node.id) ?? 0));
+    grouped[layer].push(node);
+  }
 
-        // console.log("fromPos: ", fromPos);
-        ctx.beginPath();
-        ctx.moveTo(fromPos.x, fromPos.y);
-        ctx.lineTo(toPos.x, toPos.y);
+  const positions = new Map();
+  const padX = 300;
+  const padY = 100;
+  const usableW = Math.max(1, width - padX * 2);
+  const usableH = Math.max(1, height - padY * 2);
+  const layerGap = maxLayer > 0 ? usableW / maxLayer : 0;
 
-        // Color: Green for positive weights, Red for negative weights
-        ctx.strokeStyle = conn.weight >= 0 ? '#2CD5C4' : '#CE0058';
+  for (let layer = 0; layer <= maxLayer; layer++) {
+    const nodes = grouped[layer];
+    if (!nodes.length) continue;
+    const x = padX + layer * layerGap;
+    const gapY = nodes.length > 1 ? usableH / (nodes.length - 1) : 0;
+    for (let i = 0; i < nodes.length; i++) {
+      positions.set(nodes[i].id, {
+        x,
+        y: nodes.length > 1 ? padY + i * gapY : height * 0.5,
+      });
+    }
+  }
 
-        // console.log("conn.weight: ", conn.weight)
-        // Thickness scales with weight magnitude
-        ctx.lineWidth = Math.min(Math.abs(conn.weight) * 1.5, 5); 
-        ctx.stroke();
-    });
+  const getNodeId = (n) => (typeof n === "object" && n !== null ? n.id : n);
+  const getNodeType = (n) =>
+    typeof n === "object" && n !== null
+      ? n.nodeType
+      : nodeById.get(n)?.nodeType;
 
-    // 5. Draw Nodes
-    const nodeRadius = 15;
-    genome.nodeGenes.forEach(node => {
-        const pos = positions[node.id];
-        if (!pos) return;
+  ctx.lineCap = "round";
+  for (let i = 0; i < genome.connectionGenes.length; i++) {
+    const conn = genome.connectionGenes[i];
+    if (!conn.enabled) continue;
 
-        ctx.beginPath();
-        ctx.arc(pos.x, pos.y, nodeRadius, 0, 2 * Math.PI);
-        
-        // Color based on node type
-        if (node.nodeType === 'INPUT') ctx.fillStyle = '#861F41';
-        else if (node.nodeType === 'OUTPUT') ctx.fillStyle = '#CA4F00';
-        else if (node.nodeType === 'HIDDEN') ctx.fillStyle = '#D7D2CB';
-        else if (node.nodeType === 'BIAS') ctx.fillStyle = '#508590';                             
-        
-        ctx.fill();
-        
-        // Draw border (darker if node has a high bias)
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = '#ffffff';
-        ctx.stroke();
+    const fromId = getNodeId(conn.outNode);
+    const toId = getNodeId(conn.inNode);
+    const fromPos = positions.get(fromId);
+    const toPos = positions.get(toId);
+    if (!fromPos || !toPos) continue;
 
-        // Label node ID inside or near the node
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '24px sans-serif';
-        ctx.textBaseline = 'middle';
-        
-        if (node.nodeType === 'INPUT') {
-            ctx.textAlign = 'right';
-            ctx.fillText(nodeMap[node.id], pos.x - 30, pos.y)
-        } else if(node.nodeType === 'OUTPUT') {
-            ctx.textAlign = 'left';
-            ctx.fillText(nodeMap[node.id], pos.x + 30, pos.y)
-        }
-    });
-}
+    ctx.beginPath();
+    ctx.moveTo(fromPos.x, fromPos.y);
+    ctx.lineTo(toPos.x, toPos.y);
+    ctx.strokeStyle = conn.weight >= 0 ? "#2CD5C4" : "#CE0058";
+    ctx.lineWidth = Math.min(1 + Math.abs(conn.weight) * 1.25, 5);
+    ctx.stroke();
+  }
 
-/**
- * Helper: Sorts nodes into topology layers to prevent backward visual overlapping.
- */
-function assignLayers(genome) {
-    const layers = {};
-    
-    // Initialize inputs to layer 0, outputs to a placeholder large layer
-    genome.nodeGenes.forEach(node => {
-        if (node.nodeType === 'INPUT') layers[node.id] = 0;
-    });
+  const radius = 15;
+  ctx.textBaseline = "middle";
+  ctx.font = "24px sans-serif";
 
-    // Push hidden/output layers forward based on graph depth
-    let changed = true;
-    let iterations = 0;
-    const maxIterations = genome.nodeGenes.length * 2; // Prevent infinite loops in cyclic recurrent nets
+  for (let i = 0; i < genome.nodeGenes.length; i++) {
+    const node = genome.nodeGenes[i];
+    const pos = positions.get(node.id);
+    if (!pos) continue;
 
-    while (changed && iterations < maxIterations) {
-        changed = false;
-        iterations++;
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
 
-        genome.connectionGenes.forEach(conn => {
-            if (conn.enabled === false) return;
-            
-            const fromLayer = layers[conn.outNode];
-            const toLayer = layers[conn.inNode];
-
-            if (fromLayer !== undefined) {
-                // The target node must be at least one layer further right than the source node
-                if (toLayer === undefined || toLayer <= fromLayer) {
-                    layers[conn.inNode] = fromLayer + 1;
-                    changed = true;
-                }
-            }
-        });
+    switch (node.nodeType) {
+      case "INPUT":
+        ctx.fillStyle = "#861F41";
+        break;
+      case "OUTPUT":
+        ctx.fillStyle = "#CA4F00";
+        break;
+      case "HIDDEN":
+        ctx.fillStyle = "#D7D2CB";
+        break;
+      case "BIAS":
+        ctx.fillStyle = "#508590";
+        break;
+      default:
+        ctx.fillStyle = "#999999";
     }
 
-    // Force outputs to the final layer edge for clean visual structure
-    let maxHiddenLayer = 0;
-    genome.nodeGenes.forEach(node => {
-        if (node.nodeType !== 'OUTPUT' && layers[node.id] > maxHiddenLayer) {
-            maxHiddenLayer = layers[node.id];
-        }
-    });
-    
-    genome.nodeGenes.forEach(node => {
-        if (node.nodeType === 'OUTPUT') {
-            layers[node.id] = maxHiddenLayer + 1;
-        }
-    });
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#FFFFFF";
+    ctx.stroke();
 
-    return layers;
+    const label = getNodeLabel(node);
+    if (!label) continue;
+
+    ctx.fillStyle = "#FFFFFF";
+    if (node.nodeType === "INPUT") {
+      ctx.textAlign = "right";
+      ctx.fillText(label, pos.x - radius - 8, pos.y);
+    } else if (node.nodeType === "OUTPUT") {
+      ctx.textAlign = "left";
+      ctx.fillText(label, pos.x + radius + 8, pos.y);
+    } else {
+      ctx.textAlign = "center";
+      ctx.fillText(label, pos.x, pos.y - radius - 10);
+    }
+  }
+}
+
+function getNodeLabel(node) {
+  if (node.nodeType === "INPUT")
+    return INPUT_LABELS[node.id] ?? `Input ${node.id}`;
+  if (node.nodeType === "OUTPUT")
+    return OUTPUT_LABELS[node.id - INPUT_LABELS.length] ?? `Output ${node.id}`;
+}
+
+function assignLayers(genome) {
+  const layers = new Map();
+  const nodes = genome.nodeGenes;
+  const connections = genome.connectionGenes;
+  const nodeById = new Map();
+
+  for (let i = 0; i < nodes.length; i++) nodeById.set(nodes[i].id, nodes[i]);
+
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    if (node.nodeType === "INPUT" || node.nodeType === "BIAS")
+      layers.set(node.id, 0);
+  }
+
+  let changed = true;
+  let iterations = 0;
+  const maxIterations = nodes.length * 4;
+
+  while (changed && iterations++ < maxIterations) {
+    changed = false;
+    for (let i = 0; i < connections.length; i++) {
+      const conn = connections[i];
+      if (!conn.enabled) continue;
+
+      const fromId =
+        typeof conn.outNode === "object" ? conn.outNode.id : conn.outNode;
+      const toId =
+        typeof conn.inNode === "object" ? conn.inNode.id : conn.inNode;
+      if (!nodeById.has(fromId) || !nodeById.has(toId)) continue;
+
+      const fromLayer = layers.get(fromId);
+      if (fromLayer === undefined) continue;
+
+      const nextLayer = fromLayer + 1;
+      const currentLayer = layers.get(toId);
+      const targetNode = nodeById.get(toId);
+
+      if (currentLayer === undefined || nextLayer > currentLayer) {
+        if (targetNode.nodeType !== "INPUT" && targetNode.nodeType !== "BIAS") {
+          layers.set(toId, nextLayer);
+          changed = true;
+        }
+      }
+    }
+  }
+
+  let maxLayer = 0;
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    const layer = layers.get(node.id) ?? 0;
+    if (node.nodeType !== "OUTPUT" && layer > maxLayer) maxLayer = layer;
+  }
+
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    if (node.nodeType === "OUTPUT") layers.set(node.id, maxLayer + 1);
+  }
+
+  return layers;
 }

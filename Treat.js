@@ -15,6 +15,6 @@ class Treat extends Pickup {
 
     super(location, sprite, 2, width, height)
 
-    this.life = millis() + 5000;
+    this.life = millis() + 10000;
   }
 }
