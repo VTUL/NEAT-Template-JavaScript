@@ -85,7 +85,7 @@ const config = new Config({
   reinitializeWeightRate: 0.1,
   minPerturb: -0.5,
   maxPerturb: 0.5,
-  populationSize: 300,
+  populationSize: 500,
   generations: 1000,
   targetFitness: 1000,
   survivalRate: 0.2,
@@ -160,14 +160,6 @@ function draw() {
     enemies[i].show();
   }
 
-  // if (!humanPlaying) {
-  //   noStroke();
-  //   fill(0);
-  //   textAlign(CENTER, TOP);
-  //   textSize(32);
-  //   text('AI Playing', 540, 15);
-  // }
-
   drawToScreen(now);
 
   if (humanPlaying) {
@@ -233,7 +225,7 @@ function handleRespawns(now) {
     enemyRespawnTime = now + 5000;
   }
 
-  if (treats.length < 25) treats.push(new Treat(treat, 20, 20));
+  if (treats.length < 30) treats.push(new Treat(treat, 20, 20));
 
   for (let i = treats.length - 1; i >= 0; i--) {
     if (treats[i].life < now) {
@@ -408,6 +400,32 @@ function resetGame() {
     if (players[i]) players[i].reset(genomes[i]);
     else players[i] = new Player(genomes[i]);
   }
+}
+
+function findPickupSpawnLocation() {
+  const emptyCells = [];
+  const validCells = [];
+
+  // Use the actual grid bounds. A large population may occupy every valid
+  // cell, so sharing a cell is preferable to an unbounded placement loop.
+  for (let y = 0; y < mapGrid.length; y++) {
+    const row = mapGrid[y];
+    for (let x = 0; x < row.length; x++) {
+      const cell = row[x];
+      if (!cell?.valid) continue;
+
+      const location = { x, y };
+      validCells.push(location);
+      if (cell.occupants.length === 0) emptyCells.push(location);
+    }
+  }
+
+  const candidates = emptyCells.length ? emptyCells : validCells;
+  if (!candidates.length) {
+    throw new Error('The map has no valid cell for a pickup.');
+  }
+
+  return candidates[(Math.random() * candidates.length) | 0];
 }
 
 function getRandomInt(min, max) {

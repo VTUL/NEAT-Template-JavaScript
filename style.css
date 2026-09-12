@@ -20,7 +20,7 @@ main {
   margin: 0;
   width: calc(100vw - 100px);
   height: calc(100vh - 200px);
-  margin-top: 100px;
+  margin-top: 25px;
   margin-left: 100px;
   margin-right: 0;
 }
@@ -111,4 +111,25 @@ footer {
 
 footer > img {
   height: 75px;
+}
+
+h1.titles {
+    color: white;
+    font-size: 4rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+}
+
+.btitle.titles {
+  margin-top: 100px;
 }
