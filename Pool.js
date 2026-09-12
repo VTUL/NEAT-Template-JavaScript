@@ -44,7 +44,7 @@ class Pool extends Population {
 
   calculateFitness() {
     const players = this.players;
-    for (let i = 1, len = players.length; i < len; i++) {
+    for (let i = 0, len = players.length; i < len; i++) {
       players[i].calculateFitness();
     }
   }

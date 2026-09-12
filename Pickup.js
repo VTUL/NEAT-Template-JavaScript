@@ -40,8 +40,8 @@ class Pickup {
     const list =
       type === 2 ? treats :
       type === 3 ? pb :
-      type === 4 ? balls :
-      type === 5 ? beds :
+      type === 4 ? beds :
+      type === 5 ? balls :
       null;
 
     if (!list) return false;
