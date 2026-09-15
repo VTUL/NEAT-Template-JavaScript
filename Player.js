@@ -32,6 +32,15 @@ function drawPlayerSprite(sprite, x, y, frame) {
 
 class Player extends Entity {
   constructor(brain = null) {
+
+    const tileCallback = (newLocation) => {
+      const novel = this.tilesVisited.some((tile) => {
+        return tile.x === newLocation.x && tile.y === newLocation.y;
+      })
+
+      if (!novel) this.tilesVisited.push(newLocation);
+    }
+    
     const collisionCallback = (collisions) => {
       for (let i = 0; i < collisions.length; i++) {
         const occupant = collisions[i];
@@ -67,7 +76,7 @@ class Player extends Entity {
       }
     };
 
-    super({ x: PLAYER_START.x, y: PLAYER_START.y }, 40, 24, 5, 0, collisionCallback);
+    super({ x: PLAYER_START.x, y: PLAYER_START.y }, 40, 24, 5, 0, collisionCallback, tileCallback);
     playerRegistry.set(this.uuid, this);
     this.genomeInputs = VISION_SIZE;
     this.genomeOutputs = 5;
@@ -79,6 +88,7 @@ class Player extends Entity {
     this.isInvinUntil = 0;
     this.isInvincible = false;
     this.tilesVisited = [];
+    this.powerupBonus = 0;
 
     // Immutable sprite metadata is shared by every player.
     this.spriteSets = PLAYER_SPRITE_SETS();
@@ -230,11 +240,11 @@ class Player extends Entity {
   }
 
   calculateFitness() {
-    console.log(this.tilesVisited);
     const explorationBonus = 0.25 * this.tilesVisited.length;
-    const usefulPowerupBonus = 0.1 * stats.usefulPowerupsCollected;
+    const usefulPowerupBonus = 0.1 * this.powerupBonus;
     const wallPenalty = 0.5 * Math.pow(this.fitnessPenalty, 1.25);
 
+    // console.log(`Game score: ${this.score}, exploration bonus: ${explorationBonus}, useful powerup bonus: ${usefulPowerupBonus}, wall penalty: ${wallPenalty}, total: ${(this.score + explorationBonus + usefulPowerupBonus) - wallPenalty}.`)
     this.brain.fitness = (this.score + explorationBonus + usefulPowerupBonus) - wallPenalty;
   }
 }

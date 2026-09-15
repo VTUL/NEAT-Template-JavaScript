@@ -1,7 +1,6 @@
 const ENEMY_MOVE_ORDER = ['w', 'd', 's', 'a'];
 
 class Enemy extends Entity {
-  static enemyCount = 0;
   static _spritesReady = false;
   static spriteLeft = null;
   static spriteDown = null;
@@ -19,7 +18,6 @@ class Enemy extends Entity {
 
   constructor() {
     Enemy.initSprites();
-
     const collisionCallback = (collisions) => {
       for (let i = 0; i < collisions.length; i++) {
         const occupant = collisions[i];
@@ -40,14 +38,15 @@ class Enemy extends Entity {
     let spawnX = 0;
     let spawnY = 0;
     switch (whichWall) {
-      case 1: spawnX = 2; spawnY = getRandomInt(3, 16); break;
-      case 2: spawnX = 13; spawnY = getRandomInt(3, 16); break;
-      case 3: spawnX = getRandomInt(2, 13); spawnY = 3; break;
-      case 4: spawnX = getRandomInt(2, 13); spawnY = 16; break;
+      case 1: spawnX = 3; spawnY = getRandomInt(3, 14); break;
+      case 2: spawnX = 12; spawnY = getRandomInt(3, 14); break;
+      case 3: spawnX = getRandomInt(3, 12); spawnY = 3; break;
+      case 4: spawnX = getRandomInt(3, 12); spawnY = 14; break;
     }
 
+    // console.log(`x: ${spawnX} and y: ${spawnY}`)
+
     super({ x: spawnX, y: spawnY }, 36, 18, 8, 1, collisionCallback);
-    Enemy.enemyCount++;
     this.isActive = true;
     this.spriteLeft = Enemy.spriteLeft;
     this.spriteDown = Enemy.spriteDown;

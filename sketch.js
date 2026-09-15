@@ -21,7 +21,6 @@ let pb = [];
 let bedsRespawnTime = 0;
 let PBRespawnTime = 0;
 let ballRespawnTime = 0;
-let enemyRespawnTime = 0;
 let deathMessageTime = 0;
 let bestScoreThisGen = 0;
 
@@ -80,7 +79,7 @@ const config = new Config({
   bias: 1.0,
   connectBias: true,
   biasMode: 'WEIGHTED_NODE',
-  activationFunction: 'Tanh',
+  activationFunction: 'NEATSigmoid',
   weightInitialization: { type: 'Random', params: [-0.75, 0.75] },
 
   c1: 1.0,
@@ -314,7 +313,7 @@ function writeInfo() {
   info2 += 'Generation: ' + (population.generation + 1) + '<br>';
   info2 += 'Species: ' + population.species.length + '<br>';
   info1 += 'Global Best Score: ' + population.globalBestScore + '<br>';
-  info2 += 'Training steps/frame: ' + trainingStepsPerFrame + '<br>';
+  if(trainingStepsPerFrame > 1) info2 += 'Training steps/frame: ' + trainingStepsPerFrame + '<br>';
 
   if (infoDiv1) infoDiv1.innerHTML = info1;
   if (infoDiv2) infoDiv2.innerHTML = info2;

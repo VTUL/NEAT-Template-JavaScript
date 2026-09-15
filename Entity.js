@@ -30,7 +30,7 @@ function deregisterOccupant(cell, id, type) {
 }
 
 class Entity {
-  constructor(currentLocation, w, h, speed, type, collisionCallback = () => {}) {
+  constructor(currentLocation, w, h, speed, type, collisionCallback = () => {}, tileCallback = () => {}) {
     this.isReadytoMove = true;
     this.currentLocation = currentLocation;
     this.nextLocation = null;
@@ -40,6 +40,7 @@ class Entity {
     this.h = h;
     this.type = type;
     this.collisionCallback = collisionCallback;
+    this.tileCallback = tileCallback;
 
     this.x = currentLocation.x * gridWidth;
     this.y = currentLocation.y * gridHeight;
@@ -52,6 +53,7 @@ class Entity {
     this.movesWithoutTreat = 0;
     this.movesTaken = 0;
     this.fitnessPenalty = 0;
+    this.invalidMove = false;
 
     this.registerLocation(currentLocation);
   }
@@ -70,15 +72,20 @@ class Entity {
     const cell = mapGrid[ny]?.[nx];
     this.facing = direction;
 
-    if (!cell?.valid) {
+    if (!cell?.valid && this.invalidMove) {
       this.fitnessPenalty++;
+      return;
+    } else if(!cell?.valid) {
+      this.invalidMove = true;
       return;
     }
 
     this.movesTaken++;
+    this.invalidMove = false;
     this.nextX = nx;
     this.nextY = ny;
     this.nextLocation = { x: nx, y: ny };
+    this.tileCallback(this.nextLocation);
 
     // AI players need only non-player objects; enemies need only players.
     const occupants = this.type === 0 ? cell.nonPlayerOccupants : cell.occupantsByType?.[0];

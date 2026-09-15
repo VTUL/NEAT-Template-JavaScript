@@ -1,0 +1,3 @@
+Tweak fitness function
+Add powerup bonus
+Make each generation run 3 episodes
