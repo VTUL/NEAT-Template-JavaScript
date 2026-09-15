@@ -10,6 +10,7 @@ class Pickup {
     this.idList = [];
     this.uuid = crypto.randomUUID();
 
+    pickupRegistry.set(this.uuid, this);
     this.registerLocation();
   }
 
@@ -19,38 +20,18 @@ class Pickup {
 
   registerLocation() {
     const cell = mapGrid?.[this.location.y]?.[this.location.x];
-    if (cell?.occupants) {
-      cell.occupants.push({ type: this.type, id: this.uuid });
-    }
+    if (cell?.occupants) registerOccupant(cell, { type: this.type, id: this.uuid });
   }
 
   deregisterLocation() {
-    const occupants = mapGrid?.[this.location.y]?.[this.location.x]?.occupants;
-    if (!occupants?.length) return;
+    const cell = mapGrid?.[this.location.y]?.[this.location.x];
+    if (!cell?.occupants) return;
 
-    for (let i = occupants.length - 1; i >= 0; i--) {
-      if (occupants[i].id !== this.uuid) continue;
-      occupants[i] = occupants[occupants.length - 1];
-      occupants.pop();
-      return;
-    }
+    deregisterOccupant(cell, this.uuid, this.type);
+    pickupRegistry.delete(this.uuid);
   }
 
-  static inList(pickupId, type, playerId) {
-    const list =
-      type === 2 ? treats :
-      type === 3 ? pb :
-      type === 4 ? beds :
-      type === 5 ? balls :
-      null;
-
-    if (!list) return false;
-
-    for (let i = 0; i < list.length; i++) {
-      const item = list[i];
-      if (item.uuid === pickupId) return item.idList.includes(playerId);
-    }
-
-    return false;
+  static inList(pickupId, _type, playerId) {
+    return pickupRegistry.get(pickupId)?.idList.includes(playerId) ?? false;
   }
 }

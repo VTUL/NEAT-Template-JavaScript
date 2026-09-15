@@ -4,6 +4,6 @@ class Treat extends Pickup {
   constructor(sprite, width, height) {
     const location = findPickupSpawnLocation();
     super(location, sprite, 2, width, height);
-    this.life = millis() + 10000;
+    this.life = millis() * trainingStepsPerFrame + 7000;
   }
 }

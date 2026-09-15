@@ -11,10 +11,8 @@ class Pool extends Population {
   }
 
   updateAlive() {
-    const players = this.players;
-
-    for (let i = 0, len = players.length; i < len; i++) {
-      const player = players[i];
+    for (let i = 0; i < this.players.length; i++) {
+      const player = this.players[i];
       if (player.dead) continue;
 
       if (player.isReadytoMove) {
@@ -25,27 +23,27 @@ class Pool extends Population {
       }
 
       player.update();
+      if (player.score > this.globalBestScore) this.globalBestScore = player.score;
+    }
+  }
 
-      player.show();
-
-      if (player.score > this.globalBestScore) {
-        this.globalBestScore = player.score;
-      }
+  show() {
+    for (let i = 0; i < this.players.length; i++) {
+      const player = this.players[i];
+      if (!player.dead) player.show();
     }
   }
 
   done() {
-    const players = this.players;
-    for (let i = 0, len = players.length; i < len; i++) {
-      if (!players[i].dead) return false;
+    for (let i = 0; i < this.players.length; i++) {
+      if (!this.players[i].dead) return false;
     }
     return true;
   }
 
   calculateFitness() {
-    const players = this.players;
-    for (let i = 0, len = players.length; i < len; i++) {
-      players[i].calculateFitness();
+    for (let i = 0; i < this.players.length; i++) {
+      this.players[i].calculateFitness();
     }
   }
 }

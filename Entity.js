@@ -5,6 +5,30 @@ const MOVE_DELTAS = Object.freeze({
   s: [0, 1],
 });
 
+function registerOccupant(cell, occupant) {
+  cell.occupants.push(occupant);
+  const byType = cell.occupantsByType ??= Object.create(null);
+  (byType[occupant.type] ??= []).push(occupant);
+
+  if (occupant.type !== 0) (cell.nonPlayerOccupants ??= []).push(occupant);
+}
+
+function deregisterOccupant(cell, id, type) {
+  const remove = (list) => {
+    if (!list) return;
+    for (let i = list.length - 1; i >= 0; i--) {
+      if (list[i].id !== id) continue;
+      list[i] = list[list.length - 1];
+      list.pop();
+      return;
+    }
+  };
+
+  remove(cell.occupants);
+  remove(cell.occupantsByType?.[type]);
+  if (type !== 0) remove(cell.nonPlayerOccupants);
+}
+
 class Entity {
   constructor(currentLocation, w, h, speed, type, collisionCallback = () => {}) {
     this.isReadytoMove = true;
@@ -19,14 +43,11 @@ class Entity {
 
     this.x = currentLocation.x * gridWidth;
     this.y = currentLocation.y * gridHeight;
-
     this.facing = null;
     this.baseSpeed = speed;
     this.boostedSpeed = 10;
     this.speed = speed;
-
     this.uuid = crypto.randomUUID();
-
     this.lastDec = null;
     this.movesWithoutTreat = 0;
     this.movesTaken = 0;
@@ -35,27 +56,22 @@ class Entity {
     this.registerLocation(currentLocation);
   }
 
-  move(direction = 'a', increasePenalty = () => {}) {
+  move(direction = 'a') {
     if (!this.isReadytoMove) {
       this._continueMove();
       return;
     }
 
     const delta = MOVE_DELTAS[direction];
-    if (!delta) {
-      console.error('No valid directions given');
-      return;
-    }
+    if (!delta) return;
 
     const nx = this.currentLocation.x + delta[0];
     const ny = this.currentLocation.y + delta[1];
     const cell = mapGrid[ny]?.[nx];
-
     this.facing = direction;
 
     if (!cell?.valid) {
       this.fitnessPenalty++;
-      increasePenalty();
       return;
     }
 
@@ -64,7 +80,8 @@ class Entity {
     this.nextY = ny;
     this.nextLocation = { x: nx, y: ny };
 
-    const occupants = cell.occupants;
+    // AI players need only non-player objects; enemies need only players.
+    const occupants = this.type === 0 ? cell.nonPlayerOccupants : cell.occupantsByType?.[0];
     if (occupants?.length) this.collisionCallback(occupants);
 
     this.lastDec = direction;
@@ -79,20 +96,11 @@ class Entity {
     const step = this.speed;
 
     switch (this.lastDec) {
-      case 'a':
-        this.x = this.x - step <= targetX ? targetX : this.x - step;
-        break;
-      case 'd':
-        this.x = this.x + step >= targetX ? targetX : this.x + step;
-        break;
-      case 'w':
-        this.y = this.y - step <= targetY ? targetY : this.y - step;
-        break;
-      case 's':
-        this.y = this.y + step >= targetY ? targetY : this.y + step;
-        break;
-      default:
-        return;
+      case 'a': this.x = this.x - step <= targetX ? targetX : this.x - step; break;
+      case 'd': this.x = this.x + step >= targetX ? targetX : this.x + step; break;
+      case 'w': this.y = this.y - step <= targetY ? targetY : this.y - step; break;
+      case 's': this.y = this.y + step >= targetY ? targetY : this.y + step; break;
+      default: return;
     }
 
     if (this.x === targetX && this.y === targetY) {
@@ -111,27 +119,14 @@ class Entity {
 
   registerLocation(location) {
     const cell = mapGrid[location.y]?.[location.x];
-    if (!cell?.occupants) return;
-    cell.occupants.push({ type: this.type, id: this.uuid });
+    if (cell?.occupants) registerOccupant(cell, { type: this.type, id: this.uuid });
   }
 
   deregisterLocation(location) {
-    const occupants = mapGrid[location.y]?.[location.x]?.occupants;
-    if (!occupants?.length) return;
-
-    for (let i = occupants.length - 1; i >= 0; i--) {
-      if (occupants[i].id !== this.uuid) continue;
-      occupants[i] = occupants[occupants.length - 1];
-      occupants.pop();
-      return;
-    }
+    const cell = mapGrid[location.y]?.[location.x];
+    if (cell?.occupants) deregisterOccupant(cell, this.uuid, this.type);
   }
 
-  getX(location) {
-    return location.x * gridWidth;
-  }
-
-  getY(location) {
-    return location.y * gridHeight;
-  }
+  getX(location) { return location.x * gridWidth; }
+  getY(location) { return location.y * gridHeight; }
 }

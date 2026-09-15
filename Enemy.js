@@ -21,8 +21,6 @@ class Enemy extends Entity {
     Enemy.initSprites();
 
     const collisionCallback = (collisions) => {
-      if (!collisions?.length) return;
-
       for (let i = 0; i < collisions.length; i++) {
         const occupant = collisions[i];
         if (occupant.type !== 0) continue;
@@ -32,48 +30,30 @@ class Enemy extends Entity {
           return;
         }
 
-        const players = population?.players;
-        if (!players?.length) return;
-
-        for (let j = 0; j < players.length; j++) {
-          const player = players[j];
-          if (player.uuid !== occupant.id) continue;
-          if (!player.isInvincible) player.dead = true;
-          return;
-        }
+        const player = playerRegistry.get(occupant.id);
+        if (player && !player.isInvincible) player.dead = true;
+        return;
       }
     };
 
     const whichWall = getRandomInt(1, 4);
     let spawnX = 0;
     let spawnY = 0;
-    switch(whichWall){
-      case 1:
-        spawnX = 0;
-        spawnY = getRandomInt(2, 17);
-       break;
-      case 2:
-        spawnX = 15;
-        spawnY = getRandomInt(2, 17);
-      break;
-      case 3:
-        spawnX = getRandomInt(1, 14);
-        spawnY = 1;
-      break;
-      case 4:
-        spawnX = getRandomInt(1, 14);
-        spawnY = 18;
+    switch (whichWall) {
+      case 1: spawnX = 2; spawnY = getRandomInt(3, 16); break;
+      case 2: spawnX = 13; spawnY = getRandomInt(3, 16); break;
+      case 3: spawnX = getRandomInt(2, 13); spawnY = 3; break;
+      case 4: spawnX = getRandomInt(2, 13); spawnY = 16; break;
     }
 
     super({ x: spawnX, y: spawnY }, 36, 18, 8, 1, collisionCallback);
-
     Enemy.enemyCount++;
     this.isActive = true;
     this.spriteLeft = Enemy.spriteLeft;
     this.spriteDown = Enemy.spriteDown;
     this.spriteRight = Enemy.spriteRight;
     this.spriteUp = Enemy.spriteUp;
-    this.spawnTime = millis();
+    this.spawnTime = millis() * trainingStepsPerFrame;
   }
 
   patrol() {
@@ -82,13 +62,7 @@ class Enemy extends Entity {
 
   show() {
     push();
-
-    const sprite =
-      this.facing === 'a' ? this.spriteLeft :
-      this.facing === 'w' ? this.spriteUp :
-      this.facing === 'd' ? this.spriteRight :
-      this.spriteDown;
-
+    const sprite = this.facing === 'a' ? this.spriteLeft : this.facing === 'w' ? this.spriteUp : this.facing === 'd' ? this.spriteRight : this.spriteDown;
     sprite.draw(this.x, this.y);
     pop();
   }

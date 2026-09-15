@@ -1,6 +1,7 @@
 let nextConnectionNo = 1000;
 let population;
-let speed = 30;
+let trainingStepsPerFrame = 1;
+const MAX_TRAINING_STEPS_PER_FRAME = 12;
 
 const canStructuredClone = typeof structuredClone === 'function';
 const cloneGrid = () => (canStructuredClone ? structuredClone(mapGridOriginal) : JSON.parse(JSON.stringify(mapGridOriginal)));
@@ -19,11 +20,9 @@ let pb = [];
 
 let bedsRespawnTime = 0;
 let PBRespawnTime = 0;
-let treatRemoveTime = 0;
 let ballRespawnTime = 0;
 let enemyRespawnTime = 0;
 let deathMessageTime = 0;
-let introTime = 0;
 let bestScoreThisGen = 0;
 
 let bg;
@@ -68,34 +67,50 @@ let lastInfoUpdate = 0;
 let lastInfo1 = '';
 let lastInfo2 = '';
 
-const MAX_MOVES_WITHOUT_TREAT = 35;
+const pickupRegistry = new Map();
+const playerRegistry = new Map();
+
+const MAX_MOVES_WITHOUT_TREAT = 45;
 const INFO_UPDATE_INTERVAL = 250;
 
 const config = new Config({
   inputSize: 23,
   outputSize: 5,
+
+  bias: 1.0,
+  connectBias: true,
+  biasMode: 'WEIGHTED_NODE',
   activationFunction: 'Tanh',
-  weightInitialization: { type: 'Random', params: [-1, 1] },
-  mutationRate: 1.0,
-  weightMutationRate: 0.8,
-  addConnectionMutationRate: 0.05,
-  addNodeMutationRate: 0.03,
-  minWeight: -4.0,
-  maxWeight: 4.0,
-  reinitializeWeightRate: 0.1,
-  minPerturb: -0.5,
-  maxPerturb: 0.5,
+  weightInitialization: { type: 'Random', params: [-0.75, 0.75] },
+
+  c1: 1.0,
+  c2: 1.0,
+  c3: 0.4,
+  compatibilityThreshold: 0.3,
+  interspeciesMatingRate: 0.01,
+
+  mutationRate: 0.9,
+  weightMutationRate: 0.85,
+  addConnectionMutationRate: 0.09,
+  addNodeMutationRate: 0.05,
+  minWeight: -5.0,
+  maxWeight: 5.0,
+  reinitializeWeightRate: 0.05,
+  minPerturb: -0.25,
+  maxPerturb: 0.25,
+
   populationSize: 500,
-  generations: 1000,
-  targetFitness: 1000,
-  survivalRate: 0.2,
-  numOfElite: 15,
-  dropOffAge: 15,
-  populationStagnationLimit: 15,
+  generations: 10000,
+  targetFitness: 10000,
+  survivalRate: 0.25,
+  numOfElite: 5,
+  dropOffAge: 25,
+  populationStagnationLimit: 50,
   keepDisabledOnCrossOverRate: 0.75,
-  mutateOnlyProb: 0.25,
+  mutateOnlyProb: 0.35,
+
   allowRecurrentConnections: true,
-  recurrentConnectionRate: 1.0
+  recurrentConnectionRate: 0.1,
 });
 
 function preload() {
@@ -131,8 +146,7 @@ function setup() {
 
   population = new Pool(config);
   resetGame();
-  introTime = millis() + 3000;
-  frameRate(speed);
+  frameRate(60);
 
   brainCanvas = document.getElementById('brain');
   infoDiv1 = document.getElementById('gameInfo1');
@@ -146,36 +160,33 @@ function setup() {
 function draw() {
   const now = millis();
   background(255);
-
   if (bg) image(bg, 0, 0, width, height);
 
-  for (let i = 0, len = treats.length; i < len; i++) treats[i].show();
-  if (beds.length >= 1) beds[0].show();
-  if (balls.length >= 1) balls[0].show();
-
-  handleRespawns(now);
-
-  for (let i = enemies.length - 1; i >= 0; i--) {
-    enemies[i].patrol();
-    enemies[i].show();
-  }
-
-  drawToScreen(now);
-
   if (humanPlaying) {
+    updateWorld(now);
     showHumanPlaying();
-  } else if (!population.done()) {
-    population.updateAlive();
   } else {
-    population.calculateFitness();
-    population.evolve();
-    resetGame();
-    visualizeGenome(population.getBestGenome(), brainCanvas);
+    // Run simulation independently of browser paint rate. Rendering occurs
+    // once below, even when several AI ticks run in this frame.
+    for (let step = 0; step < trainingStepsPerFrame; step++) {
+      updateWorld(millis() * trainingStepsPerFrame);
+
+      if (population.done()) {
+        population.calculateFitness();
+        population.evolve();
+        resetGame();
+        visualizeGenome(population.getBestGenome(), brainCanvas);
+        break;
+      }
+
+      population.updateAlive();
+    }
   }
 
-  if (humanPlaying && humanPlayer && humanPlayer.stamina !== undefined) {
-    drawStaminaBar(humanPlayer);
-  }
+  renderWorld();
+
+  if (!humanPlaying) population.show();
+  if (humanPlaying && humanPlayer?.stamina !== undefined) drawStaminaBar(humanPlayer);
 
   if (deathMessageTime !== 0 && now - deathMessageTime < 2000) {
     fill(255);
@@ -197,6 +208,19 @@ function draw() {
   }
 }
 
+function updateWorld(now) {
+  handleRespawns(now);
+  for (let i = 0; i < enemies.length; i++) enemies[i].patrol();
+}
+
+function renderWorld() {
+  for (let i = 0; i < treats.length; i++) treats[i].show();
+  if (pb.length) pb[0].show();
+  if (beds.length) beds[0].show();
+  if (balls.length) balls[0].show();
+  for (let i = 0; i < enemies.length; i++) enemies[i].show();
+}
+
 function getActiveGamepad() {
   const pads = navigator.getGamepads?.();
   if (!pads) return null;
@@ -206,9 +230,8 @@ function getActiveGamepad() {
 function handleRespawns(now) {
   if (pb.length < 1 && now > PBRespawnTime) {
     pb.push(new PeanutButter(peanut, 24, 24));
-    PBRespawnTime = now + 5000;
+    PBRespawnTime = now + 10000;
   }
-  if (pb.length >= 1) pb[0].show();
 
   if (beds.length === 0 && now > bedsRespawnTime) {
     beds.push(new DogBed(bed, 48, 48));
@@ -220,12 +243,7 @@ function handleRespawns(now) {
     ballRespawnTime = now + 25000;
   }
 
-  if (now > enemyRespawnTime && enemies.length < 7) {
-    enemies.push(new Enemy());
-    enemyRespawnTime = now + 5000;
-  }
-
-  if (treats.length < 30) treats.push(new Treat(treat, 20, 20));
+  if (treats.length < 20) treats.push(new Treat(treat, 20, 20));
 
   for (let i = treats.length - 1; i >= 0; i--) {
     if (treats[i].life < now) {
@@ -285,21 +303,10 @@ function drawGrid() {
   }
 }
 
-function drawToScreen(now) {
-  if (!showNothing) {
-    writeInfo(now);
-  }
-}
-
 function writeInfo() {
-  let currentBestScore = bestScoreThisGen;
   for (let i = 0; i < population.players.length; i++) {
-    if (population.players[i].score > bestScoreThisGen) {
-      bestScoreThisGen = population.players[i].score;
-    }
+    bestScoreThisGen = Math.max(bestScoreThisGen, population.players[i].score);
   }
-
-  if (currentBestScore >= bestScoreThisGen) return;
 
   let info1 = '';
   let info2 = '';
@@ -307,6 +314,7 @@ function writeInfo() {
   info2 += 'Generation: ' + (population.generation + 1) + '<br>';
   info2 += 'Species: ' + population.species.length + '<br>';
   info1 += 'Global Best Score: ' + population.globalBestScore + '<br>';
+  info2 += 'Training steps/frame: ' + trainingStepsPerFrame + '<br>';
 
   if (infoDiv1) infoDiv1.innerHTML = info1;
   if (infoDiv2) infoDiv2.innerHTML = info2;
@@ -315,14 +323,10 @@ function writeInfo() {
 function keyPressed() {
   switch (key) {
     case 'I':
-      speed = frameRate() + 30;
-      frameRate(speed);
+      trainingStepsPerFrame = Math.min(trainingStepsPerFrame + 1, MAX_TRAINING_STEPS_PER_FRAME);
       break;
     case 'U':
-      if (speed > 40) {
-        speed = frameRate() - 30;
-        frameRate(speed);
-      }
+      trainingStepsPerFrame = Math.max(trainingStepsPerFrame - 1, 1);
       break;
     case 'P':
       toggleHumanPlay();
@@ -363,7 +367,12 @@ function clearMapOccupants() {
     const row = mapGrid[y];
     for (let x = 0; x < row.length; x++) {
       const cell = row[x];
-      if (cell?.occupants) cell.occupants.length = 0;
+      if (!cell) continue;
+      if (cell.occupants) cell.occupants.length = 0;
+      if (cell.nonPlayerOccupants) cell.nonPlayerOccupants.length = 0;
+      if (cell.occupantsByType) {
+        for (const occupants of Object.values(cell.occupantsByType)) occupants.length = 0;
+      }
     }
   }
 }
@@ -377,19 +386,18 @@ function resetGame() {
   beds.length = 0;
   balls.length = 0;
   pb.length = 0;
+  pickupRegistry.clear();
 
   beds.push(new DogBed(bed, 48, 48));
   balls.push(new TennisBall(tennis, 16, 16));
   pb.push(new PeanutButter(peanut, 24, 24));
 
-  const now = millis();
-  bedsRespawnTime = now + 20000;
-  ballRespawnTime = now + 40000;
-  PBRespawnTime = now + 60000;
-  enemyRespawnTime = now + 5000;
-  treatRemoveTime = now + 1000;
+  const now = millis() * trainingStepsPerFrame;
+  bedsRespawnTime = now + 9000;
+  ballRespawnTime = now + 12000;
+  PBRespawnTime = now + 10000;
 
-  for (let i = 0; i < 25; i++) treats.push(new Treat(treat, 20, 20));
+  for (let i = 0; i < 20; i++) treats.push(new Treat(treat, 20, 20));
   for (let i = 0; i < 5; i++) enemies.push(new Enemy());
 
   const genomes = population.genomes;
@@ -406,8 +414,6 @@ function findPickupSpawnLocation() {
   const emptyCells = [];
   const validCells = [];
 
-  // Use the actual grid bounds. A large population may occupy every valid
-  // cell, so sharing a cell is preferable to an unbounded placement loop.
   for (let y = 0; y < mapGrid.length; y++) {
     const row = mapGrid[y];
     for (let x = 0; x < row.length; x++) {
@@ -421,10 +427,7 @@ function findPickupSpawnLocation() {
   }
 
   const candidates = emptyCells.length ? emptyCells : validCells;
-  if (!candidates.length) {
-    throw new Error('The map has no valid cell for a pickup.');
-  }
-
+  if (!candidates.length) throw new Error('The map has no valid cell for a pickup.');
   return candidates[(Math.random() * candidates.length) | 0];
 }
 

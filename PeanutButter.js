@@ -4,6 +4,6 @@ class PeanutButter extends Pickup {
   constructor(sprite, width, height) {
     const location = findPickupSpawnLocation();
     super(location, sprite, 3, width, height);
-    this.life = millis() + 10000;
+    this.life = millis() * trainingStepsPerFrame + 9000;
   }
 }
