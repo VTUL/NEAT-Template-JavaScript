@@ -31,7 +31,7 @@ class Pickup {
     pickupRegistry.delete(this.uuid);
   }
 
-  static inList(pickupId, _type, playerId) {
+  static inList(pickupId, playerId) {
     return pickupRegistry.get(pickupId)?.idList.includes(playerId) ?? false;
   }
 }

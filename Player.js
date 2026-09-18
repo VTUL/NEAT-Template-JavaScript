@@ -1,7 +1,6 @@
 const PLAYER_MOVE_ORDER = ['w', 'd', 's', 'a'];
 const SCAN_DX = [0, 0, 1, 0, -1];
 const SCAN_DY = [0, -1, 0, 1, 0];
-const VISION_SIZE = 23;
 const PLAYER_START = Object.freeze({ x: 9, y: 8 });
 
 const PLAYER_SPRITE_SETS = (() => {
@@ -64,6 +63,7 @@ class Player extends Entity {
           if (this.stamina <= 15) this.powerupBonus += 10;
           this.stamina = this.maxStamina;
         } else {
+          if(this.hasAdjacentEnemy()) this.powerupBonus += 20;
           this.isInvincible = true;
           this.isInvinUntil = millis() + 7000;
         }
@@ -77,13 +77,10 @@ class Player extends Entity {
       }
     };
 
-    super({ x: PLAYER_START.x, y: PLAYER_START.y }, 40, 24, 5, 0, collisionCallback, tileCallback);
+    super({ x: PLAYER_START.x, y: PLAYER_START.y }, 5, 0, collisionCallback, tileCallback);
     playerRegistry.set(this.uuid, this);
-    this.genomeInputs = VISION_SIZE;
-    this.genomeOutputs = 5;
     this.brain = brain;
     this.vision = new Array(VISION_SIZE).fill(0);
-    this.decision = [];
     this.dead = false;
     this.score = 0;
     this.isInvinUntil = 0;
@@ -95,11 +92,6 @@ class Player extends Entity {
     this.spriteSets = PLAYER_SPRITE_SETS();
     this.animationFrame = random(4);
     this.i = floor(random(3));
-    this.distanceTrackerX = this.x;
-    this.distanceTrackerY = this.y;
-    this.r = getRandomInt(0, 255);
-    this.g = getRandomInt(0, 255);
-    this.b = getRandomInt(0, 255);
     this.stamina = 100;
     this.maxStamina = 100;
     this.staminaDrainRate = 0.8;
@@ -124,6 +116,9 @@ class Player extends Entity {
     this.isReadytoMove = true;
     this.dead = false;
     this.score = 0;
+    this.powerupBonus = 0;
+    this.invalidMove = false;
+    this.movesTaken = 0;
     this.movesWithoutTreat = 0;
     this.fitnessPenalty = 0;
     this.isInvinUntil = 0;
@@ -131,10 +126,7 @@ class Player extends Entity {
     this.stamina = this.maxStamina;
     this.speed = this.baseSpeed;
     this.isSprinting = false;
-    this.distanceTrackerX = this.x;
-    this.distanceTrackerY = this.y;
     this.vision.fill(0);
-    this.decision.length = 0;
     this.tilesVisited.length = 0;
     this.registerLocation(this.currentLocation);
     return this;
@@ -192,15 +184,56 @@ class Player extends Entity {
 
   look() {
     const vision = this.vision;
+    const [enemyX, enemyY] = this.getNearestEnemyVector();
+
     vision[0] = this.checkWall(1); vision[1] = this.checkWall(2); vision[2] = this.checkWall(3); vision[3] = this.checkWall(4);
-    vision[4] = this.checkOther(1, 1); vision[5] = this.checkOther(2, 1); vision[6] = this.checkOther(3, 1); vision[7] = this.checkOther(4, 1);
-    vision[8] = this.checkOther(1, 2); vision[9] = this.checkOther(2, 2); vision[10] = this.checkOther(3, 2); vision[11] = this.checkOther(4, 2);
-    vision[12] = this.checkOther(1, 3); vision[13] = this.checkOther(2, 3); vision[14] = this.checkOther(3, 3); vision[15] = this.checkOther(4, 3);
-    vision[16] = this.checkOther(1, 4); vision[17] = this.checkOther(2, 4); vision[18] = this.checkOther(3, 4); vision[19] = this.checkOther(4, 4);
-    vision[20] = this.stamina / 100;
-    vision[21] = this.speed === 5 ? 0 : 1;
-    vision[22] = this.isInvincible ? 1 : 0;
+    vision[4] = enemyX; vision[5] = enemyY;
+    vision[6] = this.checkOther(1, 2); vision[7] = this.checkOther(2, 2); vision[8] = this.checkOther(3, 2); vision[9] = this.checkOther(4, 2);
+    vision[10] = this.checkOther(1, 3); vision[11] = this.checkOther(2, 3); vision[12] = this.checkOther(3, 3); vision[13] = this.checkOther(4, 3);
+    vision[14] = this.checkOther(1, 4); vision[15] = this.checkOther(2, 4); vision[16] = this.checkOther(3, 4); vision[17] = this.checkOther(4, 4);
+    vision[18] = this.stamina / this.maxStamina;
+    vision[19] = this.speed === this.baseSpeed ? 0 : 1;
+    vision[20] = this.isInvincible ? 1 : 0;
     return vision;
+  }
+
+  getNearestEnemyVector() {
+    let nearestX = 0;
+    let nearestY = 0;
+    let nearestDistanceSquared = Infinity;
+
+    for (let i = 0; i < enemies.length; i++) {
+      const enemy = enemies[i];
+      if (!enemy?.isActive) continue;
+
+      const dx = (enemy.x - this.x) / gridWidth;
+      const dy = (enemy.y - this.y) / gridHeight;
+      const distanceSquared = dx * dx + dy * dy;
+
+      if (distanceSquared < nearestDistanceSquared) {
+        nearestDistanceSquared = distanceSquared;
+        nearestX = dx;
+        nearestY = dy;
+      }
+    }
+
+    if (!Number.isFinite(nearestDistanceSquared) || nearestDistanceSquared === 0) return [0, 0];
+
+    const distance = Math.sqrt(nearestDistanceSquared);
+    return [nearestX / distance, nearestY / distance];
+  }
+
+  hasAdjacentEnemy() {
+    const { x, y } = this.currentLocation;
+
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        if (dx === 0 && dy === 0) continue;
+        if (mapGrid[y + dy]?.[x + dx]?.occupantsByType?.[1]?.length) return true;
+      }
+    }
+
+    return false;
   }
 
   _scan(direction, maxSteps, targetType = null) {
@@ -216,7 +249,7 @@ class Player extends Entity {
       if (!occupants?.length) continue;
       for (let i = 0; i < occupants.length; i++) {
         const occ = occupants[i];
-        if (!Pickup.inList(occ.id, occ.type, this.uuid)) return 1 / steps;
+        if (!Pickup.inList(occ.id, this.uuid)) return 1 / steps;
       }
     }
     return 0;

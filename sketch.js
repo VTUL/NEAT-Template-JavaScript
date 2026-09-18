@@ -1,4 +1,3 @@
-let nextConnectionNo = 1000;
 let population;
 let trainingStepsPerFrame = 1;
 const MAX_TRAINING_STEPS_PER_FRAME = 12;
@@ -11,7 +10,6 @@ let mapGrid = cloneGrid();
 let humanPlaying = false;
 let humanPlayer = null;
 
-let showNothing = false;
 let treats = [];
 let enemies = [];
 let beds = [];
@@ -25,7 +23,6 @@ let deathMessageTime = 0;
 let bestScoreThisGen = 0;
 
 let bg;
-let blockImg;
 let derekLeft;
 let derekRight;
 let derekUp;
@@ -38,7 +35,6 @@ let josieLeft;
 let josieRight;
 let josieUp;
 let josieDown;
-let acorn;
 let squirrelUp;
 let squirrelDown;
 let squirrelRight;
@@ -47,24 +43,13 @@ let peanut;
 let treat;
 let bed;
 let tennis;
-let arrow;
 
-let occupantList = ['player', 'enemy', 'treat', 'peanut', 'bed', 'tennis'];
-
-let wall;
-let blocks = [];
-let pendingReset = false;
 let startWasPressed = false;
 let activeGamepadIndex = null;
-let accordionIndex = 0;
-let bWasPressed = false;
-let rightStickCooldown = 0;
 let brainCanvas;
 let infoDiv1;
 let infoDiv2;
 let lastInfoUpdate = 0;
-let lastInfo1 = '';
-let lastInfo2 = '';
 
 const pickupRegistry = new Map();
 const playerRegistry = new Map();
@@ -73,7 +58,7 @@ const MAX_MOVES_WITHOUT_TREAT = 45;
 const INFO_UPDATE_INTERVAL = 250;
 
 const config = new Config({
-  inputSize: 23,
+  inputSize: 21,
   outputSize: 5,
 
   bias: 1.0,
@@ -114,8 +99,6 @@ const config = new Config({
 
 function preload() {
   bg = loadImage('images/library_map (1).png');
-  blockImg = loadImage('images/square.png');
-  acorn = loadImage('images/Acorn_Item.png');
   squirrelLeft = loadImage('spriteSheets/EnemyLeft.png');
   squirrelDown = loadImage('spriteSheets/EnemyDown.png');
   squirrelRight = loadImage('spriteSheets/EnemyRight.png');
@@ -136,7 +119,6 @@ function preload() {
   josieRight = loadImage('spriteSheets/JosieRight.png');
   bed = loadImage('images/Dog_Bed-1.png.png');
   tennis = loadImage('images/Ball-1.png.png');
-  arrow = loadImage('images/red-pixel-arrow.png');
 }
 
 function setup() {
@@ -290,17 +272,17 @@ function drawStaminaBar(player) {
   pop();
 }
 
-function drawGrid() {
-  stroke(100);
-  strokeWeight(1);
+// function drawGrid() {
+//   stroke(100);
+//   strokeWeight(1);
 
-  for (let x = -(gridWidth / 2); x <= (screenWidth + gridWidth / 2); x += gridWidth) {
-    line(x, -(gridWidth / 2), x, screenHeight + (gridWidth / 2));
-  }
-  for (let y = -(gridHeight / 2); y <= (screenHeight + gridHeight / 2); y += gridHeight) {
-    line(-(gridHeight / 2), y, screenWidth + (gridHeight / 2), y);
-  }
-}
+//   for (let x = -(gridWidth / 2); x <= (screenWidth + gridWidth / 2); x += gridWidth) {
+//     line(x, -(gridWidth / 2), x, screenHeight + (gridWidth / 2));
+//   }
+//   for (let y = -(gridHeight / 2); y <= (screenHeight + gridHeight / 2); y += gridHeight) {
+//     line(-(gridHeight / 2), y, screenWidth + (gridHeight / 2), y);
+//   }
+// }
 
 function writeInfo() {
   for (let i = 0; i < population.players.length; i++) {
@@ -352,7 +334,6 @@ function showHumanPlaying() {
   if (!humanPlayer) return;
 
   if (!humanPlayer.dead) {
-    humanPlayer.look();
     humanPlayer.update();
     humanPlayer.show();
   } else {

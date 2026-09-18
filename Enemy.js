@@ -46,13 +46,12 @@ class Enemy extends Entity {
 
     // console.log(`x: ${spawnX} and y: ${spawnY}`)
 
-    super({ x: spawnX, y: spawnY }, 36, 18, 8, 1, collisionCallback);
+    super({ x: spawnX, y: spawnY }, 8, 1, collisionCallback);
     this.isActive = true;
     this.spriteLeft = Enemy.spriteLeft;
     this.spriteDown = Enemy.spriteDown;
     this.spriteRight = Enemy.spriteRight;
     this.spriteUp = Enemy.spriteUp;
-    this.spawnTime = millis() * trainingStepsPerFrame;
   }
 
   patrol() {

@@ -30,14 +30,12 @@ function deregisterOccupant(cell, id, type) {
 }
 
 class Entity {
-  constructor(currentLocation, w, h, speed, type, collisionCallback = () => {}, tileCallback = () => {}) {
+  constructor(currentLocation, speed, type, collisionCallback = () => {}, tileCallback = () => {}) {
     this.isReadytoMove = true;
     this.currentLocation = currentLocation;
     this.nextLocation = null;
     this.nextX = currentLocation.x;
     this.nextY = currentLocation.y;
-    this.w = w;
-    this.h = h;
     this.type = type;
     this.collisionCallback = collisionCallback;
     this.tileCallback = tileCallback;
@@ -134,6 +132,4 @@ class Entity {
     if (cell?.occupants) deregisterOccupant(cell, this.uuid, this.type);
   }
 
-  getX(location) { return location.x * gridWidth; }
-  getY(location) { return location.y * gridHeight; }
 }

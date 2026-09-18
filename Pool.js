@@ -2,7 +2,6 @@ class Pool extends Population {
   constructor(config) {
     super(config);
     this.players = [];
-    this.bestScore = 0;
     this.globalBestScore = 0;
 
     for (let i = 0; i < config.populationSize; i++) {

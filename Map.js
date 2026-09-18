@@ -4,9 +4,6 @@ const screenHeight = 1500;
 const gridWidth = 100;
 const gridHeight = 100;
 
-const gridColumns = 19;
-const gridRows = 16;
-
 const mapGridOriginal = [
   [
     { valid: false, occupants: [] },

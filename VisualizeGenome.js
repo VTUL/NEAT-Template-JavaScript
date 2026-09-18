@@ -1,6 +1,6 @@
 const INPUT_LABELS = [
   "Look Up for Wall", "Look Right for Wall", "Look Down for Wall", "Look Left for Wall",
-  "Look Up for Squirrels", "Look Right for Squirrels", "Look Down for Squirrels", "Look Left for Squirrels",
+  "Nearest Enemy X", "Nearest Enemy Y",
   "Look Up for Treats", "Look Right for Treats", "Look Down for Treats", "Look Left for Treats",
   "Look Up for PB", "Look Right for PB", "Look Down for PB", "Look Left for PB",
   "Look Up for Powerup", "Look Right for Powerup", "Look Down for Powerup", "Look Left for Powerup",
@@ -16,7 +16,6 @@ function visualizeGenome(genome, canvas) {
   const { width, height } = canvas;
   ctx.clearRect(0, 0, width, height);
 
-  const nodeById = new Map(genome.nodeGenes.map((node) => [node.id, node]));
   const layers = assignLayers(genome);
   const maxLayer = Math.max(0, ...layers.values());
   const grouped = Array.from({ length: maxLayer + 1 }, () => []);
