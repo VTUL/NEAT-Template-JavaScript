@@ -61,10 +61,11 @@ class Player extends Entity {
           this.score += PeanutButter.value;
           this.movesWithoutTreat = 0;
         } else if (occupant.type === 4) {
+          if (this.stamina <= 15) this.powerupBonus += 10;
           this.stamina = this.maxStamina;
         } else {
           this.isInvincible = true;
-          this.isInvinUntil = millis() + 10000;
+          this.isInvinUntil = millis() + 7000;
         }
 
         if (humanPlaying) {
