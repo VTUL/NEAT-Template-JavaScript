@@ -2,6 +2,7 @@ const PLAYER_MOVE_ORDER = ['w', 'd', 's', 'a'];
 const SCAN_DX = [0, 0, 1, 0, -1];
 const SCAN_DY = [0, -1, 0, 1, 0];
 const PLAYER_START = Object.freeze({ x: 9, y: 8 });
+const VISION_SIZE = 21;
 
 const PLAYER_SPRITE_SETS = (() => {
   let sets = null;
