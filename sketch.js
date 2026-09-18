@@ -1,3 +1,4 @@
+let nextConnectionNo = 1000;
 let population;
 let trainingStepsPerFrame = 1;
 const MAX_TRAINING_STEPS_PER_FRAME = 12;
@@ -54,7 +55,7 @@ let lastInfoUpdate = 0;
 const pickupRegistry = new Map();
 const playerRegistry = new Map();
 
-const MAX_MOVES_WITHOUT_TREAT = 45;
+const MAX_MOVES_WITHOUT_TREAT = 60;
 const INFO_UPDATE_INTERVAL = 250;
 
 const config = new Config({
@@ -70,13 +71,13 @@ const config = new Config({
   c1: 1.0,
   c2: 1.0,
   c3: 0.4,
-  compatibilityThreshold: 0.3,
+  compatibilityThreshold: 0.2,
   interspeciesMatingRate: 0.01,
 
   mutationRate: 0.9,
   weightMutationRate: 0.85,
-  addConnectionMutationRate: 0.09,
-  addNodeMutationRate: 0.05,
+  addConnectionMutationRate: 0.1,
+  addNodeMutationRate: 0.06,
   minWeight: -5.0,
   maxWeight: 5.0,
   reinitializeWeightRate: 0.05,
@@ -126,7 +127,7 @@ function setup() {
   canvas.parent('canvasContainer');
 
   population = new Pool(config);
-  resetGame();
+  resetGame(true);
   frameRate(60);
 
   brainCanvas = document.getElementById('brain');
@@ -153,10 +154,16 @@ function draw() {
       updateWorld(millis() * trainingStepsPerFrame);
 
       if (population.done()) {
-        population.calculateFitness();
-        population.evolve();
-        resetGame();
-        visualizeGenome(population.getBestGenome(), brainCanvas);
+        const generationComplete = population.finishEpisode();
+
+        if (generationComplete) {
+          population.evolve();
+          population.startGeneration();
+          resetGame(true);
+          visualizeGenome(population.getBestGenome(), brainCanvas);
+        } else {
+          resetGame();
+        }
         break;
       }
 
@@ -293,7 +300,8 @@ function writeInfo() {
   let info2 = '';
   info1 += 'Best Score this Gen: ' + bestScoreThisGen + '<br>';
   info2 += 'Generation: ' + (population.generation + 1) + '<br>';
-  info2 += 'Species: ' + population.species.length + '<br>';
+  info2 += 'Episode: ' + population.currentEpisode + ' / ' + EPISODES_PER_GENERATION + '<br>';
+  info1 += 'Species: ' + population.species.length + '<br>';
   info1 += 'Global Best Score: ' + population.globalBestScore + '<br>';
   if(trainingStepsPerFrame > 1) info2 += 'Training steps/frame: ' + trainingStepsPerFrame + '<br>';
 
@@ -357,9 +365,9 @@ function clearMapOccupants() {
   }
 }
 
-function resetGame() {
+function resetGame(resetGenerationStats = false) {
   clearMapOccupants();
-  bestScoreThisGen = 0;
+  if (resetGenerationStats) bestScoreThisGen = 0;
 
   treats.length = 0;
   enemies.length = 0;

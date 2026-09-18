@@ -1,8 +1,8 @@
 const PLAYER_MOVE_ORDER = ['w', 'd', 's', 'a'];
 const SCAN_DX = [0, 0, 1, 0, -1];
 const SCAN_DY = [0, -1, 0, 1, 0];
-const PLAYER_START = Object.freeze({ x: 9, y: 8 });
 const VISION_SIZE = 21;
+const PLAYER_START = Object.freeze({ x: 9, y: 8 });
 
 const PLAYER_SPRITE_SETS = (() => {
   let sets = null;
@@ -94,6 +94,7 @@ class Player extends Entity {
     this.animationFrame = random(4);
     this.i = floor(random(3));
     this.stamina = 100;
+    this.movesTaken = 0;
     this.maxStamina = 100;
     this.staminaDrainRate = 0.8;
     this.staminaRegenRate = this.maxStamina / (30 * 60);
@@ -117,11 +118,14 @@ class Player extends Entity {
     this.isReadytoMove = true;
     this.dead = false;
     this.score = 0;
+    this.movesWithoutTreat = 0;
     this.powerupBonus = 0;
     this.invalidMove = false;
     this.movesTaken = 0;
-    this.movesWithoutTreat = 0;
     this.fitnessPenalty = 0;
+    this.invalidMove = false;
+    this.powerupBonus = 0;
+    this.staminaCooldown = 0;
     this.isInvinUntil = 0;
     this.isInvincible = false;
     this.stamina = this.maxStamina;
@@ -219,7 +223,6 @@ class Player extends Entity {
     }
 
     if (!Number.isFinite(nearestDistanceSquared) || nearestDistanceSquared === 0) return [0, 0];
-
     const distance = Math.sqrt(nearestDistanceSquared);
     return [nearestX / distance, nearestY / distance];
   }
@@ -230,34 +233,56 @@ class Player extends Entity {
     for (let dy = -1; dy <= 1; dy++) {
       for (let dx = -1; dx <= 1; dx++) {
         if (dx === 0 && dy === 0) continue;
-        if (mapGrid[y + dy]?.[x + dx]?.occupantsByType?.[1]?.length) return true;
+        const occupants = mapGrid[y + dy]?.[x + dx]?.occupantsByType?.[1];
+        if (occupants?.length) return true;
       }
     }
-
     return false;
   }
 
-  _scan(direction, maxSteps, targetType = null) {
+  checkWall(direction) {
     const dx = SCAN_DX[direction];
     const dy = SCAN_DY[direction];
-    const startX = this.currentLocation.x;
-    const startY = this.currentLocation.y;
-    for (let steps = 1; steps <= maxSteps; steps++) {
-      const cell = mapGrid[startY + dy * steps]?.[startX + dx * steps];
-      if (!cell?.valid) return 1 / steps;
-      if (targetType === null) continue;
-      const occupants = cell.occupantsByType?.[targetType];
-      if (!occupants?.length) continue;
+    if (dx === undefined || dy === undefined) return 0;
+
+    let x = this.currentLocation.x + dx;
+    let y = this.currentLocation.y + dy;
+    let distance = 1;
+    while (mapGrid[y]?.[x]?.valid) {
+      x += dx;
+      y += dy;
+      distance++;
+    }
+    return 1 / distance;
+  }
+
+  checkOther(direction, type) {
+    return this._scan(direction, (location) => {
+      const occupants = mapGrid[location.y]?.[location.x]?.occupantsByType?.[type];
+      if (!occupants?.length) return false;
       for (let i = 0; i < occupants.length; i++) {
-        const occ = occupants[i];
-        if (!Pickup.inList(occ.id, this.uuid)) return 1 / steps;
+        if (!Pickup.inList(occupants[i].id, type, this.uuid)) return true;
       }
+      return false;
+    });
+  }
+
+  _scan(direction, predicate) {
+    const dx = SCAN_DX[direction];
+    const dy = SCAN_DY[direction];
+    if (dx === undefined || dy === undefined) return 0;
+
+    let x = this.currentLocation.x + dx;
+    let y = this.currentLocation.y + dy;
+    let distance = 1;
+    while (mapGrid[y]?.[x]?.valid) {
+      if (predicate({ x, y })) return 1 / distance;
+      x += dx;
+      y += dy;
+      distance++;
     }
     return 0;
   }
-
-  checkWall(direction) { return this._scan(direction, 17); }
-  checkOther(direction, target) { return this._scan(direction, 19, target); }
 
   think() {
     const decision = this.brain.propagate(this.vision);
@@ -274,12 +299,15 @@ class Player extends Entity {
     this.move(PLAYER_MOVE_ORDER[maxIndex]);
   }
 
-  calculateFitness() {
+  getFitnessScore() {
     const explorationBonus = 0.25 * this.tilesVisited.length;
-    const usefulPowerupBonus = 0.1 * this.powerupBonus;
+    const usefulPowerupBonus = 0.5 * this.powerupBonus;
     const wallPenalty = 0.5 * Math.pow(this.fitnessPenalty, 1.25);
+    return (this.score + explorationBonus + usefulPowerupBonus) - wallPenalty;
+  }
 
-    // console.log(`Game score: ${this.score}, exploration bonus: ${explorationBonus}, useful powerup bonus: ${usefulPowerupBonus}, wall penalty: ${wallPenalty}, total: ${(this.score + explorationBonus + usefulPowerupBonus) - wallPenalty}.`)
-    this.brain.fitness = (this.score + explorationBonus + usefulPowerupBonus) - wallPenalty;
+  calculateFitness() {
+    this.brain.fitness = this.getFitnessScore();
+    return this.brain.fitness;
   }
 }
