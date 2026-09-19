@@ -70,11 +70,9 @@ class Entity {
     const cell = mapGrid[ny]?.[nx];
     this.facing = direction;
 
-    if (!cell?.valid && this.invalidMove) {
-      this.fitnessPenalty++;
-      return;
-    } else if(!cell?.valid) {
+    if (!cell?.valid) {
       this.invalidMove = true;
+      if (this.type === 0) this.fitnessPenalty++;
       return;
     }
 

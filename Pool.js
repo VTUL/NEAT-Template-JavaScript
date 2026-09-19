@@ -1,7 +1,14 @@
-const EPISODES_PER_GENERATION = 3;
+const EPISODES_PER_GENERATION = 5;
+const FITNESS_VARIABILITY_PENALTY = 0.25;
 
-function robustFitness(episodeScores) {  
-  return episodeScores.reduce((sum, score) => sum + score, 0) / episodeScores.length;
+function robustFitness(episodeScores) {
+  const mean =
+    episodeScores.reduce((sum, score) => sum + score, 0) /
+    episodeScores.length;
+  const variance =
+    episodeScores.reduce((sum, score) => sum + ((score - mean) ** 2), 0) /
+    episodeScores.length;
+  return mean - FITNESS_VARIABILITY_PENALTY * Math.sqrt(variance);
 }
 
 class Pool extends Population {

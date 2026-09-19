@@ -29,7 +29,10 @@ class Enemy extends Entity {
         }
 
         const player = playerRegistry.get(occupant.id);
-        if (player && !player.isInvincible) player.dead = true;
+        if (player && !player.isInvincible) {
+          player.dead = true;
+          player.deathCause = 'enemy';
+        }
         return;
       }
     };

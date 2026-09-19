@@ -2,7 +2,7 @@ let nextConnectionNo = 1000;
 let population;
 let trainingStepsPerFrame = 1;
 const MAX_TRAINING_STEPS_PER_FRAME = 12;
-const MAX_ENEMIES = 3;
+const MAX_ENEMIES = 4;
 const MAX_TREATS = 22;
 
 const canStructuredClone = typeof structuredClone === 'function';
@@ -61,7 +61,7 @@ const MAX_MOVES_WITHOUT_TREAT = 60;
 const INFO_UPDATE_INTERVAL = 250;
 
 const config = new Config({
-  inputSize: 18,
+  inputSize: 20,
   outputSize: 5,
 
   bias: 1.0,
@@ -78,8 +78,8 @@ const config = new Config({
 
   mutationRate: 0.9,
   weightMutationRate: 0.85,
-  addConnectionMutationRate: 0.3,
-  addNodeMutationRate: 0.25,
+  addConnectionMutationRate: 0.35,
+  addNodeMutationRate: 0.3,
   minWeight: -5.0,
   maxWeight: 5.0,
   reinitializeWeightRate: 0.05,
@@ -96,8 +96,8 @@ const config = new Config({
   keepDisabledOnCrossOverRate: 0.75,
   mutateOnlyProb: 0.35,
 
-  allowRecurrentConnections: true,
-  recurrentConnectionRate: 0.15,
+  allowRecurrentConnections: false,
+  recurrentConnectionRate: 0,
 });
 
 function preload() {
@@ -303,8 +303,8 @@ function writeInfo() {
   info1 += 'Best Score this Gen: ' + bestScoreThisGen + '<br>';
   info2 += 'Generation: ' + (population.generation + 1) + '<br>';
   info2 += 'Episode: ' + population.currentEpisode + ' / ' + EPISODES_PER_GENERATION + '<br>';
-  info1 += 'Species: ' + population.species.length + '<br>';
   info1 += 'Global Best Score: ' + population.globalBestScore + '<br>';
+  info1 += 'Species: ' + population.species.length + '<br>';
   if(trainingStepsPerFrame > 1) info2 += 'Training steps/frame: ' + trainingStepsPerFrame + '<br>';
 
   if (infoDiv1) infoDiv1.innerHTML = info1;
