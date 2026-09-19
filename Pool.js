@@ -1,10 +1,7 @@
 const EPISODES_PER_GENERATION = 3;
 
-function robustFitness(episodeScores) {
-  const sorted = [...episodeScores].sort((a, b) => a - b);
-  const mean = sorted.reduce((sum, score) => sum + score, 0) / sorted.length;
-  const worstQuartileIndex = Math.floor((sorted.length - 1) * 0.25);
-  return 0.75 * mean + 0.25 * sorted[worstQuartileIndex];
+function robustFitness(episodeScores) {  
+  return episodeScores.reduce((sum, score) => sum + score, 0) / episodeScores.length;
 }
 
 class Pool extends Population {

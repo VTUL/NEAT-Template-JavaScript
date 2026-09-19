@@ -1,10 +1,12 @@
 const INPUT_LABELS = [
-  "Look Up for Wall", "Look Right for Wall", "Look Down for Wall", "Look Left for Wall",
+  "Wall Up", "Wall Right", "Wall Down", "Wall Left",
   "Nearest Enemy X", "Nearest Enemy Y",
-  "Look Up for Treats", "Look Right for Treats", "Look Down for Treats", "Look Left for Treats",
-  "Look Up for PB", "Look Right for PB", "Look Down for PB", "Look Left for PB",
-  "Look Up for Powerup", "Look Right for Powerup", "Look Down for Powerup", "Look Left for Powerup",
+  "Nearest Treat X", "Nearest Treat Y",
+  "Nearest Peanut Butter X", "Nearest Peanut Butter Y",
+  "Nearest Tennis Ball X", "Nearest Tennis Ball Y",
+  "Nearest Dog Bed X", "Nearest Dog Bed Y",
   "Stamina Available", "Speed", "Whether Invincible",
+  "Moves without Treat",
 ];
 
 const OUTPUT_LABELS = ["Move Up", "Move Right", "Move Down", "Move Left", "Sprint"];

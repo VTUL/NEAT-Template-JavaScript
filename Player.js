@@ -1,7 +1,7 @@
 const PLAYER_MOVE_ORDER = ['w', 'd', 's', 'a'];
 const SCAN_DX = [0, 0, 1, 0, -1];
 const SCAN_DY = [0, -1, 0, 1, 0];
-const VISION_SIZE = 21;
+const VISION_SIZE = 18;
 const PLAYER_START = Object.freeze({ x: 9, y: 8 });
 
 const PLAYER_SPRITE_SETS = (() => {
@@ -148,6 +148,30 @@ class Player extends Entity {
 
   deadzone(v, dz = 0.25) { return Math.abs(v) < dz ? 0 : v; }
 
+  clampVisionValue(value) {
+    return Math.max(-1, Math.min(1, value));
+  }
+
+  normalizeZeroToOne(value) {
+    return this.clampVisionValue((value * 2) - 1);
+  }
+
+  normalizeRange(value, min, max) {
+    if (!Number.isFinite(value) || !Number.isFinite(min) || !Number.isFinite(max) || max === min) {
+      return -1;
+    }
+    return this.clampVisionValue((((value - min) / (max - min)) * 2) - 1);
+  }
+
+  normalizeRelativeVector(dx, dy) {
+    const boardWidth = mapGrid.reduce((width, row) => Math.max(width, row?.length ?? 0), 1);
+    const boardHeight = Math.max(1, mapGrid.length);
+    return [
+      this.clampVisionValue(dx / Math.max(1, boardWidth - 1)),
+      this.clampVisionValue(dy / Math.max(1, boardHeight - 1)),
+    ];
+  }
+
   update() {
     if (this.dead) return;
     const now = millis();
@@ -190,15 +214,34 @@ class Player extends Entity {
   look() {
     const vision = this.vision;
     const [enemyX, enemyY] = this.getNearestEnemyVector();
+    const [treatX, treatY] = this.getNearestPickupVector(2);
+    const [peanutButterX, peanutButterY] = this.getNearestPickupVector(3);
+    const [tennisBallX, tennisBallY] = this.getNearestPickupVector(5);
+    const [dogBedX, dogBedY] = this.getNearestPickupVector(4);
 
     vision[0] = this.checkWall(1); vision[1] = this.checkWall(2); vision[2] = this.checkWall(3); vision[3] = this.checkWall(4);
     vision[4] = enemyX; vision[5] = enemyY;
-    vision[6] = this.checkOther(1, 2); vision[7] = this.checkOther(2, 2); vision[8] = this.checkOther(3, 2); vision[9] = this.checkOther(4, 2);
-    vision[10] = this.checkOther(1, 3); vision[11] = this.checkOther(2, 3); vision[12] = this.checkOther(3, 3); vision[13] = this.checkOther(4, 3);
-    vision[14] = this.checkOther(1, 4); vision[15] = this.checkOther(2, 4); vision[16] = this.checkOther(3, 4); vision[17] = this.checkOther(4, 4);
-    vision[18] = this.stamina / this.maxStamina;
-    vision[19] = this.speed === this.baseSpeed ? 0 : 1;
-    vision[20] = this.isInvincible ? 1 : 0;
+    vision[6] = treatX; vision[7] = treatY;
+    vision[8] = peanutButterX; vision[9] = peanutButterY;
+    vision[10] = tennisBallX; vision[11] = tennisBallY;
+    vision[12] = dogBedX; vision[13] = dogBedY;
+    vision[14] = this.normalizeRange(this.stamina, 0, this.maxStamina);
+    vision[15] = this.normalizeRange(this.speed, this.baseSpeed, this.boostedSpeed);
+    vision[16] = this.isInvincible ? 1 : -1;
+    vision[17] = this.normalizeRange(this.movesWithoutTreat, 0, this.MAX_MOVES_WITHOUT_TREAT)
+
+    // console.log(`wallUp: ${vision[0]}`);
+    // console.log(`wallRight: ${vision[1]}`);
+    // console.log(`wallDown: ${vision[2]}`);
+    // console.log(`wallLeft: ${vision[3]}`);
+    // console.log(`enemyX: ${vision[4]}, enemyY: ${vision[5]}`);
+    // console.log(`treatX: ${vision[6]}, treatY: ${vision[7]}`);
+    // console.log(`peanutButterX: ${vision[8]}, peanutButterY: ${vision[9]}`);
+    // console.log(`tennisBallX: ${vision[10]}, tennisBallY: ${vision[11]}`);
+    // console.log(`dogBedX: ${vision[12]}, dogBedY: ${vision[13]}`);
+    // console.log(`stamina: ${vision[14]}`);
+    // console.log(`speed: ${vision[15]}`);
+    // console.log(`invincible: ${vision[16]}`);
     return vision;
   }
 
@@ -206,13 +249,15 @@ class Player extends Entity {
     let nearestX = 0;
     let nearestY = 0;
     let nearestDistanceSquared = Infinity;
+    const playerLocation = this.currentLocation;
 
     for (let i = 0; i < enemies.length; i++) {
       const enemy = enemies[i];
-      if (!enemy?.isActive) continue;
+      const enemyLocation = enemy?.currentLocation;
+      if (!enemy?.isActive || !enemyLocation) continue;
 
-      const dx = (enemy.x - this.x) / gridWidth;
-      const dy = (enemy.y - this.y) / gridHeight;
+      const dx = enemyLocation.x - playerLocation.x;
+      const dy = enemyLocation.y - playerLocation.y;
       const distanceSquared = dx * dx + dy * dy;
 
       if (distanceSquared < nearestDistanceSquared) {
@@ -222,9 +267,37 @@ class Player extends Entity {
       }
     }
 
-    if (!Number.isFinite(nearestDistanceSquared) || nearestDistanceSquared === 0) return [0, 0];
-    const distance = Math.sqrt(nearestDistanceSquared);
-    return [nearestX / distance, nearestY / distance];
+    if (!Number.isFinite(nearestDistanceSquared)) return [-1, -1];
+    return this.normalizeRelativeVector(nearestX, nearestY);
+  }
+
+  getNearestPickupVector(type) {
+    let nearestX = 0;
+    let nearestY = 0;
+    let nearestDistanceSquared = Infinity;
+    const playerLocation = this.currentLocation;
+
+    for (const pickup of pickupRegistry.values()) {
+      const pickupLocation = pickup?.currentLocation;
+      if (
+        pickup?.type !== type ||
+        !pickupLocation ||
+        pickup.idList.includes(this.uuid)
+      ) continue;
+
+      const dx = pickupLocation.x - playerLocation.x;
+      const dy = pickupLocation.y - playerLocation.y;
+      const distanceSquared = dx * dx + dy * dy;
+
+      if (distanceSquared < nearestDistanceSquared) {
+        nearestDistanceSquared = distanceSquared;
+        nearestX = dx;
+        nearestY = dy;
+      }
+    }
+
+    if (!Number.isFinite(nearestDistanceSquared)) return [-1, -1];
+    return this.normalizeRelativeVector(nearestX, nearestY);
   }
 
   hasAdjacentEnemy() {
@@ -243,45 +316,26 @@ class Player extends Entity {
   checkWall(direction) {
     const dx = SCAN_DX[direction];
     const dy = SCAN_DY[direction];
-    if (dx === undefined || dy === undefined) return 0;
-
     let x = this.currentLocation.x + dx;
     let y = this.currentLocation.y + dy;
-    let distance = 1;
-    while (mapGrid[y]?.[x]?.valid) {
+    let clearTiles = 0;
+
+    while (true) {
+      const row = mapGrid[y];
+      const tile = row?.[x];
+      if (!tile || tile.type === 1) break;
+      clearTiles++;
       x += dx;
       y += dy;
-      distance++;
     }
-    return 1 / distance;
-  }
 
-  checkOther(direction, type) {
-    return this._scan(direction, (location) => {
-      const occupants = mapGrid[location.y]?.[location.x]?.occupantsByType?.[type];
-      if (!occupants?.length) return false;
-      for (let i = 0; i < occupants.length; i++) {
-        if (!Pickup.inList(occupants[i].id, type, this.uuid)) return true;
-      }
-      return false;
-    });
-  }
-
-  _scan(direction, predicate) {
-    const dx = SCAN_DX[direction];
-    const dy = SCAN_DY[direction];
-    if (dx === undefined || dy === undefined) return 0;
-
-    let x = this.currentLocation.x + dx;
-    let y = this.currentLocation.y + dy;
-    let distance = 1;
-    while (mapGrid[y]?.[x]?.valid) {
-      if (predicate({ x, y })) return 1 / distance;
-      x += dx;
-      y += dy;
-      distance++;
-    }
-    return 0;
+    const boardWidth = mapGrid.reduce((width, row) => Math.max(width, row?.length ?? 0), 1);
+    const boardHeight = Math.max(1, mapGrid.length);
+    const maxClearTiles = (direction === 1 || direction === 3)
+      ? Math.max(1, boardHeight - 1)
+      : Math.max(1, boardWidth - 1);
+    const proximity = 1 - Math.min(clearTiles, maxClearTiles) / maxClearTiles;
+    return this.normalizeZeroToOne(proximity);
   }
 
   think() {
@@ -300,7 +354,7 @@ class Player extends Entity {
   }
 
   getFitnessScore() {
-    const explorationBonus = 0.25 * this.tilesVisited.length;
+    const explorationBonus = 0.5 * this.tilesVisited.length;
     const usefulPowerupBonus = 0.5 * this.powerupBonus;
     const wallPenalty = 0.5 * Math.pow(this.fitnessPenalty, 1.25);
     return (this.score + explorationBonus + usefulPowerupBonus) - wallPenalty;

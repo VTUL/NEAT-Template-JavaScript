@@ -2,6 +2,8 @@ let nextConnectionNo = 1000;
 let population;
 let trainingStepsPerFrame = 1;
 const MAX_TRAINING_STEPS_PER_FRAME = 12;
+const MAX_ENEMIES = 3;
+const MAX_TREATS = 22;
 
 const canStructuredClone = typeof structuredClone === 'function';
 const cloneGrid = () => (canStructuredClone ? structuredClone(mapGridOriginal) : JSON.parse(JSON.stringify(mapGridOriginal)));
@@ -59,25 +61,25 @@ const MAX_MOVES_WITHOUT_TREAT = 60;
 const INFO_UPDATE_INTERVAL = 250;
 
 const config = new Config({
-  inputSize: 21,
+  inputSize: 18,
   outputSize: 5,
 
   bias: 1.0,
   connectBias: true,
   biasMode: 'WEIGHTED_NODE',
-  activationFunction: 'NEATSigmoid',
+  activationFunction: 'Tanh',
   weightInitialization: { type: 'Random', params: [-0.75, 0.75] },
 
   c1: 1.0,
   c2: 1.0,
   c3: 0.4,
-  compatibilityThreshold: 0.2,
-  interspeciesMatingRate: 0.01,
+  compatibilityThreshold: 0.3,
+  interspeciesMatingRate: 0.07,
 
   mutationRate: 0.9,
   weightMutationRate: 0.85,
-  addConnectionMutationRate: 0.1,
-  addNodeMutationRate: 0.06,
+  addConnectionMutationRate: 0.3,
+  addNodeMutationRate: 0.25,
   minWeight: -5.0,
   maxWeight: 5.0,
   reinitializeWeightRate: 0.05,
@@ -95,7 +97,7 @@ const config = new Config({
   mutateOnlyProb: 0.35,
 
   allowRecurrentConnections: true,
-  recurrentConnectionRate: 0.1,
+  recurrentConnectionRate: 0.15,
 });
 
 function preload() {
@@ -231,7 +233,7 @@ function handleRespawns(now) {
     ballRespawnTime = now + 25000;
   }
 
-  if (treats.length < 20) treats.push(new Treat(treat, 20, 20));
+  if (treats.length < MAX_TREATS) treats.push(new Treat(treat, 20, 20));
 
   for (let i = treats.length - 1; i >= 0; i--) {
     if (treats[i].life < now) {
@@ -385,8 +387,8 @@ function resetGame(resetGenerationStats = false) {
   ballRespawnTime = now + 12000;
   PBRespawnTime = now + 10000;
 
-  for (let i = 0; i < 20; i++) treats.push(new Treat(treat, 20, 20));
-  for (let i = 0; i < 5; i++) enemies.push(new Enemy());
+  for (let i = 0; i < MAX_TREATS; i++) treats.push(new Treat(treat, 20, 20));
+  for (let i = 0; i < MAX_ENEMIES; i++) enemies.push(new Enemy());
 
   const genomes = population.genomes;
   const players = population.players;
